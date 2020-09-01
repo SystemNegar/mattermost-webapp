@@ -1,18 +1,18 @@
 body.farsi
 {
   @include font-smoothing;
-  font-family: 'vazir', sans-serif !important;
+  font-family: 'dana', sans-serif !important;
   .font--open_sans {
-    font-family: 'vazir', sans-serif !important;
+    font-family: 'dana', sans-serif !important;
   }
 }
 body.rtl
 {
   direction: rtl;
   @include font-smoothing;
-  font-family: 'vazir', sans-serif !important;
+  font-family: 'dana', sans-serif !important;
   .font--open_sans {
-    font-family: 'vazir', sans-serif !important;
+    font-family: 'dana', sans-serif !important;
   }
   .tootip
   {
@@ -20,7 +20,7 @@ body.rtl
     {
       span
       {
-        font-family: 'vazir', sans-serif !important;
+        font-family: 'dana', sans-serif !important;
       }
     }
   }
