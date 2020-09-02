@@ -2,13 +2,14 @@
 
 exports[`components/user_settings/display/CustomThemeChooser should match, init 1`] = `
 <div
-  className="appearance-section padding-top"
+  className="appearance-section pt-2"
 >
   <div
     className="theme-elements row"
   >
     <div
       className="theme-elements__header"
+      id="sidebarStyles"
       onClick={[Function]}
     >
       <FormattedMessage
@@ -19,13 +20,25 @@ exports[`components/user_settings/display/CustomThemeChooser should match, init 
       <div
         className="header__icon"
       >
-        <i
+        <LocalizedIcon
           className="fa fa-plus"
-          title="Expand Icon"
+          component="i"
+          title={
+            Object {
+              "defaultMessage": "Expand Icon",
+              "id": "generic_icons.expand",
+            }
+          }
         />
-        <i
+        <LocalizedIcon
           className="fa fa-minus"
-          title="Collapse Icon"
+          component="i"
+          title={
+            Object {
+              "defaultMessage": "Collapse Icon",
+              "id": "generic_icons.collapse",
+            }
+          }
         />
       </div>
     </div>
@@ -37,10 +50,16 @@ exports[`components/user_settings/display/CustomThemeChooser should match, init 
         key="custom-theme-key0"
       >
         <ColorChooser
-          color="#145dbf"
           id="sidebarBg"
-          label="Sidebar BG"
+          label={
+            <FormattedMessage
+              defaultMessage="Sidebar BG"
+              id="user.settings.custom_theme.sidebarBg"
+              values={Object {}}
+            />
+          }
           onChange={[Function]}
+          value="#145dbf"
         />
       </div>
       <div
@@ -48,10 +67,16 @@ exports[`components/user_settings/display/CustomThemeChooser should match, init 
         key="custom-theme-key1"
       >
         <ColorChooser
-          color="#ffffff"
           id="sidebarText"
-          label="Sidebar Text"
+          label={
+            <FormattedMessage
+              defaultMessage="Sidebar Text"
+              id="user.settings.custom_theme.sidebarText"
+              values={Object {}}
+            />
+          }
           onChange={[Function]}
+          value="#ffffff"
         />
       </div>
       <div
@@ -59,10 +84,16 @@ exports[`components/user_settings/display/CustomThemeChooser should match, init 
         key="custom-theme-key2"
       >
         <ColorChooser
-          color="#1153ab"
           id="sidebarHeaderBg"
-          label="Sidebar Header BG"
+          label={
+            <FormattedMessage
+              defaultMessage="Sidebar Header BG"
+              id="user.settings.custom_theme.sidebarHeaderBg"
+              values={Object {}}
+            />
+          }
           onChange={[Function]}
+          value="#1153ab"
         />
       </div>
       <div
@@ -70,10 +101,16 @@ exports[`components/user_settings/display/CustomThemeChooser should match, init 
         key="custom-theme-key3"
       >
         <ColorChooser
-          color="#ffffff"
           id="sidebarHeaderTextColor"
-          label="Sidebar Header Text"
+          label={
+            <FormattedMessage
+              defaultMessage="Sidebar Header Text"
+              id="user.settings.custom_theme.sidebarHeaderTextColor"
+              values={Object {}}
+            />
+          }
           onChange={[Function]}
+          value="#ffffff"
         />
       </div>
       <div
@@ -81,10 +118,16 @@ exports[`components/user_settings/display/CustomThemeChooser should match, init 
         key="custom-theme-key4"
       >
         <ColorChooser
-          color="#ffffff"
           id="sidebarUnreadText"
-          label="Sidebar Unread Text"
+          label={
+            <FormattedMessage
+              defaultMessage="Sidebar Unread Text"
+              id="user.settings.custom_theme.sidebarUnreadText"
+              values={Object {}}
+            />
+          }
           onChange={[Function]}
+          value="#ffffff"
         />
       </div>
       <div
@@ -92,10 +135,16 @@ exports[`components/user_settings/display/CustomThemeChooser should match, init 
         key="custom-theme-key5"
       >
         <ColorChooser
-          color="#4578bf"
           id="sidebarTextHoverBg"
-          label="Sidebar Text Hover BG"
+          label={
+            <FormattedMessage
+              defaultMessage="Sidebar Text Hover BG"
+              id="user.settings.custom_theme.sidebarTextHoverBg"
+              values={Object {}}
+            />
+          }
           onChange={[Function]}
+          value="#4578bf"
         />
       </div>
       <div
@@ -103,10 +152,16 @@ exports[`components/user_settings/display/CustomThemeChooser should match, init 
         key="custom-theme-key6"
       >
         <ColorChooser
-          color="#579eff"
           id="sidebarTextActiveBorder"
-          label="Sidebar Text Active Border"
+          label={
+            <FormattedMessage
+              defaultMessage="Sidebar Text Active Border"
+              id="user.settings.custom_theme.sidebarTextActiveBorder"
+              values={Object {}}
+            />
+          }
           onChange={[Function]}
+          value="#579eff"
         />
       </div>
       <div
@@ -114,10 +169,16 @@ exports[`components/user_settings/display/CustomThemeChooser should match, init 
         key="custom-theme-key7"
       >
         <ColorChooser
-          color="#ffffff"
           id="sidebarTextActiveColor"
-          label="Sidebar Text Active Color"
+          label={
+            <FormattedMessage
+              defaultMessage="Sidebar Text Active Color"
+              id="user.settings.custom_theme.sidebarTextActiveColor"
+              values={Object {}}
+            />
+          }
           onChange={[Function]}
+          value="#ffffff"
         />
       </div>
       <div
@@ -125,10 +186,16 @@ exports[`components/user_settings/display/CustomThemeChooser should match, init 
         key="custom-theme-key8"
       >
         <ColorChooser
-          color="#06d6a0"
           id="onlineIndicator"
-          label="Online Indicator"
+          label={
+            <FormattedMessage
+              defaultMessage="Online Indicator"
+              id="user.settings.custom_theme.onlineIndicator"
+              values={Object {}}
+            />
+          }
           onChange={[Function]}
+          value="#06d6a0"
         />
       </div>
       <div
@@ -136,10 +203,16 @@ exports[`components/user_settings/display/CustomThemeChooser should match, init 
         key="custom-theme-key9"
       >
         <ColorChooser
-          color="#ffbc42"
           id="awayIndicator"
-          label="Away Indicator"
+          label={
+            <FormattedMessage
+              defaultMessage="Away Indicator"
+              id="user.settings.custom_theme.awayIndicator"
+              values={Object {}}
+            />
+          }
           onChange={[Function]}
+          value="#ffbc42"
         />
       </div>
       <div
@@ -147,10 +220,16 @@ exports[`components/user_settings/display/CustomThemeChooser should match, init 
         key="custom-theme-key10"
       >
         <ColorChooser
-          color="#f74343"
           id="dndIndicator"
-          label="Do Not Disturb Indicator"
+          label={
+            <FormattedMessage
+              defaultMessage="Do Not Disturb Indicator"
+              id="user.settings.custom_theme.dndIndicator"
+              values={Object {}}
+            />
+          }
           onChange={[Function]}
+          value="#f74343"
         />
       </div>
       <div
@@ -158,10 +237,16 @@ exports[`components/user_settings/display/CustomThemeChooser should match, init 
         key="custom-theme-key11"
       >
         <ColorChooser
-          color="#ffffff"
           id="mentionBg"
-          label="Mention Jewel BG"
+          label={
+            <FormattedMessage
+              defaultMessage="Mention Jewel BG"
+              id="user.settings.custom_theme.mentionBg"
+              values={Object {}}
+            />
+          }
           onChange={[Function]}
+          value="#ffffff"
         />
       </div>
       <div
@@ -169,20 +254,26 @@ exports[`components/user_settings/display/CustomThemeChooser should match, init 
         key="custom-theme-key12"
       >
         <ColorChooser
-          color="#145dbf"
           id="mentionColor"
-          label="Mention Jewel Text"
+          label={
+            <FormattedMessage
+              defaultMessage="Mention Jewel Text"
+              id="user.settings.custom_theme.mentionColor"
+              values={Object {}}
+            />
+          }
           onChange={[Function]}
+          value="#145dbf"
         />
       </div>
     </div>
   </div>
   <div
     className="theme-elements row"
-    id="centerChannelStyles"
   >
     <div
       className="theme-elements__header"
+      id="centerChannelStyles"
       onClick={[Function]}
     >
       <FormattedMessage
@@ -193,28 +284,47 @@ exports[`components/user_settings/display/CustomThemeChooser should match, init 
       <div
         className="header__icon"
       >
-        <i
+        <LocalizedIcon
           className="fa fa-plus"
-          title="Expand Icon"
+          component="i"
+          title={
+            Object {
+              "defaultMessage": "Expand Icon",
+              "id": "generic_icons.expand",
+            }
+          }
         />
-        <i
+        <LocalizedIcon
           className="fa fa-minus"
-          title="Collapse Icon"
+          component="i"
+          title={
+            Object {
+              "defaultMessage": "Collapse Icon",
+              "id": "generic_icons.collapse",
+            }
+          }
         />
       </div>
     </div>
     <div
       className="theme-elements__body"
+      id="centerChannelStyles"
     >
       <div
         className="col-sm-6 form-group element"
         key="custom-theme-key13"
       >
         <ColorChooser
-          color="#ffffff"
           id="centerChannelBg"
-          label="Center Channel BG"
+          label={
+            <FormattedMessage
+              defaultMessage="Center Channel BG"
+              id="user.settings.custom_theme.centerChannelBg"
+              values={Object {}}
+            />
+          }
           onChange={[Function]}
+          value="#ffffff"
         />
       </div>
       <div
@@ -222,10 +332,16 @@ exports[`components/user_settings/display/CustomThemeChooser should match, init 
         key="custom-theme-key14"
       >
         <ColorChooser
-          color="#3d3c40"
           id="centerChannelColor"
-          label="Center Channel Text"
+          label={
+            <FormattedMessage
+              defaultMessage="Center Channel Text"
+              id="user.settings.custom_theme.centerChannelColor"
+              values={Object {}}
+            />
+          }
           onChange={[Function]}
+          value="#3d3c40"
         />
       </div>
       <div
@@ -233,10 +349,16 @@ exports[`components/user_settings/display/CustomThemeChooser should match, init 
         key="custom-theme-key15"
       >
         <ColorChooser
-          color="#ff8800"
           id="newMessageSeparator"
-          label="New Message Separator"
+          label={
+            <FormattedMessage
+              defaultMessage="New Message Separator"
+              id="user.settings.custom_theme.newMessageSeparator"
+              values={Object {}}
+            />
+          }
           onChange={[Function]}
+          value="#ff8800"
         />
       </div>
       <div
@@ -244,10 +366,16 @@ exports[`components/user_settings/display/CustomThemeChooser should match, init 
         key="custom-theme-key16"
       >
         <ColorChooser
-          color="#fd5960"
           id="errorTextColor"
-          label="Error Text Color"
+          label={
+            <FormattedMessage
+              defaultMessage="Error Text Color"
+              id="user.settings.custom_theme.errorTextColor"
+              values={Object {}}
+            />
+          }
           onChange={[Function]}
+          value="#fd5960"
         />
       </div>
       <div
@@ -255,10 +383,16 @@ exports[`components/user_settings/display/CustomThemeChooser should match, init 
         key="custom-theme-key17"
       >
         <ColorChooser
-          color="#ffe577"
           id="mentionHighlightBg"
-          label="Mention Highlight BG"
+          label={
+            <FormattedMessage
+              defaultMessage="Mention Highlight BG"
+              id="user.settings.custom_theme.mentionHighlightBg"
+              values={Object {}}
+            />
+          }
           onChange={[Function]}
+          value="#ffe577"
         />
       </div>
       <div
@@ -266,10 +400,16 @@ exports[`components/user_settings/display/CustomThemeChooser should match, init 
         key="custom-theme-key19"
       >
         <ColorChooser
-          color="#166de0"
           id="mentionHighlightLink"
-          label="Mention Highlight Link"
+          label={
+            <FormattedMessage
+              defaultMessage="Mention Highlight Link"
+              id="user.settings.custom_theme.mentionHighlightLink"
+              values={Object {}}
+            />
+          }
           onChange={[Function]}
+          value="#166de0"
         />
       </div>
       <div
@@ -279,7 +419,11 @@ exports[`components/user_settings/display/CustomThemeChooser should match, init 
         <label
           className="custom-label"
         >
-          Code Theme
+          <FormattedMessage
+            defaultMessage="Code Theme"
+            id="user.settings.custom_theme.codeTheme"
+            values={Object {}}
+          />
         </label>
         <div
           className="input-group theme-group group--code dropdown"
@@ -320,11 +464,11 @@ exports[`components/user_settings/display/CustomThemeChooser should match, init 
             defaultOverlayShown={false}
             overlay={
               <Popover
-                bsClass="popover"
-                bsStyle="info"
                 className="code-popover"
                 id="code-popover"
                 placement="right"
+                popoverSize="sm"
+                popoverStyle="info"
               >
                 <img
                   alt="code theme image"
@@ -355,10 +499,11 @@ exports[`components/user_settings/display/CustomThemeChooser should match, init 
     </div>
   </div>
   <div
-    className="theme-elements row form-group"
+    className="theme-elements row"
   >
     <div
       className="theme-elements__header"
+      id="linkAndButtonsStyles"
       onClick={[Function]}
     >
       <FormattedMessage
@@ -369,13 +514,25 @@ exports[`components/user_settings/display/CustomThemeChooser should match, init 
       <div
         className="header__icon"
       >
-        <i
+        <LocalizedIcon
           className="fa fa-plus"
-          title="Expand Icon"
+          component="i"
+          title={
+            Object {
+              "defaultMessage": "Expand Icon",
+              "id": "generic_icons.expand",
+            }
+          }
         />
-        <i
+        <LocalizedIcon
           className="fa fa-minus"
-          title="Collapse Icon"
+          component="i"
+          title={
+            Object {
+              "defaultMessage": "Collapse Icon",
+              "id": "generic_icons.collapse",
+            }
+          }
         />
       </div>
     </div>
@@ -387,10 +544,16 @@ exports[`components/user_settings/display/CustomThemeChooser should match, init 
         key="custom-theme-key18"
       >
         <ColorChooser
-          color="#2389d7"
           id="linkColor"
-          label="Link Color"
+          label={
+            <FormattedMessage
+              defaultMessage="Link Color"
+              id="user.settings.custom_theme.linkColor"
+              values={Object {}}
+            />
+          }
           onChange={[Function]}
+          value="#2389d7"
         />
       </div>
       <div
@@ -398,10 +561,16 @@ exports[`components/user_settings/display/CustomThemeChooser should match, init 
         key="custom-theme-key20"
       >
         <ColorChooser
-          color="#166de0"
           id="buttonBg"
-          label="Button BG"
+          label={
+            <FormattedMessage
+              defaultMessage="Button BG"
+              id="user.settings.custom_theme.buttonBg"
+              values={Object {}}
+            />
+          }
           onChange={[Function]}
+          value="#166de0"
         />
       </div>
       <div
@@ -409,16 +578,22 @@ exports[`components/user_settings/display/CustomThemeChooser should match, init 
         key="custom-theme-key21"
       >
         <ColorChooser
-          color="#ffffff"
           id="buttonColor"
-          label="Button Text"
+          label={
+            <FormattedMessage
+              defaultMessage="Button Text"
+              id="user.settings.custom_theme.buttonColor"
+              values={Object {}}
+            />
+          }
           onChange={[Function]}
+          value="#ffffff"
         />
       </div>
     </div>
   </div>
   <div
-    className="row"
+    className="row mt-3"
   >
     <div
       className="col-sm-12"
@@ -427,7 +602,7 @@ exports[`components/user_settings/display/CustomThemeChooser should match, init 
         className="custom-label"
       >
         <FormattedMessage
-          defaultMessage="Copy and paste to share theme colors:"
+          defaultMessage="Copy to share or paste theme colors here:"
           id="user.settings.custom_theme.copyPaste"
           values={Object {}}
         />
@@ -437,9 +612,39 @@ exports[`components/user_settings/display/CustomThemeChooser should match, init 
         id="pasteBox"
         onChange={[Function]}
         onClick={[Function]}
+        onCopy={[Function]}
         onPaste={[Function]}
-        value="{\\"sidebarBg\\":\\"#145dbf\\",\\"sidebarText\\":\\"#ffffff\\",\\"sidebarUnreadText\\":\\"#ffffff\\",\\"sidebarTextHoverBg\\":\\"#4578bf\\",\\"sidebarTextActiveBorder\\":\\"#579eff\\",\\"sidebarTextActiveColor\\":\\"#ffffff\\",\\"sidebarHeaderBg\\":\\"#1153ab\\",\\"sidebarHeaderTextColor\\":\\"#ffffff\\",\\"onlineIndicator\\":\\"#06d6a0\\",\\"awayIndicator\\":\\"#ffbc42\\",\\"dndIndicator\\":\\"#f74343\\",\\"mentionBj\\":\\"#ffffff\\",\\"mentionColor\\":\\"#145dbf\\",\\"centerChannelBg\\":\\"#ffffff\\",\\"centerChannelColor\\":\\"#3d3c40\\",\\"newMessageSeparator\\":\\"#ff8800\\",\\"linkColor\\":\\"#2389d7\\",\\"buttonBg\\":\\"#166de0\\",\\"buttonColor\\":\\"#ffffff\\",\\"errorTextColor\\":\\"#fd5960\\",\\"mentionHighlightBg\\":\\"#ffe577\\",\\"mentionHighlightLink\\":\\"#166de0\\",\\"codeTheme\\":\\"github\\"}"
+        value="{\\"sidebarBg\\":\\"#145dbf\\",\\"sidebarText\\":\\"#ffffff\\",\\"sidebarUnreadText\\":\\"#ffffff\\",\\"sidebarTextHoverBg\\":\\"#4578bf\\",\\"sidebarTextActiveBorder\\":\\"#579eff\\",\\"sidebarTextActiveColor\\":\\"#ffffff\\",\\"sidebarHeaderBg\\":\\"#1153ab\\",\\"sidebarHeaderTextColor\\":\\"#ffffff\\",\\"onlineIndicator\\":\\"#06d6a0\\",\\"awayIndicator\\":\\"#ffbc42\\",\\"dndIndicator\\":\\"#f74343\\",\\"mentionBg\\":\\"#ffffff\\",\\"mentionBj\\":\\"#ffffff\\",\\"mentionColor\\":\\"#145dbf\\",\\"centerChannelBg\\":\\"#ffffff\\",\\"centerChannelColor\\":\\"#3d3c40\\",\\"newMessageSeparator\\":\\"#ff8800\\",\\"linkColor\\":\\"#2389d7\\",\\"buttonBg\\":\\"#166de0\\",\\"buttonColor\\":\\"#ffffff\\",\\"errorTextColor\\":\\"#fd5960\\",\\"mentionHighlightBg\\":\\"#ffe577\\",\\"mentionHighlightLink\\":\\"#166de0\\",\\"codeTheme\\":\\"github\\"}"
       />
+      <div
+        className="mt-3"
+      >
+        <button
+          className="btn btn-link copy-theme-button"
+          onClick={[Function]}
+        >
+          <FormattedMessage
+            defaultMessage="Copy Theme Colors"
+            id="user.settings.custom_theme.copyThemeColors"
+            values={Object {}}
+          />
+        </button>
+        <span
+          className="alert alert-success copy-theme-success"
+          role="alert"
+          style={
+            Object {
+              "display": "none",
+            }
+          }
+        >
+          <FormattedMessage
+            defaultMessage="✔ Copied"
+            id="user.settings.custom_theme.copied"
+            values={Object {}}
+          />
+        </span>
+      </div>
     </div>
   </div>
 </div>

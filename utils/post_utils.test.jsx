@@ -3,8 +3,14 @@
 
 import assert from 'assert';
 
+import {createIntl} from 'react-intl';
+import {Posts} from 'mattermost-redux/constants';
+
 import * as PostUtils from 'utils/post_utils.jsx';
-import {PostListRowListIds} from 'utils/constants.jsx';
+import {PostListRowListIds} from 'utils/constants';
+import EmojiMap from 'utils/emoji_map';
+
+const enMessages = require('../i18n/en');
 
 describe('PostUtils.containsAtChannel', () => {
     test('should return correct @all (same for @channel)', () => {
@@ -165,8 +171,43 @@ describe('PostUtils.containsAtChannel', () => {
                 text: '@cha![](https://myimage)nnel',
                 result: false,
             },
+            {
+                text: '@here![](https://myimage)nnel',
+                result: true,
+                options: {
+                    checkAllMentions: true,
+                },
+            },
+            {
+                text: '@heree',
+                result: false,
+                options: {
+                    checkAllMentions: true,
+                },
+            },
+            {
+                text: '=@here=',
+                result: true,
+                options: {
+                    checkAllMentions: true,
+                },
+            },
+            {
+                text: '@HERE',
+                result: true,
+                options: {
+                    checkAllMentions: true,
+                },
+            },
+            {
+                text: '@here',
+                result: false,
+                options: {
+                    checkAllMentions: false,
+                },
+            },
         ]) {
-            const containsAtChannel = PostUtils.containsAtChannel(data.text);
+            const containsAtChannel = PostUtils.containsAtChannel(data.text, data.options);
 
             assert.equal(containsAtChannel, data.result, data.text);
         }
@@ -272,7 +313,10 @@ describe('PostUtils.postMessageOnKeyPress', () => {
                 testCase.input.event,
                 testCase.input.message,
                 testCase.input.sendMessageOnCtrlEnter,
-                testCase.input.sendCodeBlockOnCtrlEnter
+                testCase.input.sendCodeBlockOnCtrlEnter,
+                0,
+                0,
+                testCase.input.message.length,
             );
 
             expect(output).toEqual(testCase.expected);
@@ -300,7 +344,10 @@ describe('PostUtils.postMessageOnKeyPress', () => {
                 testCase.input.event,
                 testCase.input.message,
                 testCase.input.sendMessageOnCtrlEnter,
-                testCase.input.sendCodeBlockOnCtrlEnter
+                testCase.input.sendCodeBlockOnCtrlEnter,
+                0,
+                0,
+                testCase.input.message.length,
             );
 
             expect(output).toEqual(testCase.expected);
@@ -380,7 +427,10 @@ describe('PostUtils.postMessageOnKeyPress', () => {
                 testCase.input.event,
                 testCase.input.message,
                 testCase.input.sendMessageOnCtrlEnter,
-                testCase.input.sendCodeBlockOnCtrlEnter
+                testCase.input.sendCodeBlockOnCtrlEnter,
+                0,
+                0,
+                testCase.input.message.length,
             );
 
             expect(output).toEqual(testCase.expected);
@@ -464,6 +514,14 @@ describe('PostUtils.postMessageOnKeyPress', () => {
         name: 'sendCodeBlockOnCtrlEnter: Test for overriding sending of code block on CTRL+ENTER, with ctrlKey, with inline opening backticks',
         input: {event: {keyCode: 13, ctrlKey: true}, message: '``` message', sendMessageOnCtrlEnter: true, sendCodeBlockOnCtrlEnter: false},
         expected: {allowSending: true},
+    }, {
+        name: 'sendCodeBlockOnCtrlEnter: Test for overriding sending of code block on CTRL+ENTER, no ctrlKey|metaKey, with cursor between backticks',
+        input: {event: {keyCode: 13, ctrlKey: false}, message: '``` message ```', sendMessageOnCtrlEnter: true, sendCodeBlockOnCtrlEnter: true, cursorPosition: 5},
+        expected: {allowSending: false},
+    }, {
+        name: 'sendCodeBlockOnCtrlEnter: Test for overriding sending of code block on CTRL+ENTER, with ctrlKey, with cursor between backticks',
+        input: {event: {keyCode: 13, ctrlKey: true}, message: '``` message ```', sendMessageOnCtrlEnter: true, sendCodeBlockOnCtrlEnter: true, cursorPosition: 5},
+        expected: {allowSending: true},
     }];
 
     for (const testCase of sendCodeBlockOnCtrlEnterCases) {
@@ -472,7 +530,10 @@ describe('PostUtils.postMessageOnKeyPress', () => {
                 testCase.input.event,
                 testCase.input.message,
                 testCase.input.sendMessageOnCtrlEnter,
-                testCase.input.sendCodeBlockOnCtrlEnter
+                testCase.input.sendCodeBlockOnCtrlEnter,
+                0,
+                0,
+                testCase.input.cursorPosition ? testCase.input.cursorPosition : testCase.input.message.length,
             );
 
             expect(output).toEqual(testCase.expected);
@@ -518,7 +579,8 @@ describe('PostUtils.postMessageOnKeyPress', () => {
                 testCase.input.sendMessageOnCtrlEnter,
                 testCase.input.sendCodeBlockOnCtrlEnter,
                 testCase.input.now,
-                testCase.input.lastChannelSwitch
+                testCase.input.lastChannelSwitch,
+                testCase.input.message.length,
             );
 
             expect(output).toEqual(testCase.expected);
@@ -527,13 +589,13 @@ describe('PostUtils.postMessageOnKeyPress', () => {
 });
 
 describe('PostUtils.getOldestPostId', () => {
-    test('Should not return MANUAL_TRIGGER_LOAD_MESSAGES', () => {
-        const postId = PostUtils.getOldestPostId(['postId1', 'postId2', PostListRowListIds.MANUAL_TRIGGER_LOAD_MESSAGES]);
+    test('Should not return LOAD_OLDER_MESSAGES_TRIGGER', () => {
+        const postId = PostUtils.getOldestPostId(['postId1', 'postId2', PostListRowListIds.LOAD_OLDER_MESSAGES_TRIGGER]);
         assert.equal(postId, 'postId2');
     });
 
-    test('Should not return MORE_MESSAGES_LOADER', () => {
-        const postId = PostUtils.getOldestPostId(['postId1', 'postId2', PostListRowListIds.MORE_MESSAGES_LOADER]);
+    test('Should not return OLDER_MESSAGES_LOADER', () => {
+        const postId = PostUtils.getOldestPostId(['postId1', 'postId2', PostListRowListIds.OLDER_MESSAGES_LOADER]);
         assert.equal(postId, 'postId2');
     });
 
@@ -571,13 +633,13 @@ describe('PostUtils.getPreviousPostId', () => {
 });
 
 describe('PostUtils.getLatestPostId', () => {
-    test('Should not return MANUAL_TRIGGER_LOAD_MESSAGES', () => {
-        const postId = PostUtils.getLatestPostId([PostListRowListIds.MANUAL_TRIGGER_LOAD_MESSAGES, 'postId1', 'postId2']);
+    test('Should not return LOAD_OLDER_MESSAGES_TRIGGER', () => {
+        const postId = PostUtils.getLatestPostId([PostListRowListIds.LOAD_OLDER_MESSAGES_TRIGGER, 'postId1', 'postId2']);
         assert.equal(postId, 'postId1');
     });
 
-    test('Should not return MORE_MESSAGES_LOADER', () => {
-        const postId = PostUtils.getLatestPostId([PostListRowListIds.MORE_MESSAGES_LOADER, 'postId1', 'postId2']);
+    test('Should not return OLDER_MESSAGES_LOADER', () => {
+        const postId = PostUtils.getLatestPostId([PostListRowListIds.OLDER_MESSAGES_LOADER, 'postId1', 'postId2']);
         assert.equal(postId, 'postId1');
     });
 
@@ -599,5 +661,170 @@ describe('PostUtils.getLatestPostId', () => {
     test('Should return first postId from combined system messages', () => {
         const postId = PostUtils.getLatestPostId(['user-activity-post1_post2_post3', 'postId1', 'postId2']);
         assert.equal(postId, 'post1');
+    });
+});
+
+describe('PostUtils.createAriaLabelForPost', () => {
+    const emojiMap = new EmojiMap(new Map());
+    test('Should show username, timestamp, message, attachments, reactions, flagged and pinned', () => {
+        const intl = createIntl({locale: 'en', messages: enMessages, defaultLocale: 'en'}, {});
+
+        const testPost = {
+            message: 'test_message',
+            root_id: null,
+            create_at: (new Date().getTime() / 1000) || 0,
+            props: {
+                attachments: [
+                    {i: 'am attachment 1'},
+                    {and: 'i am attachment 2'},
+                ],
+            },
+            file_ids: ['test_file_id_1'],
+        };
+        const author = 'test_author';
+        const reactions = {
+            reaction1: 'reaction 1',
+            reaction2: 'reaction 2',
+        };
+        const isFlagged = true;
+
+        const ariaLabel = PostUtils.createAriaLabelForPost(testPost, author, isFlagged, reactions, intl, emojiMap);
+        assert.ok(ariaLabel.indexOf(author));
+        assert.ok(ariaLabel.indexOf(testPost.message));
+        assert.ok(ariaLabel.indexOf('3 attachments'));
+        assert.ok(ariaLabel.indexOf('2 reactions'));
+        assert.ok(ariaLabel.indexOf('message is saved and pinned'));
+    });
+    test('Should show that message is a reply', () => {
+        const intl = createIntl({locale: 'en', messages: enMessages, defaultLocale: 'en'}, {});
+
+        const testPost = {
+            message: 'test_message',
+            root_id: 'test_id',
+            create_at: (new Date().getTime() / 1000) || 0,
+        };
+        const author = 'test_author';
+        const reactions = {};
+        const isFlagged = true;
+
+        const ariaLabel = PostUtils.createAriaLabelForPost(testPost, author, isFlagged, reactions, intl, emojiMap);
+        assert.ok(ariaLabel.indexOf('reply'));
+    });
+    test('Should translate emoji into {emoji-name} emoji', () => {
+        const intl = createIntl({locale: 'en', messages: enMessages, defaultLocale: 'en'}, {});
+
+        const testPost = {
+            message: 'emoji_test :smile: :+1: :non-potable_water: :space emoji: :not_an_emoji:',
+            create_at: (new Date().getTime() / 1000) || 0,
+        };
+        const author = 'test_author';
+        const reactions = {};
+        const isFlagged = true;
+
+        const ariaLabel = PostUtils.createAriaLabelForPost(testPost, author, isFlagged, reactions, intl, emojiMap);
+        assert.ok(ariaLabel.indexOf('smile emoji'));
+        assert.ok(ariaLabel.indexOf('+1 emoji'));
+        assert.ok(ariaLabel.indexOf('non-potable water emoji'));
+        assert.ok(ariaLabel.indexOf(':space emoji:'));
+        assert.ok(ariaLabel.indexOf(':not_an_emoji:'));
+    });
+});
+
+describe('PostUtils.splitMessageBasedOnCaretPosition', () => {
+    const state = {
+        caretPosition: 2,
+    };
+
+    const message = 'Test Message';
+    it('should return an object with two strings when given context and message', () => {
+        const stringPieces = PostUtils.splitMessageBasedOnCaretPosition(state.caretPosition, message);
+        assert.equal('Te', stringPieces.firstPiece);
+        assert.equal('st Message', stringPieces.lastPiece);
+    });
+});
+
+describe('makeGetReplyCount', () => {
+    test('should return the number of comments when called on a root post', () => {
+        const getReplyCount = PostUtils.makeGetReplyCount();
+
+        const state = {
+            entities: {
+                posts: {
+                    posts: {
+                        post1: {id: 'post1'},
+                        post2: {id: 'post2', root_id: 'post1'},
+                        post3: {id: 'post3', root_id: 'post1'},
+                    },
+                    postsInThread: {
+                        post1: ['post2', 'post3'],
+                    },
+                },
+            },
+        };
+        const post = state.entities.posts.posts.post1;
+
+        expect(getReplyCount(state, post)).toBe(2);
+    });
+
+    test('should return the number of comments when called on a comment', () => {
+        const getReplyCount = PostUtils.makeGetReplyCount();
+
+        const state = {
+            entities: {
+                posts: {
+                    posts: {
+                        post1: {id: 'post1'},
+                        post2: {id: 'post2', root_id: 'post1'},
+                        post3: {id: 'post3', root_id: 'post1'},
+                    },
+                    postsInThread: {
+                        post1: ['post2', 'post3'],
+                    },
+                },
+            },
+        };
+        const post = state.entities.posts.posts.post3;
+
+        expect(getReplyCount(state, post)).toBe(2);
+    });
+
+    test('should return 0 when called on a post without comments', () => {
+        const getReplyCount = PostUtils.makeGetReplyCount();
+
+        const state = {
+            entities: {
+                posts: {
+                    posts: {
+                        post1: {id: 'post1'},
+                    },
+                    postsInThread: {},
+                },
+            },
+        };
+        const post = state.entities.posts.posts.post1;
+
+        expect(getReplyCount(state, post)).toBe(0);
+    });
+
+    test('should not count ephemeral comments', () => {
+        const getReplyCount = PostUtils.makeGetReplyCount();
+
+        const state = {
+            entities: {
+                posts: {
+                    posts: {
+                        post1: {id: 'post1'},
+                        post2: {id: 'post2', root_id: 'post1', type: Posts.POST_TYPES.EPHEMERAL},
+                        post3: {id: 'post3', root_id: 'post1'},
+                    },
+                    postsInThread: {
+                        post1: ['post2', 'post3'],
+                    },
+                },
+            },
+        };
+        const post = state.entities.posts.posts.post1;
+
+        expect(getReplyCount(state, post)).toBe(1);
     });
 });

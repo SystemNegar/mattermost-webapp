@@ -15,6 +15,11 @@
         flex-direction: column;
         height: 100vh;
 
+        // Fix for Safari on iOS MM-24361
+        @supports (-webkit-touch-callout: none) {
+            height: -webkit-fill-available;
+        }
+
         .announcement-bar--fixed & {
             height: calc(100vh - 32px);
         }
@@ -69,7 +74,11 @@
     }
 
     .filtered-user-list {
-        height: calc(100vh - 120px);
+        height: calc(100vh - 175px);
+
+        .announcement-bar--fixed & {
+            height: calc(100vh - 205px);
+        }
     }
 
     .Select-value-label {
@@ -108,12 +117,6 @@
 
         .placeholder-text {
             color: $gray;
-        }
-    }
-
-    .table {
-        &.table-margin--none {
-            margin-bottom: 0;
         }
     }
 
@@ -265,8 +268,14 @@
             margin-bottom: 0.5em;
         }
 
+        .banner__icon {
+            padding: 5px 10px 5px 5px;
+        }
+
         &.warning {
-            background: #e60000;
+            background: #fcf8e3;
+            border-color: #faebcc;
+            color: #8a6d3b;
         }
     }
 
@@ -448,10 +457,15 @@
             overflow: hidden;
 
             .control-label {
-                padding: 0;
+                padding: 5px 0 0 0;
                 @include text-clamp(2, 20);
             }
+
+            div:nth-child(2) > .control-label {
+                padding: 0;
+            }
         }
+
         .reset-defaults-btn {
             position: absolute;
             right: 0;
@@ -479,6 +493,21 @@
     .suggestion--selected {
         background-color: #e2e2e2;
     }
+
+    .trial {
+        margin-top: 15px;
+    }
+    .trial-error {
+        color: $dark-gray;
+        font-weight: 400;
+        margin-top: 10px;
+    }
+    .trial-legal-terms {
+        margin-top: 10px;
+        margin-bottom: 0;
+        color: $dark-gray;
+        font-weight: 400;
+    }
 }
 
 .job-table__cancel-button {
@@ -502,22 +531,13 @@
     width: 100%;
 }
 
-.job-table__panel {
-}
-
-
-.brand-img {
-    margin-bottom: 1.5em;
-    max-width: 150px;
-}
-
 .admin-console__disabled-text {
     color: #777;
     margin: 10px 0 0 15px;
 }
 
 .admin-sidebar {
-    background: #333;
+    background: #111;
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -527,6 +547,45 @@
     width: 220px;
     z-index: 10;
 
+    .filter-container{
+        position: relative;
+        .search__icon {
+            stroke: #999;
+            width: 16px;
+            height: 16px;
+            position: absolute;
+            top: 16px;
+            left: 21px
+        }
+        .filter {
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid #666;
+            border-radius: 20px;
+            color: $white;
+            padding: 5px 36px;
+            margin: 8px;
+            width: 204px;
+            font-size: 14px;
+            outline: none;
+            &:focus, &.active {
+                margin: 7px;
+                border: 2px solid $primary-color;
+            }
+        }
+        .input-clear {
+            color: $white;
+            font-weight: bold;
+            position: absolute;
+            right: 16px
+        }
+    }
+
+    .Menu {
+        .dropdown-menu {
+            overflow: auto;
+        }
+    }
+
     mark {
         border-radius: 5%;
         background-color: $highlight-color;
@@ -534,6 +593,7 @@
 
     body.announcement-bar--fixed & {
         top: $announcement-bar-height;
+        padding-bottom: $announcement-bar-height;
     }
 
     .dropdown-menu {
@@ -549,48 +609,14 @@
 
     .nav-pills__container {
         @include font-smoothing(initial);
-        background: #111;
         height: calc(100% - 68px);
         margin-top: 1px;
         padding-bottom: 20px;
         position: relative;
 
-        .filter-container{
-            position: relative;
-            .search__icon {
-                stroke: #999;
-                width: 16px;
-                height: 16px;
-                position: absolute;
-                top: 16px;
-                left: 21px
-            }
-            .filter {
-                background: rgba(255, 255, 255, .05);
-                border: 1px solid #666;
-                border-radius: 20px;
-                color: $white;
-                padding: 5px 36px;
-                margin: 8px;
-                width: 204px;
-                font-size: 14px;
-                outline: none;
-                &:focus, &.active {
-                    margin: 7px;
-                    border: 2px solid $primary-color;
-                }
-            }
-            .sidebar__search-clear {
-                color: $white;
-                font-weight: bold;
-                position: absolute;
-                top: 10px;
-                right: 12px
-            }
-        }
-
         ul {
             margin-top: 1px;
+            padding-bottom: 20px;
         }
 
     }
@@ -827,12 +853,6 @@
         }
     }
 
-    .manage-teams__profile-picture {
-        border-radius: 20px;
-        height: 40px;
-        width: 40px;
-    }
-
     .manage-teams__info {
         flex: 1;
         margin-left: 10px;
@@ -922,26 +942,6 @@
     }
 }
 
-.admin-setting-user__image {
-    @include border-radius(20px);
-    display: block;
-    font-size: 15px;
-    height: 16px;
-    line-height: 16px;
-    margin-right: 7px;
-    margin-top: 3px;
-    text-align: center;
-    width: 16px;
-
-    .admin-setting-user--align {
-        display: inline-block;
-        max-width: 80%;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-}
-
 .admin-setting-user__fullname {
     @include opacity(.5);
 }
@@ -960,4 +960,25 @@
     .tooltip-inner {
         max-width: none;
     }
+}
+
+.admin-console .admin-console__content.admin-logs-content {
+    max-width: none;
+
+    // We keep the banner the same width and only expand the content box.
+    .banner {
+        max-width: 920px;
+    }
+}
+
+div[disabled] {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.enterprise-license-text {
+    padding: 10px;
+    text-align: justify;
+    border: 1px solid $light-gray;
+    background: white;
 }

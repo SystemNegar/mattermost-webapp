@@ -5,15 +5,17 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Modal} from 'react-bootstrap';
 import {FormattedMessage} from 'react-intl';
+import {matchPath} from 'react-router-dom';
 
+import * as UserAgent from 'utils/user_agent';
 import {browserHistory} from 'utils/browser_history';
-import * as UserAgent from 'utils/user_agent.jsx';
+
+const urlFormatForDMGMPermalink = '/:teamName/messages/:username/:postid';
+const urlFormatForChannelPermalink = '/:teamName/channels/:channelname/:postid';
 
 export default class DeletePostModal extends React.PureComponent {
     static propTypes = {
-
         channelName: PropTypes.string,
-        focusedPostId: PropTypes.string,
         teamName: PropTypes.string,
         post: PropTypes.object.isRequired,
         commentCount: PropTypes.number.isRequired,
@@ -34,16 +36,30 @@ export default class DeletePostModal extends React.PureComponent {
     handleDelete = async () => {
         const {
             actions,
-            channelName,
-            focusedPostId,
             post,
-            teamName,
         } = this.props;
+
+        let permalinkPostId = '';
 
         const result = await actions.deleteAndRemovePost(post);
 
-        if (post.id === focusedPostId && channelName) {
-            browserHistory.push('/' + teamName + '/channels/' + channelName);
+        const matchUrlForDMGM = matchPath(this.props.location.pathname, {
+            path: urlFormatForDMGMPermalink,
+        });
+
+        const matchUrlForChannel = matchPath(this.props.location.pathname, {
+            path: urlFormatForChannelPermalink,
+        });
+
+        if (matchUrlForDMGM) {
+            permalinkPostId = matchUrlForDMGM.params.postid;
+        } else if (matchUrlForChannel) {
+            permalinkPostId = matchUrlForChannel.params.postid;
+        }
+
+        if (permalinkPostId === post.id) {
+            const channelUrl = this.props.location.pathname.split('/').slice(0, -1).join('/');
+            browserHistory.replace(channelUrl);
         }
 
         if (result.data) {
@@ -101,6 +117,7 @@ export default class DeletePostModal extends React.PureComponent {
 
         return (
             <Modal
+                dialogClassName='a11y__modal'
                 show={this.state.show}
                 onEntered={this.handleEntered}
                 onHide={this.onHide}

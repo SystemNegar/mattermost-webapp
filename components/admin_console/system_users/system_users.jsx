@@ -5,21 +5,27 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {FormattedMessage} from 'react-intl';
 import {debounce} from 'mattermost-redux/actions/helpers';
+import {Permissions} from 'mattermost-redux/constants';
 
 import {getStandardAnalytics} from 'actions/admin_actions.jsx';
-import {Constants, UserSearchOptions, SearchUserTeamFilter, SearchUserOptionsFilter} from 'utils/constants.jsx';
+import {Constants, UserSearchOptions, SearchUserTeamFilter, UserFilters} from 'utils/constants';
 import * as Utils from 'utils/utils.jsx';
 import {t} from 'utils/i18n.jsx';
+import {getUserOptionsFromFilter, searchUserOptionsFromFilter} from 'utils/filter_users';
 
 import LocalizedInput from 'components/localized_input/localized_input';
-import FormattedAdminHeader from 'components/widgets/admin_console/formatted_admin_header.jsx';
+import FormattedAdminHeader from 'components/widgets/admin_console/formatted_admin_header';
+import FormattedMarkdownMessage from 'components/formatted_markdown_message.jsx';
+import SystemPermissionGate from 'components/permissions_gates/system_permission_gate';
+import ConfirmModal from 'components/confirm_modal';
+import {emitUserLoggedOutEvent} from 'actions/global_actions.jsx';
 
 import SystemUsersList from './list';
 
 const USER_ID_LENGTH = 26;
 const USERS_PER_PAGE = 50;
 
-export default class SystemUsers extends React.Component {
+export default class SystemUsers extends React.PureComponent {
     static propTypes = {
 
         /*
@@ -51,6 +57,7 @@ export default class SystemUsers extends React.Component {
         teamId: PropTypes.string.isRequired,
         filter: PropTypes.string.isRequired,
         users: PropTypes.object.isRequired,
+        isDisabled: PropTypes.bool,
 
         actions: PropTypes.shape({
 
@@ -78,6 +85,16 @@ export default class SystemUsers extends React.Component {
             getProfiles: PropTypes.func.isRequired,
             setSystemUsersSearch: PropTypes.func.isRequired,
             searchProfiles: PropTypes.func.isRequired,
+
+            /*
+             * Function to revoke all sessions in the system
+             */
+            revokeSessionsForAllUsers: PropTypes.func.isRequired,
+
+            /*
+            *  Function to log errors
+            */
+            logError: PropTypes.func.isRequired,
         }).isRequired,
     }
 
@@ -87,6 +104,7 @@ export default class SystemUsers extends React.Component {
         this.state = {
             loading: true,
             searching: false,
+            showRevokeAllSessionsModal: false,
         };
     }
 
@@ -108,11 +126,11 @@ export default class SystemUsers extends React.Component {
         } = this.props.actions;
 
         if (this.props.searchTerm) {
-            this.search(this.props.searchTerm, teamId, filter);
+            this.doSearch(this.props.searchTerm, teamId, filter);
             return;
         }
 
-        const options = this.getFilterOptions(filter);
+        const options = getUserOptionsFromFilter(filter);
 
         if (teamId === SearchUserTeamFilter.ALL_USERS) {
             await Promise.all([
@@ -120,10 +138,10 @@ export default class SystemUsers extends React.Component {
                 getStandardAnalytics(),
             ]);
         } else if (teamId === SearchUserTeamFilter.NO_TEAM) {
-            await loadProfilesWithoutTeam(0, Constants.PROFILE_CHUNK_SIZE);
+            await loadProfilesWithoutTeam(0, Constants.PROFILE_CHUNK_SIZE, options);
         } else {
             await Promise.all([
-                loadProfilesAndTeamMembers(0, Constants.PROFILE_CHUNK_SIZE, teamId),
+                loadProfilesAndTeamMembers(0, Constants.PROFILE_CHUNK_SIZE, teamId, options),
                 getTeamStats(teamId),
             ]);
         }
@@ -146,8 +164,24 @@ export default class SystemUsers extends React.Component {
     handleTermChange = (term) => {
         this.props.actions.setSystemUsersSearch(term, this.props.teamId, this.props.filter);
     }
+    handleRevokeAllSessions = async () => {
+        const {data} = await this.props.actions.revokeSessionsForAllUsers();
+        if (data) {
+            emitUserLoggedOutEvent();
+        } else {
+            this.props.actions.logError({type: 'critical', message: 'Can\'t revoke all sessions'});
+        }
+    }
+    handleRevokeAllSessionsCancel = () => {
+        this.setState({showRevokeAllSessionsModal: false});
+    }
+    handleShowRevokeAllSessionsModal = () => {
+        this.setState({showRevokeAllSessionsModal: true});
+    }
 
     nextPage = async (page) => {
+        const {teamId, filter} = this.props;
+
         // Paging isn't supported while searching
         const {
             getProfiles,
@@ -155,25 +189,32 @@ export default class SystemUsers extends React.Component {
             loadProfilesAndTeamMembers,
         } = this.props.actions;
 
-        if (this.props.teamId === SearchUserTeamFilter.ALL_USERS) {
-            await getProfiles(page + 1, USERS_PER_PAGE, {});
-        } else if (this.props.teamId === SearchUserTeamFilter.NO_TEAM) {
-            await loadProfilesWithoutTeam(page + 1, USERS_PER_PAGE);
+        const options = getUserOptionsFromFilter(filter);
+
+        if (teamId === SearchUserTeamFilter.ALL_USERS) {
+            await getProfiles(page + 1, USERS_PER_PAGE, options);
+        } else if (teamId === SearchUserTeamFilter.NO_TEAM) {
+            await loadProfilesWithoutTeam(page + 1, USERS_PER_PAGE, options);
         } else {
-            await loadProfilesAndTeamMembers(page + 1, USERS_PER_PAGE, this.props.teamId);
+            await loadProfilesAndTeamMembers(page + 1, USERS_PER_PAGE, teamId, options);
         }
         this.setState({loading: false});
     }
 
-    doSearch = debounce(async (term, teamId, filter = '') => {
+    doSearch = debounce(async (term, teamId = this.props.teamId, filter = this.props.filter) => {
+        if (!term) {
+            return;
+        }
+
         this.setState({loading: true});
 
         const options = {
-            ...this.getFilterOptions(filter),
+            ...searchUserOptionsFromFilter(filter),
             ...teamId && {team_id: teamId},
             ...teamId === SearchUserTeamFilter.NO_TEAM && {
                 [UserSearchOptions.WITHOUT_TEAM]: true,
             },
+            allow_inactive: true,
         };
 
         const {data: profiles} = await this.props.actions.searchProfiles(term, options);
@@ -182,17 +223,7 @@ export default class SystemUsers extends React.Component {
         }
 
         this.setState({loading: false});
-    }, Constants.SEARCH_TIMEOUT_MILLISECONDS, true);
-
-    getFilterOptions = (filter) => {
-        const options = {};
-        if (filter === SearchUserOptionsFilter.SYSTEM_ADMIN) {
-            options[UserSearchOptions.ROLE] = SearchUserOptionsFilter.SYSTEM_ADMIN;
-        } else if (filter === SearchUserOptionsFilter.ALLOW_INACTIVE) {
-            options[SearchUserOptionsFilter.ALLOW_INACTIVE] = true;
-        }
-        return options;
-    }
+    }, Constants.SEARCH_TIMEOUT_MILLISECONDS);
 
     getUserById = async (id) => {
         if (this.props.users[id]) {
@@ -218,6 +249,44 @@ export default class SystemUsers extends React.Component {
         this.getUserById(id);
     }
 
+    renderRevokeAllUsersModal = () => {
+        const title = (
+            <FormattedMessage
+                id='admin.system_users.revoke_all_sessions_modal_title'
+                defaultMessage='Revoke all sessions in the system'
+            />
+        );
+
+        const message = (
+            <div>
+                <FormattedMarkdownMessage
+                    id='admin.system_users.revoke_all_sessions_modal_message'
+                    defaultMessage='This action revokes all sessions in the system. All users will be logged out from all devices. Are you sure you want to revoke all sessions?'
+                />
+            </div>
+        );
+
+        const confirmButtonClass = 'btn btn-danger';
+        const revokeAllButton = (
+            <FormattedMessage
+                id='admin.system_users.revoke_all_sessions_button'
+                defaultMessage='Revoke All Sessions'
+            />
+        );
+
+        return (
+            <ConfirmModal
+                show={this.state.showRevokeAllSessionsModal}
+                title={title}
+                message={message}
+                confirmButtonClass={confirmButtonClass}
+                confirmButtonText={revokeAllButton}
+                onConfirm={this.handleRevokeAllSessions}
+                onCancel={this.handleRevokeAllSessionsCancel}
+            />
+        );
+    }
+
     renderFilterRow = (doSearch) => {
         const teams = this.props.teams.map((team) => (
             <option
@@ -233,7 +302,6 @@ export default class SystemUsers extends React.Component {
                 <div className='system-users__filter'>
                     <LocalizedInput
                         id='searchUsers'
-                        ref='filter'
                         className='form-control filter-textbox'
                         placeholder={{id: t('filtered_user_list.search'), defaultMessage: 'Search users'}}
                         onInput={doSearch}
@@ -264,13 +332,15 @@ export default class SystemUsers extends React.Component {
                         />
                     </span>
                     <select
+                        id='selectUserStatus'
                         className='form-control system-users__filter'
                         value={this.props.filter}
                         onChange={this.handleFilterChange}
                     >
                         <option value=''>{Utils.localizeMessage('admin.system_users.allUsers', 'All Users')}</option>
-                        <option value={SearchUserOptionsFilter.SYSTEM_ADMIN}>{Utils.localizeMessage('admin.system_users.system_admin', 'System Admin')}</option>
-                        <option value={SearchUserOptionsFilter.ALLOW_INACTIVE}>{Utils.localizeMessage('admin.system_users.inactive', 'Inactive')}</option>
+                        <option value={UserFilters.SYSTEM_ADMIN}>{Utils.localizeMessage('admin.system_users.system_admin', 'System Admin')}</option>
+                        <option value={UserFilters.SYSTEM_GUEST}>{Utils.localizeMessage('admin.system_users.guest', 'Guest')}</option>
+                        <option value={UserFilters.INACTIVE}>{Utils.localizeMessage('admin.system_users.inactive', 'Inactive')}</option>
                     </select>
                 </label>
             </div>
@@ -278,6 +348,8 @@ export default class SystemUsers extends React.Component {
     }
 
     render() {
+        const revokeAllUsersModal = this.renderRevokeAllUsersModal();
+
         return (
             <div className='wrapper--fixed'>
                 <FormattedAdminHeader
@@ -306,8 +378,25 @@ export default class SystemUsers extends React.Component {
                                 mfaEnabled={this.props.mfaEnabled}
                                 enableUserAccessTokens={this.props.enableUserAccessTokens}
                                 experimentalEnableAuthenticationTransfer={this.props.experimentalEnableAuthenticationTransfer}
+                                isDisabled={this.props.isDisabled}
                             />
                         </div>
+                        <SystemPermissionGate permissions={[Permissions.REVOKE_USER_ACCESS_TOKEN]}>
+                            {revokeAllUsersModal}
+                            <div className='pt-3 pb-3'>
+                                <button
+                                    id='revoke-all-users'
+                                    className='btn btn-default'
+                                    onClick={() => this.handleShowRevokeAllSessionsModal()}
+                                    disabled={this.props.isDisabled}
+                                >
+                                    <FormattedMessage
+                                        id='admin.system_users.revokeAllSessions'
+                                        defaultMessage='Revoke All Sessions'
+                                    />
+                                </button>
+                            </div>
+                        </SystemPermissionGate>
                     </div>
                 </div>
             </div>

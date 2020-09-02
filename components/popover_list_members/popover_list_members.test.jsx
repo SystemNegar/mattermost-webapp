@@ -4,11 +4,11 @@
 import React from 'react';
 import {shallow} from 'enzyme';
 
-import Constants from 'utils/constants.jsx';
+import Constants from 'utils/constants';
 import PopoverListMembers from 'components/popover_list_members/popover_list_members.jsx';
 
 jest.mock('utils/browser_history', () => {
-    const original = require.requireActual('utils/browser_history');
+    const original = jest.requireActual('utils/browser_history');
     return {
         ...original,
         browserHistory: {
@@ -25,8 +25,9 @@ describe('components/PopoverListMembers', () => {
         type: Constants.DM_CHANNEl,
     };
     const users = [
-        {id: 'member_id_1'},
-        {id: 'member_id_2'},
+        {id: 'member_id_1', delete_at: 0},
+        {id: 'member_id_2', delete_at: 0},
+        {id: 'member_id_3', delete_at: 1234},
     ];
     const statuses = {
         member_id_1: 'online',
@@ -34,7 +35,7 @@ describe('components/PopoverListMembers', () => {
     };
 
     const actions = {
-        getProfilesInChannel: jest.fn(),
+        loadProfilesAndStatusesInChannel: jest.fn(),
         openDirectChannelToUserId: jest.fn().mockResolvedValue({data: {name: 'channelname'}}),
         openModal: jest.fn(),
     };
@@ -43,14 +44,16 @@ describe('components/PopoverListMembers', () => {
         channel,
         statuses,
         users,
+        manageMembers: true,
         memberCount: 2,
         currentUserId: 'current_user_id',
         actions,
+        sortedUsers: [{id: 'member_id_1', delete_at: 0}, {id: 'member_id_2', delete_at: 0}, {id: 'member_id_3', delete_at: 1234}],
     };
 
     test('should match snapshot', () => {
         const wrapper = shallow(
-            <PopoverListMembers {...baseProps}/>
+            <PopoverListMembers {...baseProps}/>,
         );
 
         expect(wrapper).toMatchSnapshot();
@@ -59,7 +62,7 @@ describe('components/PopoverListMembers', () => {
     test('should have called openDirectChannelToUserId when handleShowDirectChannel is called', (done) => {
         const browserHistory = require('utils/browser_history').browserHistory; //eslint-disable-line global-require
         const wrapper = shallow(
-            <PopoverListMembers {...baseProps}/>
+            <PopoverListMembers {...baseProps}/>,
         );
 
         wrapper.instance().closePopover = jest.fn();
@@ -78,7 +81,7 @@ describe('components/PopoverListMembers', () => {
 
     test('should match state when closePopover is called', () => {
         const wrapper = shallow(
-            <PopoverListMembers {...baseProps}/>
+            <PopoverListMembers {...baseProps}/>,
         );
 
         wrapper.instance().componentDidUpdate = jest.fn();
@@ -88,48 +91,11 @@ describe('components/PopoverListMembers', () => {
         expect(wrapper.state('showPopover')).toEqual(false);
     });
 
-    test('should match state when showChannelInviteModal is called', () => {
-        const wrapper = shallow(
-            <PopoverListMembers {...baseProps}/>
-        );
-
-        wrapper.instance().componentDidUpdate = jest.fn();
-        wrapper.setState({showChannelInviteModal: false});
-        expect(wrapper).toMatchSnapshot();
-
-        wrapper.instance().showChannelInviteModal({preventDefault: jest.fn()});
-        expect(wrapper.state('showChannelInviteModal')).toEqual(true);
-    });
-
-    test('should match state when hideChannelInviteModal is called', () => {
-        const wrapper = shallow(
-            <PopoverListMembers {...baseProps}/>
-        );
-
-        wrapper.instance().componentDidUpdate = jest.fn();
-        wrapper.setState({showChannelInviteModal: true});
-        wrapper.instance().hideChannelInviteModal({preventDefault: jest.fn()});
-
-        expect(wrapper.state('showChannelInviteModal')).toEqual(false);
-    });
-
-    test('should match state when hideTeamMembersModal is called', () => {
-        const wrapper = shallow(
-            <PopoverListMembers {...baseProps}/>
-        );
-
-        wrapper.instance().componentDidUpdate = jest.fn();
-        wrapper.setState({showTeamMembersModal: true});
-        wrapper.instance().hideTeamMembersModal({preventDefault: jest.fn()});
-
-        expect(wrapper.state('showTeamMembersModal')).toEqual(false);
-    });
-
     test('should match snapshot with archived channel', () => {
         const props = {...baseProps, channel: {...channel, delete_at: 1234}};
 
         const wrapper = shallow(
-            <PopoverListMembers {...props}/>
+            <PopoverListMembers {...props}/>,
         );
 
         expect(wrapper).toMatchSnapshot();
@@ -139,7 +105,7 @@ describe('components/PopoverListMembers', () => {
         const props = {...baseProps, channel: {...channel, group_constrained: true}};
 
         const wrapper = shallow(
-            <PopoverListMembers {...props}/>
+            <PopoverListMembers {...props}/>,
         );
 
         expect(wrapper).toMatchSnapshot();

@@ -4,10 +4,10 @@
 import React from 'react';
 import {shallow} from 'enzyme';
 
-import {AdvancedSections} from 'utils/constants.jsx';
+import {AdvancedSections} from 'utils/constants';
 
 import SettingItemMax from 'components/setting_item_max.jsx';
-import SettingItemMin from 'components/setting_item_min.jsx';
+import SettingItemMin from 'components/setting_item_min';
 
 import JoinLeaveSection from 'components/user_settings/advanced/join_leave_section/join_leave_section.jsx';
 
@@ -17,7 +17,6 @@ describe('components/user_settings/advanced/JoinLeaveSection', () => {
         currentUserId: 'current_user_id',
         joinLeave: 'true',
         onUpdateSection: jest.fn(),
-        prevActiveSection: AdvancedSections.FORMATTING,
         renderOnOffLabel: jest.fn(),
         actions: {
             savePreferences: jest.fn(() => {
@@ -30,7 +29,7 @@ describe('components/user_settings/advanced/JoinLeaveSection', () => {
 
     test('should match snapshot', () => {
         const wrapper = shallow(
-            <JoinLeaveSection {...defaultProps}/>
+            <JoinLeaveSection {...defaultProps}/>,
         );
 
         expect(wrapper).toMatchSnapshot();
@@ -45,7 +44,7 @@ describe('components/user_settings/advanced/JoinLeaveSection', () => {
 
     test('should match state on handleOnChange', () => {
         const wrapper = shallow(
-            <JoinLeaveSection {...defaultProps}/>
+            <JoinLeaveSection {...defaultProps}/>,
         );
 
         let value = 'false';
@@ -68,7 +67,7 @@ describe('components/user_settings/advanced/JoinLeaveSection', () => {
                 {...defaultProps}
                 actions={actions}
                 onUpdateSection={onUpdateSection}
-            />
+            />,
         );
 
         const joinLeavePreference = {
@@ -96,7 +95,7 @@ describe('components/user_settings/advanced/JoinLeaveSection', () => {
             <JoinLeaveSection
                 {...defaultProps}
                 onUpdateSection={onUpdateSection}
-            />
+            />,
         );
 
         wrapper.setState({joinLeaveState: 'false'});

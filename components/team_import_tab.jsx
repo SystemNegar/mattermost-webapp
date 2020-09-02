@@ -1,19 +1,20 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+/* eslint-disable react/no-string-refs */
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {defineMessages, FormattedMessage, injectIntl, intlShape} from 'react-intl';
+import {defineMessages, FormattedMessage, injectIntl} from 'react-intl';
 
 import * as utils from 'utils/utils.jsx';
 import {t} from 'utils/i18n';
 
-import LoadingSpinner from 'components/widgets/loading/loading_spinner.jsx';
+import LoadingSpinner from 'components/widgets/loading/loading_spinner';
 
-import BackIcon from 'components/icon/back_icon';
+import BackIcon from 'components/widgets/icons/fa_back_icon';
 import SettingUpload from 'components/setting_upload.jsx';
-import SuccessIcon from 'components/icon/success_icon';
-import WarningIcon from 'components/icon/warning_icon';
+import SuccessIcon from 'components/widgets/icons/fa_success_icon';
+import WarningIcon from 'components/widgets/icons/fa_warning_icon';
 
 const holders = defineMessages({
     importSlack: {
@@ -22,13 +23,14 @@ const holders = defineMessages({
     },
 });
 
-class TeamImportTab extends React.Component {
+class TeamImportTab extends React.PureComponent {
+    static propTypes = {
+        closeModal: PropTypes.func.isRequired,
+        collapseModal: PropTypes.func.isRequired,
+    };
+
     constructor(props) {
         super(props);
-
-        this.onImportFailure = this.onImportFailure.bind(this);
-        this.onImportSuccess = this.onImportSuccess.bind(this);
-        this.doImportSlack = this.doImportSlack.bind(this);
 
         this.state = {
             status: 'ready',
@@ -36,21 +38,20 @@ class TeamImportTab extends React.Component {
         };
     }
 
-    onImportFailure() {
+    onImportFailure = () => {
         this.setState({status: 'fail'});
     }
 
-    onImportSuccess(data) {
+    onImportSuccess = (data) => {
         this.setState({status: 'done', link: 'data:application/octet-stream;charset=utf-8,' + encodeURIComponent(atob(data.results))});
     }
 
-    doImportSlack(file) {
+    doImportSlack = (file) => {
         this.setState({status: 'in-progress', link: ''});
-        utils.importSlack(file, this.onImportSuccess, this.onImportFailure);
+        utils.importSlack(this.props.team.id, file, this.onImportSuccess, this.onImportFailure);
     }
 
     render() {
-        const {formatMessage} = this.props.intl;
         const uploadDocsLink = (
             <a
                 href='https://docs.mattermost.com/administration/migrating.html#migrating-from-slack'
@@ -140,7 +141,7 @@ class TeamImportTab extends React.Component {
 
         const uploadSection = (
             <SettingUpload
-                title={formatMessage(holders.importSlack)}
+                title={<FormattedMessage {...holders.importSlack}/>}
                 submit={this.doImportSlack}
                 helpText={uploadHelpText}
                 fileTypesAccepted='.zip'
@@ -249,9 +250,10 @@ class TeamImportTab extends React.Component {
 }
 
 TeamImportTab.propTypes = {
-    intl: intlShape.isRequired,
     closeModal: PropTypes.func.isRequired,
     collapseModal: PropTypes.func.isRequired,
+    team: PropTypes.object.isRequired,
 };
 
 export default injectIntl(TeamImportTab);
+/* eslint-enable react/no-string-refs */

@@ -4,16 +4,13 @@
 import React from 'react';
 
 import {getClusterStatus} from 'actions/admin_actions.jsx';
-import LoadingScreen from '../loading_screen.jsx';
+import LoadingScreen from '../loading_screen';
 
 import ClusterTable from './cluster_table.jsx';
 
-export default class ClusterTableContainer extends React.Component {
+export default class ClusterTableContainer extends React.PureComponent {
     constructor(props) {
         super(props);
-
-        this.load = this.load.bind(this);
-        this.reload = this.reload.bind(this);
 
         this.interval = null;
 
@@ -22,18 +19,18 @@ export default class ClusterTableContainer extends React.Component {
         };
     }
 
-    load() {
+    load = () => {
         getClusterStatus(
             (data) => {
                 this.setState({
                     clusterInfos: data,
                 });
             },
-            null
+            null,
         );
     }
 
-    UNSAFE_componentWillMount() { // eslint-disable-line camelcase
+    componentDidMount() {
         this.load();
 
         // reload the cluster status every 15 seconds
@@ -46,7 +43,7 @@ export default class ClusterTableContainer extends React.Component {
         }
     }
 
-    reload(e) {
+    reload = (e) => {
         if (e) {
             e.preventDefault();
         }

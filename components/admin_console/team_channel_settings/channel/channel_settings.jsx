@@ -7,9 +7,9 @@ import {FormattedMessage} from 'react-intl';
 
 import {t} from 'utils/i18n';
 import ChannelsList from 'components/admin_console/team_channel_settings/channel/list';
-import AdminPanel from 'components/widgets/admin_console/admin_panel.jsx';
+import AdminPanel from 'components/widgets/admin_console/admin_panel';
 
-export class ChannelsSettings extends React.Component {
+export class ChannelsSettings extends React.PureComponent {
     static propTypes = {
         siteName: PropTypes.string.isRequired,
     };
@@ -45,10 +45,12 @@ export class ChannelsSettings extends React.Component {
                             titleId={t('admin.channel_settings.title')}
                             titleDefault='Channels'
                             subtitleId={t('admin.channel_settings.description')}
-                            subtitleDefault={'Showing {startCount, number} - {endCount, number} of {total, number} channels. Search for and manage channel settings.'}
+                            subtitleDefault={'Manage channel settings.'}
                             subtitleValues={{...this.state}}
                         >
-                            <ChannelsList onPageChangedCallback={this.onPageChangedCallback}/>
+                            <ChannelsList
+                                onPageChangedCallback={this.onPageChangedCallback}
+                            />
                         </AdminPanel>
                     </div>
                 </div>

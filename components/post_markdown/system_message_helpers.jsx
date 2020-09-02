@@ -6,7 +6,6 @@ import {FormattedMessage} from 'react-intl';
 
 import {General, Posts} from 'mattermost-redux/constants';
 
-import {canManageMembers} from 'utils/channel_utils.jsx';
 import * as Utils from 'utils/utils.jsx';
 
 import Markdown from 'components/markdown';
@@ -23,11 +22,13 @@ function renderUsername(value) {
     return renderFormattedText(username, options);
 }
 
-function renderFormattedText(value, options) {
+function renderFormattedText(value, options, post) {
     return (
         <Markdown
             message={value}
             options={options}
+            postId={post && post.id}
+            postType={post && post.type}
         />
     );
 }
@@ -39,6 +40,18 @@ function renderJoinChannelMessage(post) {
         <FormattedMessage
             id='api.channel.join_channel.post_and_forget'
             defaultMessage='{username} joined the channel.'
+            values={{username}}
+        />
+    );
+}
+
+function renderGuestJoinChannelMessage(post) {
+    const username = renderUsername(post.props.username);
+
+    return (
+        <FormattedMessage
+            id='api.channel.guest_join_channel.post_and_forget'
+            defaultMessage='{username} joined the channel as a guest.'
             values={{username}}
         />
     );
@@ -64,6 +77,22 @@ function renderAddToChannelMessage(post) {
         <FormattedMessage
             id='api.channel.add_member.added'
             defaultMessage='{addedUsername} added to the channel by {username}.'
+            values={{
+                username,
+                addedUsername,
+            }}
+        />
+    );
+}
+
+function renderAddGuestToChannelMessage(post) {
+    const username = renderUsername(post.props.username);
+    const addedUsername = renderUsername(post.props.addedUsername);
+
+    return (
+        <FormattedMessage
+            id='api.channel.add_guest.added'
+            defaultMessage='{addedUsername} added to the channel as a guest by {username}.'
             values={{
                 username,
                 addedUsername,
@@ -148,11 +177,12 @@ function renderHeaderChangeMessage(post) {
     const headerOptions = {
         singleline: true,
         channelNamesMap: post.props && post.props.channel_mentions,
+        mentionHighlight: true,
     };
 
     const username = renderUsername(post.props.username);
-    const oldHeader = post.props.old_header ? renderFormattedText(post.props.old_header, headerOptions) : null;
-    const newHeader = post.props.new_header ? renderFormattedText(post.props.new_header, headerOptions) : null;
+    const oldHeader = post.props.old_header ? renderFormattedText(post.props.old_header, headerOptions, post) : null;
+    const newHeader = post.props.new_header ? renderFormattedText(post.props.new_header, headerOptions, post) : null;
 
     if (post.props.new_header) {
         if (post.props.old_header) {
@@ -301,14 +331,32 @@ function renderChannelDeletedMessage(post) {
     );
 }
 
+function renderChannelUnarchivedMessage(post) {
+    if (!post.props.username) {
+        return null;
+    }
+
+    const username = renderUsername(post.props.username);
+
+    return (
+        <FormattedMessage
+            id='api.channel.restore_channel.unarchived'
+            defaultMessage='{username} has unarchived the channel.'
+            values={{username}}
+        />
+    );
+}
+
 function renderMeMessage(post) {
     return renderFormattedText((post.props && post.props.message) ? post.props.message : post.message);
 }
 
 const systemMessageRenderers = {
     [Posts.POST_TYPES.JOIN_CHANNEL]: renderJoinChannelMessage,
+    [Posts.POST_TYPES.GUEST_JOIN_CHANNEL]: renderGuestJoinChannelMessage,
     [Posts.POST_TYPES.LEAVE_CHANNEL]: renderLeaveChannelMessage,
     [Posts.POST_TYPES.ADD_TO_CHANNEL]: renderAddToChannelMessage,
+    [Posts.POST_TYPES.ADD_GUEST_TO_CHANNEL]: renderAddGuestToChannelMessage,
     [Posts.POST_TYPES.REMOVE_FROM_CHANNEL]: renderRemoveFromChannelMessage,
     [Posts.POST_TYPES.JOIN_TEAM]: renderJoinTeamMessage,
     [Posts.POST_TYPES.LEAVE_TEAM]: renderLeaveTeamMessage,
@@ -319,12 +367,12 @@ const systemMessageRenderers = {
     [Posts.POST_TYPES.CONVERT_CHANNEL]: renderConvertChannelToPrivateMessage,
     [Posts.POST_TYPES.PURPOSE_CHANGE]: renderPurposeChangeMessage,
     [Posts.POST_TYPES.CHANNEL_DELETED]: renderChannelDeletedMessage,
+    [Posts.POST_TYPES.CHANNEL_UNARCHIVED]: renderChannelUnarchivedMessage,
     [Posts.POST_TYPES.ME]: renderMeMessage,
 };
 
-export function renderSystemMessage(post, channel) {
+export function renderSystemMessage(post, channel, isUserCanManageMembers) {
     if (post.props && post.props.add_channel_member) {
-        const isUserCanManageMembers = canManageMembers(channel);
         const isEphemeral = Utils.isPostEphemeral(post);
 
         if ((channel.type === General.PRIVATE_CHANNEL || channel.type === General.OPEN_CHANNEL) &&

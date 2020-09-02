@@ -7,7 +7,7 @@ exports[`components/TeamSelectorModal should match snapshot 1`] = `
   autoFocus={true}
   backdrop={true}
   bsClass="modal"
-  dialogClassName="more-modal more-direct-channels team-selector-modal"
+  dialogClassName="a11y__modal more-modal more-direct-channels team-selector-modal"
   dialogComponentClass={[Function]}
   enforceFocus={true}
   keyboard={true}
@@ -40,8 +40,8 @@ exports[`components/TeamSelectorModal should match snapshot 1`] = `
       componentClass="h1"
       id="teamSelectorModalLabel"
     >
-      <InjectIntl(FormattedMarkdownMessage)
-        defaultMessage="Add Teams To **Team Selection** List"
+      <injectIntl(FormattedMarkdownMessage)
+        defaultMessage="Add Teams to **Team Selection** List"
         id="add_teams_to_scheme.title"
       />
     </ModalTitle>
@@ -79,6 +79,7 @@ exports[`components/TeamSelectorModal should match snapshot 1`] = `
       }
     />
     <MultiSelect
+      ariaLabelRenderer={[Function]}
       buttonSubmitText="Add"
       handleAdd={[Function]}
       handleDelete={[Function]}
@@ -101,13 +102,17 @@ exports[`components/TeamSelectorModal should match snapshot 1`] = `
             "delete_at": 0,
             "display_name": "Team 3",
             "id": "id3",
+            "label": "label3",
             "scheme_id": "test",
+            "value": "value3",
           },
           Object {
             "delete_at": 0,
             "display_name": "Team 4",
             "id": "id4",
+            "label": "label4",
             "scheme_id": "",
+            "value": "value4",
           },
         ]
       }

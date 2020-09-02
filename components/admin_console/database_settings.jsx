@@ -9,27 +9,20 @@ import {recycleDatabaseConnection} from 'actions/admin_actions.jsx';
 import * as Utils from 'utils/utils.jsx';
 import {t} from 'utils/i18n';
 
-import AdminSettings from './admin_settings.jsx';
-import BooleanSetting from './boolean_setting.jsx';
+import AdminSettings from './admin_settings';
+import BooleanSetting from './boolean_setting';
 import RequestButton from './request_button/request_button.jsx';
 import SettingsGroup from './settings_group.jsx';
-import TextSetting from './text_setting.jsx';
+import TextSetting from './text_setting';
 
 export default class DatabaseSettings extends AdminSettings {
-    constructor(props) {
-        super(props);
-
-        this.getConfigFromState = this.getConfigFromState.bind(this);
-
-        this.renderSettings = this.renderSettings.bind(this);
-    }
-
-    getConfigFromState(config) {
+    getConfigFromState = (config) => {
         // driverName and dataSource are read-only from the UI
 
         config.SqlSettings.MaxIdleConns = this.parseIntNonZero(this.state.maxIdleConns);
         config.SqlSettings.MaxOpenConns = this.parseIntNonZero(this.state.maxOpenConns);
         config.SqlSettings.Trace = this.state.trace;
+        config.SqlSettings.DisableDatabaseSearch = this.state.disableDatabaseSearch;
         config.SqlSettings.QueryTimeout = this.parseIntNonZero(this.state.queryTimeout);
         config.SqlSettings.ConnMaxLifetimeMilliseconds = this.parseIntNonNegative(this.state.connMaxLifetimeMilliseconds);
         config.ServiceSettings.MinimumHashtagLength = this.parseIntNonZero(this.state.minimumHashtagLength, 3, 2);
@@ -44,6 +37,7 @@ export default class DatabaseSettings extends AdminSettings {
             maxIdleConns: config.SqlSettings.MaxIdleConns,
             maxOpenConns: config.SqlSettings.MaxOpenConns,
             trace: config.SqlSettings.Trace,
+            disableDatabaseSearch: config.SqlSettings.DisableDatabaseSearch,
             queryTimeout: config.SqlSettings.QueryTimeout,
             connMaxLifetimeMilliseconds: config.SqlSettings.ConnMaxLifetimeMilliseconds,
             minimumHashtagLength: config.ServiceSettings.MinimumHashtagLength,
@@ -59,7 +53,7 @@ export default class DatabaseSettings extends AdminSettings {
         );
     }
 
-    renderSettings() {
+    renderSettings = () => {
         const dataSource = '**********' + this.state.dataSource.substring(this.state.dataSource.indexOf('@'));
 
         let recycleDbButton = <div/>;
@@ -105,6 +99,7 @@ export default class DatabaseSettings extends AdminSettings {
                         defaultMessage: 'Recycling unsuccessful: {error}',
                     }}
                     includeDetailedError={true}
+                    disabled={this.props.isDisabled}
                 />
             );
         }
@@ -185,6 +180,7 @@ export default class DatabaseSettings extends AdminSettings {
                     value={this.state.maxIdleConns}
                     onChange={this.handleChange}
                     setByEnv={this.isSetByEnv('SqlSettings.MaxIdleConns')}
+                    disabled={this.props.isDisabled}
                 />
                 <TextSetting
                     id='maxOpenConns'
@@ -204,6 +200,7 @@ export default class DatabaseSettings extends AdminSettings {
                     value={this.state.maxOpenConns}
                     onChange={this.handleChange}
                     setByEnv={this.isSetByEnv('SqlSettings.MaxOpenConns')}
+                    disabled={this.props.isDisabled}
                 />
                 <TextSetting
                     id='queryTimeout'
@@ -223,6 +220,7 @@ export default class DatabaseSettings extends AdminSettings {
                     value={this.state.queryTimeout}
                     onChange={this.handleChange}
                     setByEnv={this.isSetByEnv('SqlSettings.QueryTimeout')}
+                    disabled={this.props.isDisabled}
                 />
                 <TextSetting
                     id='connMaxLifetimeMilliseconds'
@@ -242,6 +240,7 @@ export default class DatabaseSettings extends AdminSettings {
                     value={this.state.connMaxLifetimeMilliseconds}
                     onChange={this.handleChange}
                     setByEnv={this.isSetByEnv('SqlSettings.ConnMaxLifetimeMilliseconds')}
+                    disabled={this.props.isDisabled}
                 />
                 <TextSetting
                     id='minimumHashtagLength'
@@ -261,6 +260,7 @@ export default class DatabaseSettings extends AdminSettings {
                     value={this.state.minimumHashtagLength}
                     onChange={this.handleChange}
                     setByEnv={this.isSetByEnv('ServiceSettings.MinimumHashtagLength')}
+                    disabled={this.props.isDisabled}
                 />
                 <BooleanSetting
                     id='trace'
@@ -279,8 +279,28 @@ export default class DatabaseSettings extends AdminSettings {
                     value={this.state.trace}
                     onChange={this.handleChange}
                     setByEnv={this.isSetByEnv('SqlSettings.Trace')}
+                    disabled={this.props.isDisabled}
                 />
                 {recycleDbButton}
+                <BooleanSetting
+                    id='disableDatabaseSearch'
+                    label={
+                        <FormattedMessage
+                            id='admin.sql.disableDatabaseSearchTitle'
+                            defaultMessage='Disable database search: '
+                        />
+                    }
+                    helpText={
+                        <FormattedMarkdownMessage
+                            id='admin.sql.disableDatabaseSearchDescription'
+                            defaultMessage='Disables the use of the database to perform searches. Should only be used when other [search engines](!https://mattermost.com/pl/default-search-engine) are configured.'
+                        />
+                    }
+                    value={this.state.disableDatabaseSearch}
+                    onChange={this.handleChange}
+                    setByEnv={this.isSetByEnv('SqlSettings.DisableDatabaseSearch')}
+                    disabled={this.props.isDisabled}
+                />
             </SettingsGroup>
         );
     }

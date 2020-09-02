@@ -23,7 +23,7 @@ describe('plugins/MobileChannelHeaderPlug', () => {
                 channelMember={{}}
                 theme={{}}
                 isDropdown={false}
-            />
+            />,
         );
         expect(wrapper).toMatchSnapshot();
 
@@ -39,16 +39,16 @@ describe('plugins/MobileChannelHeaderPlug', () => {
                 channelMember={{}}
                 theme={{}}
                 isDropdown={false}
-            />
+            />,
         );
         expect(wrapper).toMatchSnapshot();
 
-        // Render a single list item containing an anchor
+        // Render a single list item containing a button
         expect(wrapper.find('li')).toHaveLength(1);
-        expect(wrapper.find('a')).toHaveLength(1);
+        expect(wrapper.find('button')).toHaveLength(1);
 
         wrapper.instance().fireAction = jest.fn();
-        wrapper.find('a').first().simulate('click');
+        wrapper.find('button').first().simulate('click');
         expect(wrapper.instance().fireAction).toHaveBeenCalledTimes(1);
         expect(wrapper.instance().fireAction).toBeCalledWith(testPlug);
     });
@@ -61,7 +61,7 @@ describe('plugins/MobileChannelHeaderPlug', () => {
                 channelMember={{}}
                 theme={{}}
                 isDropdown={false}
-            />
+            />,
         );
         expect(wrapper).toMatchSnapshot();
 
@@ -77,7 +77,7 @@ describe('plugins/MobileChannelHeaderPlug', () => {
                 channelMember={{}}
                 theme={{}}
                 isDropdown={true}
-            />
+            />,
         );
         expect(wrapper).toMatchSnapshot();
 
@@ -93,7 +93,7 @@ describe('plugins/MobileChannelHeaderPlug', () => {
                 channelMember={{}}
                 theme={{}}
                 isDropdown={true}
-            />
+            />,
         );
         expect(wrapper).toMatchSnapshot();
 
@@ -110,7 +110,7 @@ describe('plugins/MobileChannelHeaderPlug', () => {
                 channelMember={{}}
                 theme={{}}
                 isDropdown={true}
-            />
+            />,
         );
         expect(wrapper).toMatchSnapshot();
 
@@ -144,7 +144,7 @@ describe('plugins/MobileChannelHeaderPlug', () => {
                 channelMember={channelMember}
                 theme={{}}
                 isDropdown={true}
-            />
+            />,
         );
 
         wrapper.instance().fireAction(newTestPlug);

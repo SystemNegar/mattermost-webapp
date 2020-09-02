@@ -7,18 +7,18 @@ import PropTypes from 'prop-types';
 
 import {Permissions} from 'mattermost-redux/constants';
 
-import * as GlobalActions from 'actions/global_actions.jsx';
-import {Constants} from 'utils/constants';
+import {Constants, ModalIdentifiers} from 'utils/constants';
 import ChannelInviteModal from 'components/channel_invite_modal';
 import EditChannelHeaderModal from 'components/edit_channel_header_modal';
-import ProfilePicture from 'components/profile_picture.jsx';
+import ProfilePicture from 'components/profile_picture';
 import ToggleModalButtonRedux from 'components/toggle_modal_button_redux';
 import ToggleModalButton from 'components/toggle_modal_button.jsx';
 import UserProfile from 'components/user_profile';
 import ChannelPermissionGate from 'components/permissions_gates/channel_permission_gate';
 import TeamPermissionGate from 'components/permissions_gates/team_permission_gate';
 import FormattedMarkdownMessage from 'components/formatted_markdown_message';
-import EditIcon from 'components/icon/edit_icon';
+import EditIcon from 'components/widgets/icons/fa_edit_icon';
+import InvitationModal from 'components/invitation_modal';
 import AddGroupsToChannelModal from 'components/add_groups_to_channel_modal';
 import AddGroupsToTeamModal from 'components/add_groups_to_team_modal';
 
@@ -35,18 +35,24 @@ export default class ChannelIntroMessage extends React.PureComponent {
         enableUserCreation: PropTypes.bool,
         isReadOnly: PropTypes.bool,
         teamIsGroupConstrained: PropTypes.bool,
+        creatorName: PropTypes.string.isRequired,
+        teammate: PropTypes.object.isRequired,
+        teammateName: PropTypes.string,
     };
 
     render() {
         const {
             currentUserId,
             channel,
+            creatorName,
             fullWidth,
             locale,
             enableUserCreation,
             isReadOnly,
             channelProfiles,
             teamIsGroupConstrained,
+            teammate,
+            teammateName,
         } = this.props;
 
         let centeredIntro = '';
@@ -55,7 +61,7 @@ export default class ChannelIntroMessage extends React.PureComponent {
         }
 
         if (channel.type === Constants.DM_CHANNEL) {
-            return createDMIntroMessage(channel, centeredIntro);
+            return createDMIntroMessage(channel, centeredIntro, teammate, teammateName);
         } else if (channel.type === Constants.GM_CHANNEL) {
             return createGMIntroMessage(channel, centeredIntro, channelProfiles, currentUserId);
         } else if (channel.name === Constants.DEFAULT_CHANNEL) {
@@ -63,7 +69,7 @@ export default class ChannelIntroMessage extends React.PureComponent {
         } else if (channel.name === Constants.OFFTOPIC_CHANNEL) {
             return createOffTopicIntroMessage(channel, centeredIntro);
         } else if (channel.type === Constants.OPEN_CHANNEL || channel.type === Constants.PRIVATE_CHANNEL) {
-            return createStandardIntroMessage(channel, centeredIntro, locale);
+            return createStandardIntroMessage(channel, centeredIntro, locale, creatorName);
         }
         return null;
     }
@@ -78,9 +84,8 @@ function createGMIntroMessage(channel, centeredIntro, profiles, currentUserId) {
             map((profile) => (
                 <ProfilePicture
                     key={'introprofilepicture' + profile.id}
-                    src={Utils.imageURLForUser(profile)}
-                    width='50'
-                    height='50'
+                    src={Utils.imageURLForUser(profile.id, profile.last_picture_update)}
+                    size='xl'
                     userId={profile.id}
                     username={profile.username}
                 />
@@ -123,16 +128,9 @@ function createGMIntroMessage(channel, centeredIntro, profiles, currentUserId) {
     );
 }
 
-function createDMIntroMessage(channel, centeredIntro) {
-    var teammate = Utils.getDirectTeammate(channel.id);
+function createDMIntroMessage(channel, centeredIntro, teammate, teammateName) {
     const channelIntroId = 'channelIntro';
-
     if (teammate) {
-        var teammateName = teammate.username;
-        if (teammate.nickname.length > 0) {
-            teammateName = teammate.nickname;
-        }
-
         return (
             <div
                 id={channelIntroId}
@@ -140,9 +138,8 @@ function createDMIntroMessage(channel, centeredIntro) {
             >
                 <div className='post-profile-img__container channel-intro-img'>
                     <ProfilePicture
-                        src={Utils.imageURLForUser(teammate)}
-                        width='50'
-                        height='50'
+                        src={Utils.imageURLForUser(teammate.id, teammate.last_picture_update)}
+                        size='xl'
                         userId={teammate.id}
                         username={teammate.username}
                         hasMention={true}
@@ -207,7 +204,7 @@ function createOffTopicIntroMessage(channel, centeredIntro) {
             id='channelIntro'
             className={'channel-intro ' + centeredIntro}
         >
-            <h4 className='channel-intro__title'>
+            <h2 className='channel-intro__title'>
                 <FormattedMessage
                     id='intro_messages.beginning'
                     defaultMessage='Beginning of {name}'
@@ -215,7 +212,7 @@ function createOffTopicIntroMessage(channel, centeredIntro) {
                         name: channel.display_name,
                     }}
                 />
-            </h4>
+            </h2>
             <p className='channel-intro__content'>
                 <FormattedMessage
                     id='intro_messages.offTopic'
@@ -245,26 +242,33 @@ export function createDefaultIntroMessage(channel, centeredIntro, enableUserCrea
                     permissions={[Permissions.ADD_USER_TO_TEAM]}
                 >
                     {!teamIsGroupConstrained &&
-                    <span
-                        className='intro-links color--link cursor--pointer'
-                        onClick={GlobalActions.showGetTeamInviteLinkModal}
+                    <FormattedMessage
+                        id='intro_messages.inviteOthers'
+                        defaultMessage='Invite others to this team'
                     >
-                        <FormattedMessage
-                            id='generic_icons.add'
-                            defaultMessage='Add Icon'
-                        >
-                            {(title) => (
-                                <i
-                                    className='fa fa-user-plus'
-                                    title={title}
-                                />
-                            )}
-                        </FormattedMessage>
-                        <FormattedMessage
-                            id='intro_messages.inviteOthers'
-                            defaultMessage='Invite others to this team'
-                        />
-                    </span>
+                        {(message) => (
+                            <ToggleModalButtonRedux
+                                accessibilityLabel={message}
+                                id='introTextInvite'
+                                className='intro-links color--link cursor--pointer'
+                                modalId={ModalIdentifiers.INVITATION}
+                                dialogType={InvitationModal}
+                            >
+                                <FormattedMessage
+                                    id='generic_icons.add'
+                                    defaultMessage='Add Icon'
+                                >
+                                    {(title) => (
+                                        <i
+                                            className='fa fa-user-plus'
+                                            title={title}
+                                        />
+                                    )}
+                                </FormattedMessage>
+                                {message}
+                            </ToggleModalButtonRedux>
+                        )}
+                    </FormattedMessage>
                     }
                     {teamIsGroupConstrained &&
                     <ToggleModalButton
@@ -288,7 +292,6 @@ export function createDefaultIntroMessage(channel, centeredIntro, enableUserCrea
                             defaultMessage='Add other groups to this team'
                         />
                     </ToggleModalButton>
-
                     }
                 </TeamPermissionGate>
             </TeamPermissionGate>
@@ -318,7 +321,7 @@ export function createDefaultIntroMessage(channel, centeredIntro, enableUserCrea
             id='channelIntro'
             className={'channel-intro ' + centeredIntro}
         >
-            <h4 className='channel-intro__title'>
+            <h2 className='channel-intro__title'>
                 <FormattedMessage
                     id='intro_messages.beginning'
                     defaultMessage='Beginning of {name}'
@@ -326,7 +329,7 @@ export function createDefaultIntroMessage(channel, centeredIntro, enableUserCrea
                         name: channel.display_name,
                     }}
                 />
-            </h4>
+            </h2>
             <p className='channel-intro__content'>
                 {!isReadOnly &&
                     <FormattedMarkdownMessage
@@ -354,9 +357,8 @@ export function createDefaultIntroMessage(channel, centeredIntro, enableUserCrea
     );
 }
 
-function createStandardIntroMessage(channel, centeredIntro, locale) {
+function createStandardIntroMessage(channel, centeredIntro, locale, creatorName) {
     var uiName = channel.display_name;
-    var creatorName = Utils.getDisplayNameByUserId(channel.creator_id);
     var memberMessage;
     const channelIsArchived = channel.delete_at !== 0;
 
@@ -483,7 +485,7 @@ function createStandardIntroMessage(channel, centeredIntro, locale) {
             id='channelIntro'
             className={'channel-intro ' + centeredIntro}
         >
-            <h4 className='channel-intro__title'>
+            <h2 className='channel-intro__title'>
                 <FormattedMessage
                     id='intro_messages.beginning'
                     defaultMessage='Beginning of {name}'
@@ -491,7 +493,7 @@ function createStandardIntroMessage(channel, centeredIntro, locale) {
                         name: (uiName),
                     }}
                 />
-            </h4>
+            </h2>
             <p className='channel-intro__content'>
                 {createMessage}
                 {memberMessage}
@@ -566,6 +568,7 @@ function createSetHeaderButton(channel) {
         >
             {(message) => (
                 <ToggleModalButtonRedux
+                    modalId={ModalIdentifiers.EDIT_CHANNEL_HEADER}
                     accessibilityLabel={message}
                     className={'intro-links color--link'}
                     dialogType={EditChannelHeaderModal}

@@ -4,7 +4,7 @@
 import React from 'react';
 import {shallow} from 'enzyme';
 
-import SelectTeam from 'components/select_team/select_team.jsx';
+import SelectTeam, {TEAMS_PER_PAGE} from 'components/select_team/select_team.jsx';
 
 import {emitUserLoggedOutEvent} from 'actions/global_actions.jsx';
 
@@ -37,6 +37,7 @@ describe('components/select_team/SelectTeam', () => {
             loadRolesIfNeeded: jest.fn(),
             addUserToTeam,
         },
+        totalTeamsCount: 15,
     };
 
     test('should match snapshot', () => {
@@ -44,12 +45,10 @@ describe('components/select_team/SelectTeam', () => {
         const wrapper = shallow(<SelectTeam {...props}/>);
         expect(wrapper).toMatchSnapshot();
 
-        // on componentWillMount
-        expect(props.actions.loadRolesIfNeeded).toHaveBeenCalledWith(baseProps.currentUserRoles.split(' '));
-
         // on componentDidMount
         expect(props.actions.getTeams).toHaveBeenCalledTimes(1);
-        expect(props.actions.getTeams).toHaveBeenCalledWith(0, 200);
+        expect(props.actions.getTeams).toHaveBeenCalledWith(0, TEAMS_PER_PAGE, true);
+        expect(props.actions.loadRolesIfNeeded).toHaveBeenCalledWith(baseProps.currentUserRoles.split(' '));
     });
 
     test('should match snapshot, on loading', () => {
@@ -72,6 +71,12 @@ describe('components/select_team/SelectTeam', () => {
 
     test('should match snapshot, on no joinable team and is not system admin nor can create team', () => {
         const props = {...baseProps, listableTeams: [], currentUserRoles: '', canManageSystem: false, canCreateTeams: false};
+        const wrapper = shallow(<SelectTeam {...props}/>);
+        expect(wrapper).toMatchSnapshot();
+    });
+
+    test('should match snapshot, on no joinable team and user is guest', () => {
+        const props = {...baseProps, listableTeams: [], currentUserRoles: '', currentUserIsGuest: true, canManageSystem: false, canCreateTeams: false};
         const wrapper = shallow(<SelectTeam {...props}/>);
         expect(wrapper).toMatchSnapshot();
     });

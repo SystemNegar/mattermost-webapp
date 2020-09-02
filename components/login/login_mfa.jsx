@@ -7,7 +7,7 @@ import {FormattedMessage} from 'react-intl';
 
 import {localizeMessage} from 'utils/utils.jsx';
 import {t} from 'utils/i18n.jsx';
-import SaveButton from 'components/save_button.jsx';
+import SaveButton from 'components/save_button';
 import LocalizedInput from 'components/localized_input/localized_input';
 
 export default class LoginMfa extends React.PureComponent {
@@ -59,9 +59,9 @@ export default class LoginMfa extends React.PureComponent {
         this.setState(state);
 
         this.props.submit(
-            this.props.loginId,
+            this.props.loginId.toLowerCase(),
             this.props.password,
-            this.state.token
+            this.state.token,
         );
     }
 

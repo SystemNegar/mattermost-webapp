@@ -4,6 +4,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import {getEmbedFromMetadata} from 'mattermost-redux/utils/post_utils';
+
 import MessageAttachmentList from 'components/post_view/message_attachments/message_attachment_list';
 import PostAttachmentOpenGraph from 'components/post_view/post_attachment_opengraph';
 import PostImage from 'components/post_view/post_image';
@@ -16,6 +18,11 @@ export default class PostBodyAdditionalContent extends React.PureComponent {
          * The post to render the content of
          */
         post: PropTypes.object.isRequired,
+
+        /**
+         * Plugin post will render embed
+         */
+        pluginPostWillRenderEmbedComponents: PropTypes.arrayOf(PropTypes.object),
 
         /**
          * The post's message
@@ -43,18 +50,29 @@ export default class PostBodyAdditionalContent extends React.PureComponent {
 
     getEmbed = () => {
         const {metadata} = this.props.post;
-        if (!metadata || !metadata.embeds || metadata.embeds.length === 0) {
-            return null;
-        }
-
-        return metadata.embeds[0];
+        return getEmbedFromMetadata(metadata);
     }
 
     isEmbedToggleable = (embed) => {
+        const postWillRenderEmbedComponents = this.props.pluginPostWillRenderEmbedComponents || [];
+        for (const c of postWillRenderEmbedComponents) {
+            if (c.match(embed)) {
+                return Boolean(c.toggleable);
+            }
+        }
+
         return embed.type === 'image' || (embed.type === 'opengraph' && YoutubeVideo.isYoutubeLink(embed.url));
     }
 
     renderEmbed = (embed) => {
+        const postWillRenderEmbedComponents = this.props.pluginPostWillRenderEmbedComponents || [];
+        for (const c of postWillRenderEmbedComponents) {
+            if (c.match(embed)) {
+                const Component = c.component;
+                return this.props.isEmbedVisible && <Component embed={embed}/>;
+            }
+        }
+
         switch (embed.type) {
         case 'image':
             if (!this.props.isEmbedVisible) {
@@ -93,7 +111,7 @@ export default class PostBodyAdditionalContent extends React.PureComponent {
 
                 return (
                     <YoutubeVideo
-                        channelId={this.props.post.channel_id}
+                        postId={this.props.post.id}
                         link={embed.url}
                         show={this.props.isEmbedVisible}
                     />
@@ -102,6 +120,7 @@ export default class PostBodyAdditionalContent extends React.PureComponent {
 
             return (
                 <PostAttachmentOpenGraph
+                    postId={this.props.post.id}
                     link={embed.url}
                     isEmbedVisible={this.props.isEmbedVisible}
                     post={this.props.post}
@@ -116,9 +135,9 @@ export default class PostBodyAdditionalContent extends React.PureComponent {
 
     renderToggle = (prependToggle) => {
         return (
-            <a
+            <button
                 key='toggle'
-                className={`post__embed-visibility ${prependToggle ? 'pull-left' : ''}`}
+                className={`style--none post__embed-visibility color--link ${prependToggle ? 'pull-left' : ''}`}
                 data-expanded={this.props.isEmbedVisible}
                 aria-label='Toggle Embed Visibility'
                 onClick={this.toggleEmbedVisibility}

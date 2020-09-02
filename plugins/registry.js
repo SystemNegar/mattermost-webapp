@@ -11,14 +11,20 @@ import {
     unregisterPluginReconnectHandler,
 } from 'actions/websocket_actions.jsx';
 
-import {showRHSPlugin} from 'actions/views/rhs';
+import {showRHSPlugin, hideRHSPlugin, toggleRHSPlugin} from 'actions/views/rhs';
 
 import {
     registerPluginTranslationsSource,
 } from 'actions/views/root';
 
+import {
+    registerAdminConsolePlugin,
+    unregisterAdminConsolePlugin,
+    registerAdminConsoleCustomSetting,
+} from 'actions/admin_actions';
+
 import store from 'stores/redux_store.jsx';
-import {ActionTypes} from 'utils/constants.jsx';
+import {ActionTypes} from 'utils/constants';
 import {generateId} from 'utils/utils.jsx';
 
 function dispatchPluginComponentAction(name, pluginId, component, id = generateId()) {
@@ -36,7 +42,7 @@ function dispatchPluginComponentAction(name, pluginId, component, id = generateI
 }
 
 const resolveReactElement = (element) => {
-    if (typeof element === 'function') {
+    if (element && !React.isValidElement(element) && typeof element !== 'string') {
         // Allow element to be passed as the name of the component, instead of a React element.
         return React.createElement(element);
     }
@@ -167,6 +173,34 @@ export default class PluginRegistry {
         return id;
     }
 
+    // Register a component to render a custom embed preview for post links.
+    // Accepts the following:
+    // - match - A function that receives the embed object and returns a
+    //   boolean indicating if the plugin is able to process it.
+    //   The embed object contains the embed `type`, the `url` of the post link
+    //   and in some cases, a `data` object with information related to the
+    //   link (the opengraph or the image details, for example).
+    // - component - The component that renders the embed view for the link
+    // - toggleable - A boolean indicating if the embed view should be collapsable
+    // Returns a unique identifier.
+    registerPostWillRenderEmbedComponent(match, component, toggleable) {
+        const id = generateId();
+
+        store.dispatch({
+            type: ActionTypes.RECEIVED_PLUGIN_COMPONENT,
+            name: 'PostWillRenderEmbedComponent',
+            data: {
+                id,
+                pluginId: this.id,
+                component,
+                match,
+                toggleable,
+            },
+        });
+
+        return id;
+    }
+
     // Register a main menu list item by providing some text and an action function.
     // Accepts the following:
     // - text - A string or React element to display in the menu
@@ -185,6 +219,28 @@ export default class PluginRegistry {
                 text: resolveReactElement(text),
                 action,
                 mobileIcon: resolveReactElement(mobileIcon),
+            },
+        });
+
+        return id;
+    }
+
+    // Register a channel menu list item by providing some text and an action function.
+    // Accepts the following:
+    // - text - A string or React element to display in the menu
+    // - action - A function that receives the channelId and is called when the menu items is clicked.
+    // Returns a unique identifier.
+    registerChannelHeaderMenuAction(text, action) {
+        const id = generateId();
+
+        store.dispatch({
+            type: ActionTypes.RECEIVED_PLUGIN_COMPONENT,
+            name: 'ChannelHeader',
+            data: {
+                id,
+                pluginId: this.id,
+                text: resolveReactElement(text),
+                action,
             },
         });
 
@@ -213,6 +269,41 @@ export default class PluginRegistry {
         });
 
         return id;
+    }
+
+    // Register a post sub menu list item by providing some text and an action function.
+    // Accepts the following:
+    // - text - A string or React element to display in the menu
+    // - action - A function to trigger when component is clicked on
+    // - filter - A function whether to apply the plugin into the post' dropdown menu
+    //
+    // Returns an unique identifier for the root submenu, and a function to register submenu items.
+    // At this time, only one level of nesting is allowed to avoid rendering issue in the RHS.
+    registerPostDropdownSubMenuAction(text, action, filter) {
+        function registerMenuItem(pluginId, id, parentMenuId, innerText, innerAction, innerFilter) {
+            store.dispatch({
+                type: ActionTypes.RECEIVED_PLUGIN_COMPONENT,
+                name: 'PostDropdownMenu',
+                data: {
+                    id,
+                    parentMenuId,
+                    pluginId,
+                    text: resolveReactElement(innerText),
+                    subMenu: [],
+                    action: innerAction,
+                    filter: innerFilter,
+                },
+            });
+            return function registerSubMenuItem(t, a, f) {
+                if (parentMenuId) {
+                    throw new Error('Submenus are currently limited to a single level.');
+                }
+
+                return registerMenuItem(pluginId, generateId(), id, t, a, f);
+            };
+        }
+        const id = generateId();
+        return {id, rootRegisterMenuItem: registerMenuItem(this.id, id, null, text, action, filter)};
     }
 
     // Register a component at the bottom of the post dropdown menu.
@@ -435,7 +526,37 @@ export default class PluginRegistry {
     }
 
     registerTranslations(getTranslationsForLocale) {
-        registerPluginTranslationsSource(this.id, getTranslationsForLocale);
+        store.dispatch(registerPluginTranslationsSource(this.id, getTranslationsForLocale));
+    }
+
+    // Register a admin console definitions override function
+    // Note that this is a low-level interface primarily meant for internal use, and is not subject
+    // to semver guarantees. It may change in the future.
+    // Accepts the following:
+    // - func - A function that recieve the admin console config definitions and return a new
+    //          version of it, which is used for build the admin console.
+    // Each plugin can register at most one admin console plugin function, with newer registrations
+    // replacing older ones.
+    registerAdminConsolePlugin(func) {
+        store.dispatch(registerAdminConsolePlugin(this.id, func));
+    }
+
+    // Register a custom React component to manage the plugin configuration for the given setting key.
+    // Accepts the following:
+    // - key - A key specified in the settings_schema.settings block of the plugin's manifest.
+    // - component - A react component to render in place of the default handling.
+    // - options - Object for the following available options to display the setting:
+    //     showTitle - Optional boolean that if true the display_name of the setting will be rendered
+    // on the left column of the settings page and the registered component will be displayed on the
+    // available space in the right column.
+    registerAdminConsoleCustomSetting(key, component, {showTitle} = {}) {
+        store.dispatch(registerAdminConsoleCustomSetting(this.id, key, component, {showTitle}));
+    }
+
+    // Unregister a previously registered admin console definition override function.
+    // Returns undefined.
+    unregisterAdminConsolePlugin() {
+        store.dispatch(unregisterAdminConsolePlugin(this.id));
     }
 
     // Register a Right-Hand Sidebar component by providing a title for the right hand component.
@@ -445,6 +566,8 @@ export default class PluginRegistry {
     // Returns:
     // - id: a unique identifier
     // - showRHSPlugin: the action to dispatch that will open the RHS.
+    // - hideRHSPlugin: the action to dispatch that will close the RHS
+    // - toggleRHSPlugin: the action to dispatch that will toggle the RHS
     registerRightHandSidebarComponent(component, title) {
         const id = generateId();
 
@@ -459,6 +582,62 @@ export default class PluginRegistry {
             },
         });
 
-        return {id, showRHSPlugin: showRHSPlugin(id)};
+        return {id, showRHSPlugin: showRHSPlugin(id), hideRHSPlugin: hideRHSPlugin(id), toggleRHSPlugin: toggleRHSPlugin(id)};
+    }
+
+    // Register a Needs Team component by providing a route past /:team/:pluginId/ to be displayed at.
+    // Accepts the following:
+    // - route - The route to be displayed at.
+    // - component - A react component to display.
+    // Returns:
+    // - id: a unique identifier
+    registerNeedsTeamRoute(route, component) {
+        const id = generateId();
+        let fixedRoute = route.trim();
+        if (fixedRoute[0] === '/') {
+            fixedRoute = fixedRoute.substring(1);
+        }
+        fixedRoute = this.id + '/' + fixedRoute;
+
+        store.dispatch({
+            type: ActionTypes.RECEIVED_PLUGIN_COMPONENT,
+            name: 'NeedsTeamComponent',
+            data: {
+                id,
+                pluginId: this.id,
+                component,
+                route: fixedRoute,
+            },
+        });
+
+        return id;
+    }
+
+    // Register a component to be displayed at a custom route under /plug/:pluginId
+    // Accepts the following:
+    // - route - The route to be displayed at.
+    // - component - A react component to display.
+    // Returns:
+    // - id: a unique identifier
+    registerCustomRoute(route, component) {
+        const id = generateId();
+        let fixedRoute = route.trim();
+        if (fixedRoute[0] === '/') {
+            fixedRoute = fixedRoute.substring(1);
+        }
+        fixedRoute = this.id + '/' + fixedRoute;
+
+        store.dispatch({
+            type: ActionTypes.RECEIVED_PLUGIN_COMPONENT,
+            name: 'CustomRouteComponent',
+            data: {
+                id,
+                pluginId: this.id,
+                component,
+                route: fixedRoute,
+            },
+        });
+
+        return id;
     }
 }

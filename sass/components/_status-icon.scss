@@ -86,19 +86,51 @@
 }
 
 .status-selector:hover>.status {
-    display: none;
+    opacity: 0;
+    visibility: hidden;
+
+    body.enable-animations & {
+        @include transition-property(opacity, visibility);
+        @include transition-duration($transition-quick);
+        @include transition-delay(0s);
+        @include transition-timing-function(ease-in, step-end);
+    }
 }
 
 .status-selector>.status {
-    display: inherit;
+    opacity: 1;
+    visibility: visible;
+
+    body.enable-animations & {
+        @include transition-property(opacity, visibility);
+        @include transition-duration($transition-quick);
+        @include transition-delay(0s);
+        @include transition-timing-function(ease-out, step-start);
+    }
 }
 
 .status-selector>.status-edit {
-    display: none;
+    opacity: 0;
+    visibility: hidden;
+
+    body.enable-animations & {
+        @include transition-property(opacity, visibility);
+        @include transition-duration($transition-quick);
+        @include transition-delay(0s);
+        @include transition-timing-function(ease-in, step-end);
+    }
 }
 
 .status-selector:hover>.status-edit {
-    display: inherit;
+    opacity: 1;
+    visibility: visible;
+
+    body.enable-animations & {
+        @include transition-property(opacity, visibility);
+        @include transition-duration($transition-quick);
+        @include transition-delay(0s);
+        @include transition-timing-function(ease-out, step-start);
+    }
 }
 
 .status {
@@ -113,7 +145,6 @@
         font-size: 10px;
         font-weight: 600;
         height: 15px;
-        left: 1px;
         line-height: 14px;
         margin: 0 9px 0 -1px;
         text-align: center;
@@ -121,12 +152,12 @@
         top: 0;
 
         .mentions__name & {
+            background-color: rgba(var(--center-channel-color-rgb), 0.32);
             flex: 0 0 17px;
             height: 18px;
             left: 0;
             line-height: 18px;
             margin-left: 0;
-            margin-right: 6px;
             text-align: center;
             width: 17px;
         }
@@ -160,5 +191,20 @@
     .fa-globe {
         position: relative;
         top: -1px;
+    }
+}
+
+.status-dropdown-menu {
+    .online--icon > svg {
+        fill: var(--online-indicator);
+    }
+    .away--icon > svg {
+        fill: var(--away-indicator);
+    }
+    .dnd--icon > svg {
+        fill: var(--dnd-indicator);
+    }
+    .offline--icon {
+        fill: rgba(var(--center-channel-color-rgb), 0.56);
     }
 }

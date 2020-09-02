@@ -12,11 +12,11 @@ import configureServiceStore from 'mattermost-redux/store';
 import reduxInitialState from 'mattermost-redux/store/initial_state';
 
 import {storageRehydrate} from 'actions/storage';
-import {clearUserCookie} from 'actions/views/root';
+import {clearUserCookie} from 'actions/views/cookie';
 import appReducer from 'reducers';
 import {transformSet} from 'store/utils';
 import {detect} from 'utils/network.js';
-import {ActionTypes} from 'utils/constants.jsx';
+import {ActionTypes} from 'utils/constants';
 import {getBasePath} from 'selectors/general';
 
 function getAppReducer() {
@@ -90,7 +90,7 @@ export default function configureStore(initialState) {
             }
 
             return outboundState;
-        }
+        },
     );
 
     const offlineOptions = {
@@ -212,5 +212,5 @@ export default function configureStore(initialState) {
         detectNetwork: detect,
     };
 
-    return configureServiceStore({}, appReducer, offlineOptions, getAppReducer, {enableBuffer: false});
+    return configureServiceStore(initialState, appReducer, offlineOptions, getAppReducer, {enableBuffer: false});
 }

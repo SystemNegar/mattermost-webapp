@@ -10,14 +10,14 @@ import {memoizeResult} from 'mattermost-redux/utils/helpers';
 
 import * as GlobalActions from 'actions/global_actions.jsx';
 import AnnouncementBar from 'components/announcement_bar';
-import LoadingScreen from 'components/loading_screen.jsx';
-import LoadingSpinner from 'components/widgets/loading/loading_spinner.jsx';
-import LogoutIcon from 'components/icon/logout_icon';
-import WarningIcon from 'components/icon/warning_icon';
+import LoadingScreen from 'components/loading_screen';
+import LoadingSpinner from 'components/widgets/loading/loading_spinner';
+import LogoutIcon from 'components/widgets/icons/fa_logout_icon';
+import WarningIcon from 'components/widgets/icons/fa_warning_icon';
 
 import {browserHistory} from 'utils/browser_history';
 import messageHtmlToComponent from 'utils/message_html_to_component';
-import {formatText} from 'utils/text_formatting.jsx';
+import {formatText} from 'utils/text_formatting';
 import {Constants} from 'utils/constants.jsx';
 
 export default class TermsOfService extends React.PureComponent {
@@ -28,6 +28,7 @@ export default class TermsOfService extends React.PureComponent {
             getTermsOfService: PropTypes.func.isRequired,
             updateMyTermsOfServiceStatus: PropTypes.func.isRequired,
         }).isRequired,
+        emojiMap: PropTypes.object.isRequired,
     };
 
     constructor(props) {
@@ -42,7 +43,7 @@ export default class TermsOfService extends React.PureComponent {
             serverError: null,
         };
 
-        this.formattedText = memoizeResult((text) => formatText(text));
+        this.formattedText = memoizeResult((text) => formatText(text, {}, props.emojiMap));
     }
 
     componentDidMount() {
@@ -91,7 +92,7 @@ export default class TermsOfService extends React.PureComponent {
                 } else {
                     GlobalActions.redirectUserToDefaultTeam();
                 }
-            }
+            },
         );
     };
 
@@ -104,7 +105,7 @@ export default class TermsOfService extends React.PureComponent {
             false,
             () => {
                 GlobalActions.emitUserLoggedOutEvent(`/login?extra=${Constants.TERMS_REJECTED}`);
-            }
+            },
         );
     };
 

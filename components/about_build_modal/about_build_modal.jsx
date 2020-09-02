@@ -7,7 +7,9 @@ import {Modal} from 'react-bootstrap';
 import {FormattedMessage} from 'react-intl';
 
 import FormattedMarkdownMessage from 'components/formatted_markdown_message';
-import MattermostLogo from 'components/svg/mattermost_logo';
+import MattermostLogo from 'components/widgets/icons/mattermost_logo';
+
+import {AboutLinks} from 'utils/constants';
 
 export default class AboutBuildModal extends React.PureComponent {
     static defaultProps = {
@@ -15,11 +17,6 @@ export default class AboutBuildModal extends React.PureComponent {
     };
 
     static propTypes = {
-
-        /**
-         * Determines whether modal is shown or not
-         */
-        show: PropTypes.bool.isRequired,
 
         /**
          * Function that is called when the modal is dismissed
@@ -44,10 +41,17 @@ export default class AboutBuildModal extends React.PureComponent {
 
     constructor(props) {
         super(props);
-        this.doHide = this.doHide.bind(this);
+
+        this.state = {
+            show: true,
+        };
     }
 
-    doHide() {
+    doHide = () => {
+        this.setState({show: false});
+    }
+
+    handleExit = () => {
         this.props.onHide();
     }
 
@@ -136,46 +140,33 @@ export default class AboutBuildModal extends React.PureComponent {
             }
         }
 
-        let termsOfService;
-        if (config.TermsOfServiceLink) {
-            termsOfService = (
-                <a
-                    target='_blank'
-                    rel='noopener noreferrer'
-                    href={config.TermsOfServiceLink}
-                >
-                    <FormattedMessage
-                        id='about.tos'
-                        defaultMessage='Terms of Service'
-                    />
-                </a>
-            );
-        }
+        const termsOfService = (
+            <a
+                target='_blank'
+                id='tosLink'
+                rel='noopener noreferrer'
+                href={AboutLinks.TERMS_OF_SERVICE}
+            >
+                <FormattedMessage
+                    id='about.tos'
+                    defaultMessage='Terms of Service'
+                />
+            </a>
+        );
 
-        let privacyPolicy;
-        if (config.PrivacyPolicyLink) {
-            privacyPolicy = (
-                <a
-                    target='_blank'
-                    rel='noopener noreferrer'
-                    href={config.PrivacyPolicyLink}
-                >
-                    <FormattedMessage
-                        id='about.privacy'
-                        defaultMessage='Privacy Policy'
-                    />
-                </a>
-            );
-        }
-
-        let tosPrivacyHyphen;
-        if (config.TermsOfServiceLink && config.PrivacyPolicyLink) {
-            tosPrivacyHyphen = (
-                <span>
-                    {' - '}
-                </span>
-            );
-        }
+        const privacyPolicy = (
+            <a
+                target='_blank'
+                id='privacyLink'
+                rel='noopener noreferrer'
+                href={AboutLinks.PRIVACY_POLICY}
+            >
+                <FormattedMessage
+                    id='about.privacy'
+                    defaultMessage='Privacy Policy'
+                />
+            </a>
+        );
 
         // Only show build number if it's a number (so only builds from Jenkins)
         let buildnumber = (
@@ -198,9 +189,10 @@ export default class AboutBuildModal extends React.PureComponent {
 
         return (
             <Modal
-                dialogClassName='about-modal'
-                show={this.props.show}
+                dialogClassName='a11y__modal about-modal'
+                show={this.state.show}
                 onHide={this.doHide}
+                onExited={this.handleExit}
                 role='dialog'
                 aria-labelledby='aboutModalLabel'
             >
@@ -223,7 +215,7 @@ export default class AboutBuildModal extends React.PureComponent {
                         </div>
                         <div>
                             <h3 className='about-modal__title'>{'Mattermost'} {title}</h3>
-                            <p className='about-modal__subtitle padding-bottom'>{subTitle}</p>
+                            <p className='about-modal__subtitle pb-2'>{subTitle}</p>
                             <div className='form-group less'>
                                 <div>
                                     <FormattedMessage
@@ -265,12 +257,12 @@ export default class AboutBuildModal extends React.PureComponent {
                             </div>
                             <div className='about-modal__links'>
                                 {termsOfService}
-                                {tosPrivacyHyphen}
+                                {' - '}
                                 {privacyPolicy}
                             </div>
                         </div>
                     </div>
-                    <div className='about-modal__notice form-group padding-top x2'>
+                    <div className='about-modal__notice form-group pt-3'>
                         <p>
                             <FormattedMarkdownMessage
                                 id='about.notice'

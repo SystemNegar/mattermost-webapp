@@ -3,7 +3,7 @@
 
 import React from 'react';
 
-import {mountWithIntl} from 'tests/helpers/intl-test-helper.jsx';
+import {mountWithIntl} from 'tests/helpers/intl-test-helper';
 import ManageAutoResponder from 'components/user_settings/notifications/manage_auto_responder.jsx';
 
 describe('components/user_settings/notifications/ManageAutoResponder', () => {
@@ -31,7 +31,7 @@ describe('components/user_settings/notifications/ManageAutoResponder', () => {
             <ManageAutoResponder
                 {...requiredProps}
                 autoResponderActive={true}
-            />
+            />,
         );
 
         expect(wrapper).toMatchSnapshot();
@@ -47,7 +47,7 @@ describe('components/user_settings/notifications/ManageAutoResponder', () => {
                 {...requiredProps}
                 autoResponderActive={true}
                 setParentState={setParentState}
-            />
+            />,
         );
 
         expect(wrapper.find('#autoResponderActive').exists()).toBe(true);

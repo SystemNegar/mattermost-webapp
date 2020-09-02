@@ -5,10 +5,10 @@ import $ from 'jquery';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import Constants from 'utils/constants.jsx';
+import Constants from 'utils/constants';
 import * as Utils from 'utils/utils.jsx';
 
-export default class PremadeThemeChooser extends React.Component {
+export default class PremadeThemeChooser extends React.PureComponent {
     render() {
         const theme = this.props.theme;
 
@@ -22,7 +22,7 @@ export default class PremadeThemeChooser extends React.Component {
                     continue;
                 }
 
-                const premadeTheme = $.extend(true, {}, Constants.THEMES[k]);
+                const premadeTheme = $.extend(true, {}, Constants.THEMES[k]); // eslint-disable-line jquery/no-extend
 
                 let activeClass = '';
                 if (premadeTheme.type === theme.type) {
@@ -48,7 +48,7 @@ export default class PremadeThemeChooser extends React.Component {
                                 <div className='theme-label'>{Utils.toTitleCase(premadeTheme.type)}</div>
                             </label>
                         </div>
-                    </div>
+                    </div>,
                 );
             }
         }

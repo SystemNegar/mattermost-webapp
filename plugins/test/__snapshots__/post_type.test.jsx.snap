@@ -2,6 +2,7 @@
 
 exports[`plugins/PostMessageView should match snapshot with extended post type 1`] = `
 <PostMessageView
+  currentRelativeTeamUrl="team_url"
   currentUser={
     Object {
       "username": "username",
@@ -70,9 +71,11 @@ exports[`plugins/PostMessageView should match snapshot with no extended post typ
   text="this is some text"
 >
   <div
+    aria-readonly="true"
     className="post-message__text"
     id="postMessageText_post_id"
     onClick={[Function]}
+    tabIndex="0"
   >
     <Connect(PostMarkdown)
       imageProps={

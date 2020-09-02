@@ -4,10 +4,10 @@
 import React from 'react';
 import {shallow} from 'enzyme';
 
-import Constants from 'utils/constants.jsx';
+import Constants from 'utils/constants';
 import SettingItemMax from 'components/setting_item_max.jsx';
 
-describe('components/SettingItemMin', () => {
+describe('components/SettingItemMax', () => {
     const baseProps = {
         inputs: ['input_1'],
         clientError: '',
@@ -24,7 +24,7 @@ describe('components/SettingItemMin', () => {
 
     test('should match snapshot', () => {
         const wrapper = shallow(
-            <SettingItemMax {...baseProps}/>
+            <SettingItemMax {...baseProps}/>,
         );
 
         expect(wrapper).toMatchSnapshot();
@@ -33,7 +33,7 @@ describe('components/SettingItemMin', () => {
     test('should match snapshot, without submit', () => {
         const props = {...baseProps, submit: null};
         const wrapper = shallow(
-            <SettingItemMax {...props}/>
+            <SettingItemMax {...props}/>,
         );
 
         expect(wrapper).toMatchSnapshot();
@@ -42,7 +42,7 @@ describe('components/SettingItemMin', () => {
     test('should match snapshot, on clientError', () => {
         const props = {...baseProps, clientError: 'clientError'};
         const wrapper = shallow(
-            <SettingItemMax {...props}/>
+            <SettingItemMax {...props}/>,
         );
 
         expect(wrapper).toMatchSnapshot();
@@ -51,7 +51,7 @@ describe('components/SettingItemMin', () => {
     test('should match snapshot, on serverError', () => {
         const props = {...baseProps, serverError: 'serverError'};
         const wrapper = shallow(
-            <SettingItemMax {...props}/>
+            <SettingItemMax {...props}/>,
         );
 
         expect(wrapper).toMatchSnapshot();
@@ -61,7 +61,7 @@ describe('components/SettingItemMin', () => {
         const updateSection = jest.fn();
         const props = {...baseProps, updateSection};
         const wrapper = shallow(
-            <SettingItemMax {...props}/>
+            <SettingItemMax {...props}/>,
         );
 
         wrapper.instance().handleUpdateSection({preventDefault: jest.fn()});
@@ -73,7 +73,7 @@ describe('components/SettingItemMin', () => {
         const updateSection = jest.fn();
         const props = {...baseProps, updateSection, section: ''};
         const wrapper = shallow(
-            <SettingItemMax {...props}/>
+            <SettingItemMax {...props}/>,
         );
 
         wrapper.instance().handleUpdateSection({preventDefault: jest.fn()});
@@ -85,7 +85,7 @@ describe('components/SettingItemMin', () => {
         const submit = jest.fn();
         const props = {...baseProps, submit};
         const wrapper = shallow(
-            <SettingItemMax {...props}/>
+            <SettingItemMax {...props}/>,
         );
 
         wrapper.instance().handleSubmit({preventDefault: jest.fn()});
@@ -97,7 +97,7 @@ describe('components/SettingItemMin', () => {
         const submit = jest.fn();
         const props = {...baseProps, submit, setting: ''};
         const wrapper = shallow(
-            <SettingItemMax {...props}/>
+            <SettingItemMax {...props}/>,
         );
 
         wrapper.instance().handleSubmit({preventDefault: jest.fn()});
@@ -109,18 +109,23 @@ describe('components/SettingItemMin', () => {
         const submit = jest.fn();
         const props = {...baseProps, submit};
         const wrapper = shallow(
-            <SettingItemMax {...props}/>
+            <SettingItemMax {...props}/>,
         );
         const instance = wrapper.instance();
-        instance.onKeyDown({preventDefault: jest.fn(), key: Constants.KeyCodes.ENTER[0]});
-        expect(submit).toHaveBeenCalled();
+
+        instance.onKeyDown({preventDefault: jest.fn(), key: Constants.KeyCodes.ENTER[0], target: {tagName: 'SELECT', classList: {contains: jest.fn()}, parentElement: {className: 'react-select__input'}}});
+        expect(submit).toHaveBeenCalledTimes(0);
+
+        instance.settingList.current = {contains: jest.fn(() => true)};
+        instance.onKeyDown({preventDefault: jest.fn(), key: Constants.KeyCodes.ENTER[0], target: {tagName: '', classList: {contains: jest.fn()}, parentElement: {className: ''}}});
+        expect(submit).toHaveBeenCalledTimes(1);
         expect(submit).toHaveBeenCalledWith('setting');
     });
 
     test('should match snapshot, with new saveTextButton', () => {
         const props = {...baseProps, saveButtonText: 'CustomText'};
         const wrapper = shallow(
-            <SettingItemMax {...props}/>
+            <SettingItemMax {...props}/>,
         );
 
         expect(wrapper).toMatchSnapshot();

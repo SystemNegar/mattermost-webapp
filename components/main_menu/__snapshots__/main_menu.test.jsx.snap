@@ -19,12 +19,20 @@ exports[`components/Menu should match snapshot with id 1`] = `
       id="flaggedPosts"
       onClick={[Function]}
       show={false}
-      text="Flagged Posts"
+      text="Saved Posts"
     />
   </MenuGroup>
   <MenuGroup>
     <MenuItemToggleModalRedux
-      dialogType={[Function]}
+      dialogType={
+        Object {
+          "$$typeof": Symbol(react.memo),
+          "WrappedComponent": [Function],
+          "compare": null,
+          "displayName": "Connect(injectIntl(UserSettingsModal))",
+          "type": [Function],
+        }
+      }
       icon={false}
       id="accountSettings"
       modalId="user_settings"
@@ -42,7 +50,15 @@ exports[`components/Menu should match snapshot with id 1`] = `
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(AddGroupsToTeamModal)",
+            "type": [Function],
+          }
+        }
         icon={false}
         id="addGroupsToTeam"
         modalId="add_groups_to_team"
@@ -54,69 +70,27 @@ exports[`components/Menu should match snapshot with id 1`] = `
       permissions={
         Array [
           "add_user_to_team",
+          "invite_guest",
         ]
       }
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
-        icon={false}
-        id="addUsersToTeam"
-        modalId="add_user_to_team"
-        show={false}
-        text="Add Members to Team"
-      />
-    </Connect(TeamPermissionGate)>
-  </MenuGroup>
-  <MenuGroup>
-    <Connect(TeamPermissionGate)
-      permissions={
-        Array [
-          "add_user_to_team",
-        ]
-      }
-      teamId="team-id"
-    >
-      <Connect(TeamPermissionGate)
-        permissions={
-          Array [
-            "invite_user",
-          ]
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(InvitationModal)",
+            "type": [Function],
+          }
         }
-        teamId="team-id"
-      >
-        <MenuItemToggleModalRedux
-          dialogType={[Function]}
-          icon={false}
-          id="sendEmailInvite"
-          modalId="email_invite"
-          show={false}
-          text="Send Email Invite"
-        />
-      </Connect(TeamPermissionGate)>
-      <Connect(TeamPermissionGate)
-        permissions={
-          Array [
-            "invite_user",
-          ]
-        }
-        teamId="team-id"
-      >
-        <MenuItemAction
-          icon={false}
-          id="getTeamInviteLink"
-          onClick={[Function]}
-          show={false}
-          text="Get Team Invite Link"
-        />
-      </Connect(TeamPermissionGate)>
-      <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        extraText="Add or invite people to the team"
         icon={false}
-        id="addUsersToTeam"
-        modalId="add_user_to_team"
+        id="invitePeople"
+        modalId="invitation"
         show={true}
-        text="Add Members to Team"
+        text="Invite People"
       />
     </Connect(TeamPermissionGate)>
   </MenuGroup>
@@ -130,7 +104,15 @@ exports[`components/Menu should match snapshot with id 1`] = `
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(TeamSettingsModal)",
+            "type": [Function],
+          }
+        }
         icon={false}
         id="teamSettings"
         modalId="team_settings"
@@ -152,7 +134,15 @@ exports[`components/Menu should match snapshot with id 1`] = `
             "teamID": "team-id",
           }
         }
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(injectIntl(TeamGroupsManageModal))",
+            "type": [Function],
+          }
+        }
         icon={false}
         id="manageGroups"
         modalId="manage_team_groups"
@@ -170,7 +160,15 @@ exports[`components/Menu should match snapshot with id 1`] = `
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(TeamMembersModal)",
+            "type": [Function],
+          }
+        }
         icon={false}
         id="manageMembers"
         modalId="team_members"
@@ -189,7 +187,15 @@ exports[`components/Menu should match snapshot with id 1`] = `
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(TeamMembersModal)",
+            "type": [Function],
+          }
+        }
         icon={false}
         id="viewMembers"
         modalId="team_members"
@@ -210,7 +216,7 @@ exports[`components/Menu should match snapshot with id 1`] = `
         icon={false}
         id="createTeam"
         show={true}
-        text="Create a New Team"
+        text="Create a Team"
         to="/create_team"
       />
     </Connect(SystemPermissionGate)>
@@ -222,7 +228,15 @@ exports[`components/Menu should match snapshot with id 1`] = `
       to="/select_team"
     />
     <MenuItemToggleModalRedux
-      dialogType={[Function]}
+      dialogType={
+        Object {
+          "$$typeof": Symbol(react.memo),
+          "WrappedComponent": [Function],
+          "compare": null,
+          "displayName": "Connect(LeaveTeamModal)",
+          "type": [Function],
+        }
+      }
       icon={false}
       id="leaveTeam"
       modalId="leave_team"
@@ -232,36 +246,62 @@ exports[`components/Menu should match snapshot with id 1`] = `
   </MenuGroup>
   <MenuGroup />
   <MenuGroup>
+    <MenuItemLink
+      id="integrations"
+      show={false}
+      text="Integrations"
+      to="/team_name/integrations"
+    />
     <Connect(TeamPermissionGate)
       permissions={
         Array [
-          "manage_slash_commands",
-          "manage_oauth",
-          "manage_incoming_webhooks",
-          "manage_outgoing_webhooks",
+          "manage_system",
         ]
       }
       teamId="team-id"
     >
-      <MenuItemLink
-        id="integrations"
+      <MenuItemToggleModalRedux
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(MarketplaceModal)",
+            "type": [Function],
+          }
+        }
+        id="marketplaceModal"
+        modalId="plugin_marketplace"
         show={false}
-        text="Integrations"
-        to="/team name/integrations"
+        text="Plugin Marketplace"
       />
     </Connect(TeamPermissionGate)>
     <MenuItemLink
       id="customEmojis"
       show={false}
       text="Custom Emoji"
-      to="/team name/emoji"
+      to="/team_name/emoji"
     />
   </MenuGroup>
   <MenuGroup>
     <Connect(SystemPermissionGate)
       permissions={
         Array [
-          "manage_system",
+          "sysconsole_read_about",
+          "sysconsole_read_billing",
+          "sysconsole_read_reporting",
+          "sysconsole_read_user_management_users",
+          "sysconsole_read_user_management_groups",
+          "sysconsole_read_user_management_teams",
+          "sysconsole_read_user_management_channels",
+          "sysconsole_read_user_management_permissions",
+          "sysconsole_read_environment",
+          "sysconsole_read_site",
+          "sysconsole_read_authentication",
+          "sysconsole_read_plugins",
+          "sysconsole_read_integrations",
+          "sysconsole_read_compliance",
+          "sysconsole_read_experimental",
         ]
       }
     >
@@ -281,6 +321,12 @@ exports[`components/Menu should match snapshot with id 1`] = `
       show={false}
       text="Help"
       url={null}
+    />
+    <MenuItemAction
+      id="gettingStarted"
+      onClick={[Function]}
+      show={false}
+      text="Getting Started"
     />
     <MenuItemAction
       id="keyboardShortcuts"
@@ -303,7 +349,15 @@ exports[`components/Menu should match snapshot with id 1`] = `
       url={null}
     />
     <MenuItemToggleModalRedux
-      dialogType={[Function]}
+      dialogType={
+        Object {
+          "$$typeof": Symbol(react.memo),
+          "WrappedComponent": [Function],
+          "compare": null,
+          "displayName": "Connect(AboutBuildModal)",
+          "type": [Function],
+        }
+      }
       icon={false}
       id="about"
       modalId="about"
@@ -317,7 +371,7 @@ exports[`components/Menu should match snapshot with id 1`] = `
       id="logout"
       onClick={[Function]}
       show={true}
-      text="Logout"
+      text="Log Out"
     />
   </MenuGroup>
 </Menu>
@@ -341,12 +395,20 @@ exports[`components/Menu should match snapshot with most of the thing disabled 1
       id="flaggedPosts"
       onClick={[Function]}
       show={false}
-      text="Flagged Posts"
+      text="Saved Posts"
     />
   </MenuGroup>
   <MenuGroup>
     <MenuItemToggleModalRedux
-      dialogType={[Function]}
+      dialogType={
+        Object {
+          "$$typeof": Symbol(react.memo),
+          "WrappedComponent": [Function],
+          "compare": null,
+          "displayName": "Connect(injectIntl(UserSettingsModal))",
+          "type": [Function],
+        }
+      }
       icon={false}
       id="accountSettings"
       modalId="user_settings"
@@ -364,7 +426,15 @@ exports[`components/Menu should match snapshot with most of the thing disabled 1
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(AddGroupsToTeamModal)",
+            "type": [Function],
+          }
+        }
         icon={false}
         id="addGroupsToTeam"
         modalId="add_groups_to_team"
@@ -376,69 +446,27 @@ exports[`components/Menu should match snapshot with most of the thing disabled 1
       permissions={
         Array [
           "add_user_to_team",
+          "invite_guest",
         ]
       }
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
-        icon={false}
-        id="addUsersToTeam"
-        modalId="add_user_to_team"
-        show={false}
-        text="Add Members to Team"
-      />
-    </Connect(TeamPermissionGate)>
-  </MenuGroup>
-  <MenuGroup>
-    <Connect(TeamPermissionGate)
-      permissions={
-        Array [
-          "add_user_to_team",
-        ]
-      }
-      teamId="team-id"
-    >
-      <Connect(TeamPermissionGate)
-        permissions={
-          Array [
-            "invite_user",
-          ]
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(InvitationModal)",
+            "type": [Function],
+          }
         }
-        teamId="team-id"
-      >
-        <MenuItemToggleModalRedux
-          dialogType={[Function]}
-          icon={false}
-          id="sendEmailInvite"
-          modalId="email_invite"
-          show={false}
-          text="Send Email Invite"
-        />
-      </Connect(TeamPermissionGate)>
-      <Connect(TeamPermissionGate)
-        permissions={
-          Array [
-            "invite_user",
-          ]
-        }
-        teamId="team-id"
-      >
-        <MenuItemAction
-          icon={false}
-          id="getTeamInviteLink"
-          onClick={[Function]}
-          show={false}
-          text="Get Team Invite Link"
-        />
-      </Connect(TeamPermissionGate)>
-      <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        extraText="Add or invite people to the team"
         icon={false}
-        id="addUsersToTeam"
-        modalId="add_user_to_team"
+        id="invitePeople"
+        modalId="invitation"
         show={true}
-        text="Add Members to Team"
+        text="Invite People"
       />
     </Connect(TeamPermissionGate)>
   </MenuGroup>
@@ -452,7 +480,15 @@ exports[`components/Menu should match snapshot with most of the thing disabled 1
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(TeamSettingsModal)",
+            "type": [Function],
+          }
+        }
         icon={false}
         id="teamSettings"
         modalId="team_settings"
@@ -474,7 +510,15 @@ exports[`components/Menu should match snapshot with most of the thing disabled 1
             "teamID": "team-id",
           }
         }
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(injectIntl(TeamGroupsManageModal))",
+            "type": [Function],
+          }
+        }
         icon={false}
         id="manageGroups"
         modalId="manage_team_groups"
@@ -492,7 +536,15 @@ exports[`components/Menu should match snapshot with most of the thing disabled 1
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(TeamMembersModal)",
+            "type": [Function],
+          }
+        }
         icon={false}
         id="manageMembers"
         modalId="team_members"
@@ -511,7 +563,15 @@ exports[`components/Menu should match snapshot with most of the thing disabled 1
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(TeamMembersModal)",
+            "type": [Function],
+          }
+        }
         icon={false}
         id="viewMembers"
         modalId="team_members"
@@ -532,7 +592,7 @@ exports[`components/Menu should match snapshot with most of the thing disabled 1
         icon={false}
         id="createTeam"
         show={true}
-        text="Create a New Team"
+        text="Create a Team"
         to="/create_team"
       />
     </Connect(SystemPermissionGate)>
@@ -544,7 +604,15 @@ exports[`components/Menu should match snapshot with most of the thing disabled 1
       to="/select_team"
     />
     <MenuItemToggleModalRedux
-      dialogType={[Function]}
+      dialogType={
+        Object {
+          "$$typeof": Symbol(react.memo),
+          "WrappedComponent": [Function],
+          "compare": null,
+          "displayName": "Connect(LeaveTeamModal)",
+          "type": [Function],
+        }
+      }
       icon={false}
       id="leaveTeam"
       modalId="leave_team"
@@ -554,36 +622,62 @@ exports[`components/Menu should match snapshot with most of the thing disabled 1
   </MenuGroup>
   <MenuGroup />
   <MenuGroup>
+    <MenuItemLink
+      id="integrations"
+      show={false}
+      text="Integrations"
+      to="/team_name/integrations"
+    />
     <Connect(TeamPermissionGate)
       permissions={
         Array [
-          "manage_slash_commands",
-          "manage_oauth",
-          "manage_incoming_webhooks",
-          "manage_outgoing_webhooks",
+          "manage_system",
         ]
       }
       teamId="team-id"
     >
-      <MenuItemLink
-        id="integrations"
+      <MenuItemToggleModalRedux
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(MarketplaceModal)",
+            "type": [Function],
+          }
+        }
+        id="marketplaceModal"
+        modalId="plugin_marketplace"
         show={false}
-        text="Integrations"
-        to="/team name/integrations"
+        text="Plugin Marketplace"
       />
     </Connect(TeamPermissionGate)>
     <MenuItemLink
       id="customEmojis"
       show={false}
       text="Custom Emoji"
-      to="/team name/emoji"
+      to="/team_name/emoji"
     />
   </MenuGroup>
   <MenuGroup>
     <Connect(SystemPermissionGate)
       permissions={
         Array [
-          "manage_system",
+          "sysconsole_read_about",
+          "sysconsole_read_billing",
+          "sysconsole_read_reporting",
+          "sysconsole_read_user_management_users",
+          "sysconsole_read_user_management_groups",
+          "sysconsole_read_user_management_teams",
+          "sysconsole_read_user_management_channels",
+          "sysconsole_read_user_management_permissions",
+          "sysconsole_read_environment",
+          "sysconsole_read_site",
+          "sysconsole_read_authentication",
+          "sysconsole_read_plugins",
+          "sysconsole_read_integrations",
+          "sysconsole_read_compliance",
+          "sysconsole_read_experimental",
         ]
       }
     >
@@ -603,6 +697,12 @@ exports[`components/Menu should match snapshot with most of the thing disabled 1
       show={false}
       text="Help"
       url={null}
+    />
+    <MenuItemAction
+      id="gettingStarted"
+      onClick={[Function]}
+      show={false}
+      text="Getting Started"
     />
     <MenuItemAction
       id="keyboardShortcuts"
@@ -625,7 +725,15 @@ exports[`components/Menu should match snapshot with most of the thing disabled 1
       url={null}
     />
     <MenuItemToggleModalRedux
-      dialogType={[Function]}
+      dialogType={
+        Object {
+          "$$typeof": Symbol(react.memo),
+          "WrappedComponent": [Function],
+          "compare": null,
+          "displayName": "Connect(AboutBuildModal)",
+          "type": [Function],
+        }
+      }
       icon={false}
       id="about"
       modalId="about"
@@ -639,7 +747,7 @@ exports[`components/Menu should match snapshot with most of the thing disabled 1
       id="logout"
       onClick={[Function]}
       show={true}
-      text="Logout"
+      text="Log Out"
     />
   </MenuGroup>
 </Menu>
@@ -667,18 +775,26 @@ exports[`components/Menu should match snapshot with most of the thing disabled i
     <MenuItemAction
       icon={
         <i
-          className="fa fa-flag"
+          className="fa fa-bookmark"
         />
       }
       id="flaggedPosts"
       onClick={[Function]}
       show={true}
-      text="Flagged Posts"
+      text="Saved Posts"
     />
   </MenuGroup>
   <MenuGroup>
     <MenuItemToggleModalRedux
-      dialogType={[Function]}
+      dialogType={
+        Object {
+          "$$typeof": Symbol(react.memo),
+          "WrappedComponent": [Function],
+          "compare": null,
+          "displayName": "Connect(injectIntl(UserSettingsModal))",
+          "type": [Function],
+        }
+      }
       icon={
         <i
           className="fa fa-cog"
@@ -700,7 +816,15 @@ exports[`components/Menu should match snapshot with most of the thing disabled i
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(AddGroupsToTeamModal)",
+            "type": [Function],
+          }
+        }
         icon={
           <i
             className="fa fa-user-plus"
@@ -716,85 +840,31 @@ exports[`components/Menu should match snapshot with most of the thing disabled i
       permissions={
         Array [
           "add_user_to_team",
+          "invite_guest",
         ]
       }
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(InvitationModal)",
+            "type": [Function],
+          }
+        }
+        extraText="Add or invite people to the team"
         icon={
           <i
             className="fa fa-user-plus"
           />
         }
-        id="addUsersToTeam"
-        modalId="add_user_to_team"
-        show={false}
-        text="Add Members to Team"
-      />
-    </Connect(TeamPermissionGate)>
-  </MenuGroup>
-  <MenuGroup>
-    <Connect(TeamPermissionGate)
-      permissions={
-        Array [
-          "add_user_to_team",
-        ]
-      }
-      teamId="team-id"
-    >
-      <Connect(TeamPermissionGate)
-        permissions={
-          Array [
-            "invite_user",
-          ]
-        }
-        teamId="team-id"
-      >
-        <MenuItemToggleModalRedux
-          dialogType={[Function]}
-          icon={
-            <i
-              className="fa fa-user-plus"
-            />
-          }
-          id="sendEmailInvite"
-          modalId="email_invite"
-          show={false}
-          text="Send Email Invite"
-        />
-      </Connect(TeamPermissionGate)>
-      <Connect(TeamPermissionGate)
-        permissions={
-          Array [
-            "invite_user",
-          ]
-        }
-        teamId="team-id"
-      >
-        <MenuItemAction
-          icon={
-            <i
-              className="fa fa-link"
-            />
-          }
-          id="getTeamInviteLink"
-          onClick={[Function]}
-          show={false}
-          text="Get Team Invite Link"
-        />
-      </Connect(TeamPermissionGate)>
-      <MenuItemToggleModalRedux
-        dialogType={[Function]}
-        icon={
-          <i
-            className="fa fa-user-plus"
-          />
-        }
-        id="addUsersToTeam"
-        modalId="add_user_to_team"
+        id="invitePeople"
+        modalId="invitation"
         show={true}
-        text="Add Members to Team"
+        text="Invite People"
       />
     </Connect(TeamPermissionGate)>
   </MenuGroup>
@@ -808,7 +878,15 @@ exports[`components/Menu should match snapshot with most of the thing disabled i
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(TeamSettingsModal)",
+            "type": [Function],
+          }
+        }
         icon={
           <i
             className="fa fa-globe"
@@ -834,7 +912,15 @@ exports[`components/Menu should match snapshot with most of the thing disabled i
             "teamID": "team-id",
           }
         }
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(injectIntl(TeamGroupsManageModal))",
+            "type": [Function],
+          }
+        }
         icon={
           <i
             className="fa fa-user-plus"
@@ -856,7 +942,15 @@ exports[`components/Menu should match snapshot with most of the thing disabled i
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(TeamMembersModal)",
+            "type": [Function],
+          }
+        }
         icon={
           <i
             className="fa fa-users"
@@ -879,7 +973,15 @@ exports[`components/Menu should match snapshot with most of the thing disabled i
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(TeamMembersModal)",
+            "type": [Function],
+          }
+        }
         icon={
           <i
             className="fa fa-users"
@@ -908,7 +1010,7 @@ exports[`components/Menu should match snapshot with most of the thing disabled i
         }
         id="createTeam"
         show={true}
-        text="Create a New Team"
+        text="Create a Team"
         to="/create_team"
       />
     </Connect(SystemPermissionGate)>
@@ -924,7 +1026,15 @@ exports[`components/Menu should match snapshot with most of the thing disabled i
       to="/select_team"
     />
     <MenuItemToggleModalRedux
-      dialogType={[Function]}
+      dialogType={
+        Object {
+          "$$typeof": Symbol(react.memo),
+          "WrappedComponent": [Function],
+          "compare": null,
+          "displayName": "Connect(LeaveTeamModal)",
+          "type": [Function],
+        }
+      }
       icon={<LeaveTeamIcon />}
       id="leaveTeam"
       modalId="leave_team"
@@ -934,36 +1044,62 @@ exports[`components/Menu should match snapshot with most of the thing disabled i
   </MenuGroup>
   <MenuGroup />
   <MenuGroup>
+    <MenuItemLink
+      id="integrations"
+      show={false}
+      text="Integrations"
+      to="/team_name/integrations"
+    />
     <Connect(TeamPermissionGate)
       permissions={
         Array [
-          "manage_slash_commands",
-          "manage_oauth",
-          "manage_incoming_webhooks",
-          "manage_outgoing_webhooks",
+          "manage_system",
         ]
       }
       teamId="team-id"
     >
-      <MenuItemLink
-        id="integrations"
+      <MenuItemToggleModalRedux
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(MarketplaceModal)",
+            "type": [Function],
+          }
+        }
+        id="marketplaceModal"
+        modalId="plugin_marketplace"
         show={false}
-        text="Integrations"
-        to="/team name/integrations"
+        text="Plugin Marketplace"
       />
     </Connect(TeamPermissionGate)>
     <MenuItemLink
       id="customEmojis"
       show={false}
       text="Custom Emoji"
-      to="/team name/emoji"
+      to="/team_name/emoji"
     />
   </MenuGroup>
   <MenuGroup>
     <Connect(SystemPermissionGate)
       permissions={
         Array [
-          "manage_system",
+          "sysconsole_read_about",
+          "sysconsole_read_billing",
+          "sysconsole_read_reporting",
+          "sysconsole_read_user_management_users",
+          "sysconsole_read_user_management_groups",
+          "sysconsole_read_user_management_teams",
+          "sysconsole_read_user_management_channels",
+          "sysconsole_read_user_management_permissions",
+          "sysconsole_read_environment",
+          "sysconsole_read_site",
+          "sysconsole_read_authentication",
+          "sysconsole_read_plugins",
+          "sysconsole_read_integrations",
+          "sysconsole_read_compliance",
+          "sysconsole_read_experimental",
         ]
       }
     >
@@ -991,6 +1127,12 @@ exports[`components/Menu should match snapshot with most of the thing disabled i
       show={false}
       text="Help"
       url={null}
+    />
+    <MenuItemAction
+      id="gettingStarted"
+      onClick={[Function]}
+      show={false}
+      text="Getting Started"
     />
     <MenuItemAction
       id="keyboardShortcuts"
@@ -1021,7 +1163,15 @@ exports[`components/Menu should match snapshot with most of the thing disabled i
       url={null}
     />
     <MenuItemToggleModalRedux
-      dialogType={[Function]}
+      dialogType={
+        Object {
+          "$$typeof": Symbol(react.memo),
+          "WrappedComponent": [Function],
+          "compare": null,
+          "displayName": "Connect(AboutBuildModal)",
+          "type": [Function],
+        }
+      }
       icon={
         <i
           className="fa fa-info"
@@ -1043,7 +1193,7 @@ exports[`components/Menu should match snapshot with most of the thing disabled i
       id="logout"
       onClick={[Function]}
       show={true}
-      text="Logout"
+      text="Log Out"
     />
   </MenuGroup>
 </Menu>
@@ -1067,12 +1217,20 @@ exports[`components/Menu should match snapshot with most of the thing enabled 1`
       id="flaggedPosts"
       onClick={[Function]}
       show={false}
-      text="Flagged Posts"
+      text="Saved Posts"
     />
   </MenuGroup>
   <MenuGroup>
     <MenuItemToggleModalRedux
-      dialogType={[Function]}
+      dialogType={
+        Object {
+          "$$typeof": Symbol(react.memo),
+          "WrappedComponent": [Function],
+          "compare": null,
+          "displayName": "Connect(injectIntl(UserSettingsModal))",
+          "type": [Function],
+        }
+      }
       icon={false}
       id="accountSettings"
       modalId="user_settings"
@@ -1090,7 +1248,15 @@ exports[`components/Menu should match snapshot with most of the thing enabled 1`
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(AddGroupsToTeamModal)",
+            "type": [Function],
+          }
+        }
         icon={false}
         id="addGroupsToTeam"
         modalId="add_groups_to_team"
@@ -1102,69 +1268,27 @@ exports[`components/Menu should match snapshot with most of the thing enabled 1`
       permissions={
         Array [
           "add_user_to_team",
+          "invite_guest",
         ]
       }
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
-        icon={false}
-        id="addUsersToTeam"
-        modalId="add_user_to_team"
-        show={false}
-        text="Add Members to Team"
-      />
-    </Connect(TeamPermissionGate)>
-  </MenuGroup>
-  <MenuGroup>
-    <Connect(TeamPermissionGate)
-      permissions={
-        Array [
-          "add_user_to_team",
-        ]
-      }
-      teamId="team-id"
-    >
-      <Connect(TeamPermissionGate)
-        permissions={
-          Array [
-            "invite_user",
-          ]
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(InvitationModal)",
+            "type": [Function],
+          }
         }
-        teamId="team-id"
-      >
-        <MenuItemToggleModalRedux
-          dialogType={[Function]}
-          icon={false}
-          id="sendEmailInvite"
-          modalId="email_invite"
-          show={true}
-          text="Send Email Invite"
-        />
-      </Connect(TeamPermissionGate)>
-      <Connect(TeamPermissionGate)
-        permissions={
-          Array [
-            "invite_user",
-          ]
-        }
-        teamId="team-id"
-      >
-        <MenuItemAction
-          icon={false}
-          id="getTeamInviteLink"
-          onClick={[Function]}
-          show={true}
-          text="Get Team Invite Link"
-        />
-      </Connect(TeamPermissionGate)>
-      <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        extraText="Add or invite people to the team"
         icon={false}
-        id="addUsersToTeam"
-        modalId="add_user_to_team"
+        id="invitePeople"
+        modalId="invitation"
         show={true}
-        text="Add Members to Team"
+        text="Invite People"
       />
     </Connect(TeamPermissionGate)>
   </MenuGroup>
@@ -1178,7 +1302,15 @@ exports[`components/Menu should match snapshot with most of the thing enabled 1`
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(TeamSettingsModal)",
+            "type": [Function],
+          }
+        }
         icon={false}
         id="teamSettings"
         modalId="team_settings"
@@ -1200,7 +1332,15 @@ exports[`components/Menu should match snapshot with most of the thing enabled 1`
             "teamID": "team-id",
           }
         }
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(injectIntl(TeamGroupsManageModal))",
+            "type": [Function],
+          }
+        }
         icon={false}
         id="manageGroups"
         modalId="manage_team_groups"
@@ -1218,7 +1358,15 @@ exports[`components/Menu should match snapshot with most of the thing enabled 1`
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(TeamMembersModal)",
+            "type": [Function],
+          }
+        }
         icon={false}
         id="manageMembers"
         modalId="team_members"
@@ -1237,7 +1385,15 @@ exports[`components/Menu should match snapshot with most of the thing enabled 1`
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(TeamMembersModal)",
+            "type": [Function],
+          }
+        }
         icon={false}
         id="viewMembers"
         modalId="team_members"
@@ -1258,7 +1414,7 @@ exports[`components/Menu should match snapshot with most of the thing enabled 1`
         icon={false}
         id="createTeam"
         show={true}
-        text="Create a New Team"
+        text="Create a Team"
         to="/create_team"
       />
     </Connect(SystemPermissionGate)>
@@ -1270,46 +1426,80 @@ exports[`components/Menu should match snapshot with most of the thing enabled 1`
       to="/select_team"
     />
     <MenuItemToggleModalRedux
-      dialogType={[Function]}
+      dialogType={
+        Object {
+          "$$typeof": Symbol(react.memo),
+          "WrappedComponent": [Function],
+          "compare": null,
+          "displayName": "Connect(LeaveTeamModal)",
+          "type": [Function],
+        }
+      }
       icon={false}
       id="leaveTeam"
       modalId="leave_team"
-      show={false}
+      show={true}
       text="Leave Team"
     />
   </MenuGroup>
   <MenuGroup />
   <MenuGroup>
+    <MenuItemLink
+      id="integrations"
+      show={true}
+      text="Integrations"
+      to="/team_name/integrations"
+    />
     <Connect(TeamPermissionGate)
       permissions={
         Array [
-          "manage_slash_commands",
-          "manage_oauth",
-          "manage_incoming_webhooks",
-          "manage_outgoing_webhooks",
+          "manage_system",
         ]
       }
       teamId="team-id"
     >
-      <MenuItemLink
-        id="integrations"
+      <MenuItemToggleModalRedux
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(MarketplaceModal)",
+            "type": [Function],
+          }
+        }
+        id="marketplaceModal"
+        modalId="plugin_marketplace"
         show={true}
-        text="Integrations"
-        to="/team name/integrations"
+        text="Plugin Marketplace"
       />
     </Connect(TeamPermissionGate)>
     <MenuItemLink
       id="customEmojis"
       show={true}
       text="Custom Emoji"
-      to="/team name/emoji"
+      to="/team_name/emoji"
     />
   </MenuGroup>
   <MenuGroup>
     <Connect(SystemPermissionGate)
       permissions={
         Array [
-          "manage_system",
+          "sysconsole_read_about",
+          "sysconsole_read_billing",
+          "sysconsole_read_reporting",
+          "sysconsole_read_user_management_users",
+          "sysconsole_read_user_management_groups",
+          "sysconsole_read_user_management_teams",
+          "sysconsole_read_user_management_channels",
+          "sysconsole_read_user_management_permissions",
+          "sysconsole_read_environment",
+          "sysconsole_read_site",
+          "sysconsole_read_authentication",
+          "sysconsole_read_plugins",
+          "sysconsole_read_integrations",
+          "sysconsole_read_compliance",
+          "sysconsole_read_experimental",
         ]
       }
     >
@@ -1329,6 +1519,12 @@ exports[`components/Menu should match snapshot with most of the thing enabled 1`
       show={true}
       text="Help"
       url="test-link-help"
+    />
+    <MenuItemAction
+      id="gettingStarted"
+      onClick={[Function]}
+      show={false}
+      text="Getting Started"
     />
     <MenuItemAction
       id="keyboardShortcuts"
@@ -1351,7 +1547,15 @@ exports[`components/Menu should match snapshot with most of the thing enabled 1`
       url="test"
     />
     <MenuItemToggleModalRedux
-      dialogType={[Function]}
+      dialogType={
+        Object {
+          "$$typeof": Symbol(react.memo),
+          "WrappedComponent": [Function],
+          "compare": null,
+          "displayName": "Connect(AboutBuildModal)",
+          "type": [Function],
+        }
+      }
       icon={false}
       id="about"
       modalId="about"
@@ -1365,7 +1569,7 @@ exports[`components/Menu should match snapshot with most of the thing enabled 1`
       id="logout"
       onClick={[Function]}
       show={true}
-      text="Logout"
+      text="Log Out"
     />
   </MenuGroup>
 </Menu>
@@ -1393,18 +1597,26 @@ exports[`components/Menu should match snapshot with most of the thing enabled in
     <MenuItemAction
       icon={
         <i
-          className="fa fa-flag"
+          className="fa fa-bookmark"
         />
       }
       id="flaggedPosts"
       onClick={[Function]}
       show={true}
-      text="Flagged Posts"
+      text="Saved Posts"
     />
   </MenuGroup>
   <MenuGroup>
     <MenuItemToggleModalRedux
-      dialogType={[Function]}
+      dialogType={
+        Object {
+          "$$typeof": Symbol(react.memo),
+          "WrappedComponent": [Function],
+          "compare": null,
+          "displayName": "Connect(injectIntl(UserSettingsModal))",
+          "type": [Function],
+        }
+      }
       icon={
         <i
           className="fa fa-cog"
@@ -1426,7 +1638,15 @@ exports[`components/Menu should match snapshot with most of the thing enabled in
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(AddGroupsToTeamModal)",
+            "type": [Function],
+          }
+        }
         icon={
           <i
             className="fa fa-user-plus"
@@ -1442,85 +1662,31 @@ exports[`components/Menu should match snapshot with most of the thing enabled in
       permissions={
         Array [
           "add_user_to_team",
+          "invite_guest",
         ]
       }
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(InvitationModal)",
+            "type": [Function],
+          }
+        }
+        extraText="Add or invite people to the team"
         icon={
           <i
             className="fa fa-user-plus"
           />
         }
-        id="addUsersToTeam"
-        modalId="add_user_to_team"
-        show={false}
-        text="Add Members to Team"
-      />
-    </Connect(TeamPermissionGate)>
-  </MenuGroup>
-  <MenuGroup>
-    <Connect(TeamPermissionGate)
-      permissions={
-        Array [
-          "add_user_to_team",
-        ]
-      }
-      teamId="team-id"
-    >
-      <Connect(TeamPermissionGate)
-        permissions={
-          Array [
-            "invite_user",
-          ]
-        }
-        teamId="team-id"
-      >
-        <MenuItemToggleModalRedux
-          dialogType={[Function]}
-          icon={
-            <i
-              className="fa fa-user-plus"
-            />
-          }
-          id="sendEmailInvite"
-          modalId="email_invite"
-          show={true}
-          text="Send Email Invite"
-        />
-      </Connect(TeamPermissionGate)>
-      <Connect(TeamPermissionGate)
-        permissions={
-          Array [
-            "invite_user",
-          ]
-        }
-        teamId="team-id"
-      >
-        <MenuItemAction
-          icon={
-            <i
-              className="fa fa-link"
-            />
-          }
-          id="getTeamInviteLink"
-          onClick={[Function]}
-          show={true}
-          text="Get Team Invite Link"
-        />
-      </Connect(TeamPermissionGate)>
-      <MenuItemToggleModalRedux
-        dialogType={[Function]}
-        icon={
-          <i
-            className="fa fa-user-plus"
-          />
-        }
-        id="addUsersToTeam"
-        modalId="add_user_to_team"
+        id="invitePeople"
+        modalId="invitation"
         show={true}
-        text="Add Members to Team"
+        text="Invite People"
       />
     </Connect(TeamPermissionGate)>
   </MenuGroup>
@@ -1534,7 +1700,15 @@ exports[`components/Menu should match snapshot with most of the thing enabled in
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(TeamSettingsModal)",
+            "type": [Function],
+          }
+        }
         icon={
           <i
             className="fa fa-globe"
@@ -1560,7 +1734,15 @@ exports[`components/Menu should match snapshot with most of the thing enabled in
             "teamID": "team-id",
           }
         }
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(injectIntl(TeamGroupsManageModal))",
+            "type": [Function],
+          }
+        }
         icon={
           <i
             className="fa fa-user-plus"
@@ -1582,7 +1764,15 @@ exports[`components/Menu should match snapshot with most of the thing enabled in
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(TeamMembersModal)",
+            "type": [Function],
+          }
+        }
         icon={
           <i
             className="fa fa-users"
@@ -1605,7 +1795,15 @@ exports[`components/Menu should match snapshot with most of the thing enabled in
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(TeamMembersModal)",
+            "type": [Function],
+          }
+        }
         icon={
           <i
             className="fa fa-users"
@@ -1634,7 +1832,7 @@ exports[`components/Menu should match snapshot with most of the thing enabled in
         }
         id="createTeam"
         show={true}
-        text="Create a New Team"
+        text="Create a Team"
         to="/create_team"
       />
     </Connect(SystemPermissionGate)>
@@ -1650,46 +1848,80 @@ exports[`components/Menu should match snapshot with most of the thing enabled in
       to="/select_team"
     />
     <MenuItemToggleModalRedux
-      dialogType={[Function]}
+      dialogType={
+        Object {
+          "$$typeof": Symbol(react.memo),
+          "WrappedComponent": [Function],
+          "compare": null,
+          "displayName": "Connect(LeaveTeamModal)",
+          "type": [Function],
+        }
+      }
       icon={<LeaveTeamIcon />}
       id="leaveTeam"
       modalId="leave_team"
-      show={false}
+      show={true}
       text="Leave Team"
     />
   </MenuGroup>
   <MenuGroup />
   <MenuGroup>
+    <MenuItemLink
+      id="integrations"
+      show={false}
+      text="Integrations"
+      to="/team_name/integrations"
+    />
     <Connect(TeamPermissionGate)
       permissions={
         Array [
-          "manage_slash_commands",
-          "manage_oauth",
-          "manage_incoming_webhooks",
-          "manage_outgoing_webhooks",
+          "manage_system",
         ]
       }
       teamId="team-id"
     >
-      <MenuItemLink
-        id="integrations"
+      <MenuItemToggleModalRedux
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(MarketplaceModal)",
+            "type": [Function],
+          }
+        }
+        id="marketplaceModal"
+        modalId="plugin_marketplace"
         show={false}
-        text="Integrations"
-        to="/team name/integrations"
+        text="Plugin Marketplace"
       />
     </Connect(TeamPermissionGate)>
     <MenuItemLink
       id="customEmojis"
       show={false}
       text="Custom Emoji"
-      to="/team name/emoji"
+      to="/team_name/emoji"
     />
   </MenuGroup>
   <MenuGroup>
     <Connect(SystemPermissionGate)
       permissions={
         Array [
-          "manage_system",
+          "sysconsole_read_about",
+          "sysconsole_read_billing",
+          "sysconsole_read_reporting",
+          "sysconsole_read_user_management_users",
+          "sysconsole_read_user_management_groups",
+          "sysconsole_read_user_management_teams",
+          "sysconsole_read_user_management_channels",
+          "sysconsole_read_user_management_permissions",
+          "sysconsole_read_environment",
+          "sysconsole_read_site",
+          "sysconsole_read_authentication",
+          "sysconsole_read_plugins",
+          "sysconsole_read_integrations",
+          "sysconsole_read_compliance",
+          "sysconsole_read_experimental",
         ]
       }
     >
@@ -1717,6 +1949,12 @@ exports[`components/Menu should match snapshot with most of the thing enabled in
       show={true}
       text="Help"
       url="test-link-help"
+    />
+    <MenuItemAction
+      id="gettingStarted"
+      onClick={[Function]}
+      show={false}
+      text="Getting Started"
     />
     <MenuItemAction
       id="keyboardShortcuts"
@@ -1747,7 +1985,15 @@ exports[`components/Menu should match snapshot with most of the thing enabled in
       url="test"
     />
     <MenuItemToggleModalRedux
-      dialogType={[Function]}
+      dialogType={
+        Object {
+          "$$typeof": Symbol(react.memo),
+          "WrappedComponent": [Function],
+          "compare": null,
+          "displayName": "Connect(AboutBuildModal)",
+          "type": [Function],
+        }
+      }
       icon={
         <i
           className="fa fa-info"
@@ -1769,7 +2015,7 @@ exports[`components/Menu should match snapshot with most of the thing enabled in
       id="logout"
       onClick={[Function]}
       show={true}
-      text="Logout"
+      text="Log Out"
     />
   </MenuGroup>
 </Menu>
@@ -1793,12 +2039,20 @@ exports[`components/Menu should match snapshot with plugins 1`] = `
       id="flaggedPosts"
       onClick={[Function]}
       show={false}
-      text="Flagged Posts"
+      text="Saved Posts"
     />
   </MenuGroup>
   <MenuGroup>
     <MenuItemToggleModalRedux
-      dialogType={[Function]}
+      dialogType={
+        Object {
+          "$$typeof": Symbol(react.memo),
+          "WrappedComponent": [Function],
+          "compare": null,
+          "displayName": "Connect(injectIntl(UserSettingsModal))",
+          "type": [Function],
+        }
+      }
       icon={false}
       id="accountSettings"
       modalId="user_settings"
@@ -1816,7 +2070,15 @@ exports[`components/Menu should match snapshot with plugins 1`] = `
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(AddGroupsToTeamModal)",
+            "type": [Function],
+          }
+        }
         icon={false}
         id="addGroupsToTeam"
         modalId="add_groups_to_team"
@@ -1828,69 +2090,27 @@ exports[`components/Menu should match snapshot with plugins 1`] = `
       permissions={
         Array [
           "add_user_to_team",
+          "invite_guest",
         ]
       }
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
-        icon={false}
-        id="addUsersToTeam"
-        modalId="add_user_to_team"
-        show={false}
-        text="Add Members to Team"
-      />
-    </Connect(TeamPermissionGate)>
-  </MenuGroup>
-  <MenuGroup>
-    <Connect(TeamPermissionGate)
-      permissions={
-        Array [
-          "add_user_to_team",
-        ]
-      }
-      teamId="team-id"
-    >
-      <Connect(TeamPermissionGate)
-        permissions={
-          Array [
-            "invite_user",
-          ]
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(InvitationModal)",
+            "type": [Function],
+          }
         }
-        teamId="team-id"
-      >
-        <MenuItemToggleModalRedux
-          dialogType={[Function]}
-          icon={false}
-          id="sendEmailInvite"
-          modalId="email_invite"
-          show={false}
-          text="Send Email Invite"
-        />
-      </Connect(TeamPermissionGate)>
-      <Connect(TeamPermissionGate)
-        permissions={
-          Array [
-            "invite_user",
-          ]
-        }
-        teamId="team-id"
-      >
-        <MenuItemAction
-          icon={false}
-          id="getTeamInviteLink"
-          onClick={[Function]}
-          show={false}
-          text="Get Team Invite Link"
-        />
-      </Connect(TeamPermissionGate)>
-      <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        extraText="Add or invite people to the team"
         icon={false}
-        id="addUsersToTeam"
-        modalId="add_user_to_team"
+        id="invitePeople"
+        modalId="invitation"
         show={true}
-        text="Add Members to Team"
+        text="Invite People"
       />
     </Connect(TeamPermissionGate)>
   </MenuGroup>
@@ -1904,7 +2124,15 @@ exports[`components/Menu should match snapshot with plugins 1`] = `
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(TeamSettingsModal)",
+            "type": [Function],
+          }
+        }
         icon={false}
         id="teamSettings"
         modalId="team_settings"
@@ -1926,7 +2154,15 @@ exports[`components/Menu should match snapshot with plugins 1`] = `
             "teamID": "team-id",
           }
         }
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(injectIntl(TeamGroupsManageModal))",
+            "type": [Function],
+          }
+        }
         icon={false}
         id="manageGroups"
         modalId="manage_team_groups"
@@ -1944,7 +2180,15 @@ exports[`components/Menu should match snapshot with plugins 1`] = `
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(TeamMembersModal)",
+            "type": [Function],
+          }
+        }
         icon={false}
         id="manageMembers"
         modalId="team_members"
@@ -1963,7 +2207,15 @@ exports[`components/Menu should match snapshot with plugins 1`] = `
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(TeamMembersModal)",
+            "type": [Function],
+          }
+        }
         icon={false}
         id="viewMembers"
         modalId="team_members"
@@ -1984,7 +2236,7 @@ exports[`components/Menu should match snapshot with plugins 1`] = `
         icon={false}
         id="createTeam"
         show={true}
-        text="Create a New Team"
+        text="Create a Team"
         to="/create_team"
       />
     </Connect(SystemPermissionGate)>
@@ -1996,7 +2248,15 @@ exports[`components/Menu should match snapshot with plugins 1`] = `
       to="/select_team"
     />
     <MenuItemToggleModalRedux
-      dialogType={[Function]}
+      dialogType={
+        Object {
+          "$$typeof": Symbol(react.memo),
+          "WrappedComponent": [Function],
+          "compare": null,
+          "displayName": "Connect(LeaveTeamModal)",
+          "type": [Function],
+        }
+      }
       icon={false}
       id="leaveTeam"
       modalId="leave_team"
@@ -2023,36 +2283,62 @@ exports[`components/Menu should match snapshot with plugins 1`] = `
     />
   </MenuGroup>
   <MenuGroup>
+    <MenuItemLink
+      id="integrations"
+      show={false}
+      text="Integrations"
+      to="/team_name/integrations"
+    />
     <Connect(TeamPermissionGate)
       permissions={
         Array [
-          "manage_slash_commands",
-          "manage_oauth",
-          "manage_incoming_webhooks",
-          "manage_outgoing_webhooks",
+          "manage_system",
         ]
       }
       teamId="team-id"
     >
-      <MenuItemLink
-        id="integrations"
+      <MenuItemToggleModalRedux
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(MarketplaceModal)",
+            "type": [Function],
+          }
+        }
+        id="marketplaceModal"
+        modalId="plugin_marketplace"
         show={false}
-        text="Integrations"
-        to="/team name/integrations"
+        text="Plugin Marketplace"
       />
     </Connect(TeamPermissionGate)>
     <MenuItemLink
       id="customEmojis"
       show={false}
       text="Custom Emoji"
-      to="/team name/emoji"
+      to="/team_name/emoji"
     />
   </MenuGroup>
   <MenuGroup>
     <Connect(SystemPermissionGate)
       permissions={
         Array [
-          "manage_system",
+          "sysconsole_read_about",
+          "sysconsole_read_billing",
+          "sysconsole_read_reporting",
+          "sysconsole_read_user_management_users",
+          "sysconsole_read_user_management_groups",
+          "sysconsole_read_user_management_teams",
+          "sysconsole_read_user_management_channels",
+          "sysconsole_read_user_management_permissions",
+          "sysconsole_read_environment",
+          "sysconsole_read_site",
+          "sysconsole_read_authentication",
+          "sysconsole_read_plugins",
+          "sysconsole_read_integrations",
+          "sysconsole_read_compliance",
+          "sysconsole_read_experimental",
         ]
       }
     >
@@ -2072,6 +2358,12 @@ exports[`components/Menu should match snapshot with plugins 1`] = `
       show={false}
       text="Help"
       url={null}
+    />
+    <MenuItemAction
+      id="gettingStarted"
+      onClick={[Function]}
+      show={false}
+      text="Getting Started"
     />
     <MenuItemAction
       id="keyboardShortcuts"
@@ -2094,7 +2386,15 @@ exports[`components/Menu should match snapshot with plugins 1`] = `
       url={null}
     />
     <MenuItemToggleModalRedux
-      dialogType={[Function]}
+      dialogType={
+        Object {
+          "$$typeof": Symbol(react.memo),
+          "WrappedComponent": [Function],
+          "compare": null,
+          "displayName": "Connect(AboutBuildModal)",
+          "type": [Function],
+        }
+      }
       icon={false}
       id="about"
       modalId="about"
@@ -2108,7 +2408,7 @@ exports[`components/Menu should match snapshot with plugins 1`] = `
       id="logout"
       onClick={[Function]}
       show={true}
-      text="Logout"
+      text="Log Out"
     />
   </MenuGroup>
 </Menu>
@@ -2136,18 +2436,26 @@ exports[`components/Menu should match snapshot with plugins in mobile 1`] = `
     <MenuItemAction
       icon={
         <i
-          className="fa fa-flag"
+          className="fa fa-bookmark"
         />
       }
       id="flaggedPosts"
       onClick={[Function]}
       show={true}
-      text="Flagged Posts"
+      text="Saved Posts"
     />
   </MenuGroup>
   <MenuGroup>
     <MenuItemToggleModalRedux
-      dialogType={[Function]}
+      dialogType={
+        Object {
+          "$$typeof": Symbol(react.memo),
+          "WrappedComponent": [Function],
+          "compare": null,
+          "displayName": "Connect(injectIntl(UserSettingsModal))",
+          "type": [Function],
+        }
+      }
       icon={
         <i
           className="fa fa-cog"
@@ -2169,7 +2477,15 @@ exports[`components/Menu should match snapshot with plugins in mobile 1`] = `
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(AddGroupsToTeamModal)",
+            "type": [Function],
+          }
+        }
         icon={
           <i
             className="fa fa-user-plus"
@@ -2185,85 +2501,31 @@ exports[`components/Menu should match snapshot with plugins in mobile 1`] = `
       permissions={
         Array [
           "add_user_to_team",
+          "invite_guest",
         ]
       }
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(InvitationModal)",
+            "type": [Function],
+          }
+        }
+        extraText="Add or invite people to the team"
         icon={
           <i
             className="fa fa-user-plus"
           />
         }
-        id="addUsersToTeam"
-        modalId="add_user_to_team"
-        show={false}
-        text="Add Members to Team"
-      />
-    </Connect(TeamPermissionGate)>
-  </MenuGroup>
-  <MenuGroup>
-    <Connect(TeamPermissionGate)
-      permissions={
-        Array [
-          "add_user_to_team",
-        ]
-      }
-      teamId="team-id"
-    >
-      <Connect(TeamPermissionGate)
-        permissions={
-          Array [
-            "invite_user",
-          ]
-        }
-        teamId="team-id"
-      >
-        <MenuItemToggleModalRedux
-          dialogType={[Function]}
-          icon={
-            <i
-              className="fa fa-user-plus"
-            />
-          }
-          id="sendEmailInvite"
-          modalId="email_invite"
-          show={false}
-          text="Send Email Invite"
-        />
-      </Connect(TeamPermissionGate)>
-      <Connect(TeamPermissionGate)
-        permissions={
-          Array [
-            "invite_user",
-          ]
-        }
-        teamId="team-id"
-      >
-        <MenuItemAction
-          icon={
-            <i
-              className="fa fa-link"
-            />
-          }
-          id="getTeamInviteLink"
-          onClick={[Function]}
-          show={false}
-          text="Get Team Invite Link"
-        />
-      </Connect(TeamPermissionGate)>
-      <MenuItemToggleModalRedux
-        dialogType={[Function]}
-        icon={
-          <i
-            className="fa fa-user-plus"
-          />
-        }
-        id="addUsersToTeam"
-        modalId="add_user_to_team"
+        id="invitePeople"
+        modalId="invitation"
         show={true}
-        text="Add Members to Team"
+        text="Invite People"
       />
     </Connect(TeamPermissionGate)>
   </MenuGroup>
@@ -2277,7 +2539,15 @@ exports[`components/Menu should match snapshot with plugins in mobile 1`] = `
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(TeamSettingsModal)",
+            "type": [Function],
+          }
+        }
         icon={
           <i
             className="fa fa-globe"
@@ -2303,7 +2573,15 @@ exports[`components/Menu should match snapshot with plugins in mobile 1`] = `
             "teamID": "team-id",
           }
         }
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(injectIntl(TeamGroupsManageModal))",
+            "type": [Function],
+          }
+        }
         icon={
           <i
             className="fa fa-user-plus"
@@ -2325,7 +2603,15 @@ exports[`components/Menu should match snapshot with plugins in mobile 1`] = `
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(TeamMembersModal)",
+            "type": [Function],
+          }
+        }
         icon={
           <i
             className="fa fa-users"
@@ -2348,7 +2634,15 @@ exports[`components/Menu should match snapshot with plugins in mobile 1`] = `
       teamId="team-id"
     >
       <MenuItemToggleModalRedux
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(TeamMembersModal)",
+            "type": [Function],
+          }
+        }
         icon={
           <i
             className="fa fa-users"
@@ -2377,7 +2671,7 @@ exports[`components/Menu should match snapshot with plugins in mobile 1`] = `
         }
         id="createTeam"
         show={true}
-        text="Create a New Team"
+        text="Create a Team"
         to="/create_team"
       />
     </Connect(SystemPermissionGate)>
@@ -2393,7 +2687,15 @@ exports[`components/Menu should match snapshot with plugins in mobile 1`] = `
       to="/select_team"
     />
     <MenuItemToggleModalRedux
-      dialogType={[Function]}
+      dialogType={
+        Object {
+          "$$typeof": Symbol(react.memo),
+          "WrappedComponent": [Function],
+          "compare": null,
+          "displayName": "Connect(LeaveTeamModal)",
+          "type": [Function],
+        }
+      }
       icon={<LeaveTeamIcon />}
       id="leaveTeam"
       modalId="leave_team"
@@ -2420,36 +2722,62 @@ exports[`components/Menu should match snapshot with plugins in mobile 1`] = `
     />
   </MenuGroup>
   <MenuGroup>
+    <MenuItemLink
+      id="integrations"
+      show={false}
+      text="Integrations"
+      to="/team_name/integrations"
+    />
     <Connect(TeamPermissionGate)
       permissions={
         Array [
-          "manage_slash_commands",
-          "manage_oauth",
-          "manage_incoming_webhooks",
-          "manage_outgoing_webhooks",
+          "manage_system",
         ]
       }
       teamId="team-id"
     >
-      <MenuItemLink
-        id="integrations"
+      <MenuItemToggleModalRedux
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(MarketplaceModal)",
+            "type": [Function],
+          }
+        }
+        id="marketplaceModal"
+        modalId="plugin_marketplace"
         show={false}
-        text="Integrations"
-        to="/team name/integrations"
+        text="Plugin Marketplace"
       />
     </Connect(TeamPermissionGate)>
     <MenuItemLink
       id="customEmojis"
       show={false}
       text="Custom Emoji"
-      to="/team name/emoji"
+      to="/team_name/emoji"
     />
   </MenuGroup>
   <MenuGroup>
     <Connect(SystemPermissionGate)
       permissions={
         Array [
-          "manage_system",
+          "sysconsole_read_about",
+          "sysconsole_read_billing",
+          "sysconsole_read_reporting",
+          "sysconsole_read_user_management_users",
+          "sysconsole_read_user_management_groups",
+          "sysconsole_read_user_management_teams",
+          "sysconsole_read_user_management_channels",
+          "sysconsole_read_user_management_permissions",
+          "sysconsole_read_environment",
+          "sysconsole_read_site",
+          "sysconsole_read_authentication",
+          "sysconsole_read_plugins",
+          "sysconsole_read_integrations",
+          "sysconsole_read_compliance",
+          "sysconsole_read_experimental",
         ]
       }
     >
@@ -2477,6 +2805,12 @@ exports[`components/Menu should match snapshot with plugins in mobile 1`] = `
       show={false}
       text="Help"
       url={null}
+    />
+    <MenuItemAction
+      id="gettingStarted"
+      onClick={[Function]}
+      show={false}
+      text="Getting Started"
     />
     <MenuItemAction
       id="keyboardShortcuts"
@@ -2507,7 +2841,15 @@ exports[`components/Menu should match snapshot with plugins in mobile 1`] = `
       url={null}
     />
     <MenuItemToggleModalRedux
-      dialogType={[Function]}
+      dialogType={
+        Object {
+          "$$typeof": Symbol(react.memo),
+          "WrappedComponent": [Function],
+          "compare": null,
+          "displayName": "Connect(AboutBuildModal)",
+          "type": [Function],
+        }
+      }
       icon={
         <i
           className="fa fa-info"
@@ -2529,7 +2871,7 @@ exports[`components/Menu should match snapshot with plugins in mobile 1`] = `
       id="logout"
       onClick={[Function]}
       show={true}
-      text="Logout"
+      text="Log Out"
     />
   </MenuGroup>
 </Menu>

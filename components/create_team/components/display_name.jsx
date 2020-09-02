@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+/* eslint-disable react/no-string-refs */
 
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -8,9 +9,9 @@ import {FormattedMessage} from 'react-intl';
 
 import {trackEvent} from 'actions/diagnostics_actions.jsx';
 import Constants from 'utils/constants.jsx';
-import {cleanUpUrlable} from 'utils/url.jsx';
+import {cleanUpUrlable} from 'utils/url';
 import logoImage from 'images/logo.png';
-import NextIcon from 'components/icon/next_icon';
+import NextIcon from 'components/widgets/icons/fa_next_icon';
 
 export default class TeamSignupDisplayNamePage extends React.PureComponent {
     static propTypes = {
@@ -38,7 +39,7 @@ export default class TeamSignupDisplayNamePage extends React.PureComponent {
 
     submitNext = (e) => {
         e.preventDefault();
-
+        trackEvent('display_name', 'click_next');
         var displayName = ReactDOM.findDOMNode(this.refs.name).value.trim();
         if (!displayName) {
             this.setState({nameError: (
@@ -124,7 +125,7 @@ export default class TeamSignupDisplayNamePage extends React.PureComponent {
                     <button
                         id='teamNameNextButton'
                         type='submit'
-                        className='btn btn-primary margin--extra'
+                        className='btn btn-primary mt-8'
                         onClick={this.submitNext}
                     >
                         <FormattedMessage
@@ -138,3 +139,4 @@ export default class TeamSignupDisplayNamePage extends React.PureComponent {
         );
     }
 }
+/* eslint-disable react/no-string-refs */

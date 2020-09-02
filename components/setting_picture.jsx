@@ -4,22 +4,20 @@
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {FormattedMessage} from 'react-intl';
-import {OverlayTrigger, Tooltip} from 'react-bootstrap';
+import {Tooltip} from 'react-bootstrap';
 
-import {Constants} from 'utils/constants.jsx';
-import {fileSizeToString, localizeMessage} from 'utils/utils.jsx';
+import {Constants} from 'utils/constants';
+import {localizeMessage} from 'utils/utils.jsx';
 import * as FileUtils from 'utils/file_utils.jsx';
 
-import LoadingWrapper from 'components/widgets/loading/loading_wrapper.jsx';
-import FormError from 'components/form_error.jsx';
-
-import FormattedMarkdownMessage from 'components/formatted_markdown_message.jsx';
+import FormError from 'components/form_error';
+import OverlayTrigger from 'components/overlay_trigger';
+import LoadingWrapper from 'components/widgets/loading/loading_wrapper';
 
 export default class SettingPicture extends Component {
     static defaultProps = {
         imageContext: 'profile',
     };
-
     static propTypes = {
         clientError: PropTypes.string,
         serverError: PropTypes.string,
@@ -36,10 +34,15 @@ export default class SettingPicture extends Component {
         updateSection: PropTypes.func,
         imageContext: PropTypes.string,
         maxFileSize: PropTypes.number,
+        helpText: PropTypes.object,
     };
 
     constructor(props) {
         super(props);
+
+        this.settingList = React.createRef();
+        this.selectInput = React.createRef();
+        this.confirmButton = React.createRef();
 
         this.state = {
             image: null,
@@ -48,17 +51,33 @@ export default class SettingPicture extends Component {
         };
     }
 
-    UNSAFE_componentWillReceiveProps(nextProps) { // eslint-disable-line camelcase
-        if (nextProps.file !== this.props.file) {
-            this.setState({image: null});
+    focusFirstElement() {
+        if (this.settingList.current) {
+            this.settingList.current.focus();
+        }
+    }
 
-            this.setPicture(nextProps.file);
+    componentDidMount() {
+        this.focusFirstElement();
+
+        if (this.selectInput.current) {
+            this.selectInput.current.addEventListener('input', this.handleFileSelected);
+        }
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.file !== this.props.file) {
+            this.setPicture(this.props.file);
         }
     }
 
     componentWillUnmount() {
         if (this.previewBlob) {
             URL.revokeObjectURL(this.previewBlob);
+        }
+
+        if (this.selectInput.current) {
+            this.selectInput.current.removeEventListener('input', this.handleFileSelected);
         }
     }
 
@@ -67,8 +86,17 @@ export default class SettingPicture extends Component {
         this.props.updateSection(e);
     }
 
+    handleFileSelected = () => {
+        if (this.confirmButton.current) {
+            this.confirmButton.current.focus();
+        }
+    }
+
     handleSave = (e) => {
         e.preventDefault();
+        if (this.props.loadingPicture) {
+            return;
+        }
         if (this.state.removeSrc) {
             this.props.onRemove();
         } else if (this.state.setDefaultSrc) {
@@ -81,16 +109,23 @@ export default class SettingPicture extends Component {
     handleRemoveSrc = (e) => {
         e.preventDefault();
         this.setState({removeSrc: true});
+        this.focusFirstElement();
     }
 
     handleSetDefaultSrc = (e) => {
         e.preventDefault();
         this.setState({setDefaultSrc: true});
+        this.focusFirstElement();
     }
 
     handleFileChange = (e) => {
         this.setState({removeSrc: false, setDefaultSrc: false});
         this.props.onFileChange(e);
+    }
+
+    handleInputFile = () => {
+        this.selectInput.current.value = '';
+        this.selectInput.current.click();
     }
 
     setPicture = (file) => {
@@ -161,7 +196,7 @@ export default class SettingPicture extends Component {
                 title = (
                     <FormattedMessage
                         id='setting_picture.remove'
-                        defaultMessage='Remove this icon'
+                        defaultMessage='Remove This Icon'
                     />
                 );
                 handler = this.handleRemoveSrc;
@@ -169,7 +204,7 @@ export default class SettingPicture extends Component {
                 title = (
                     <FormattedMessage
                         id='setting_picture.remove_profile_picture'
-                        defaultMessage='Remove profile picture'
+                        defaultMessage='Remove Profile Picture'
                     />
                 );
                 handler = this.handleSetDefaultSrc;
@@ -177,25 +212,31 @@ export default class SettingPicture extends Component {
 
             return (
                 <div className={`${imageContext}-img__container`}>
-                    <div className='img-preview__image'>
+                    <div
+                        className='img-preview__image'
+                        aria-hidden={true}
+                    >
                         {imageElement}
                     </div>
                     <OverlayTrigger
-                        trigger={['hover', 'focus']}
                         delayShow={Constants.OVERLAY_TIME_DELAY}
                         placement='right'
                         overlay={(
                             <Tooltip id='removeIcon'>
-                                {title}
+                                <div aria-hidden={true}>
+                                    {title}
+                                </div>
                             </Tooltip>
                         )}
                     >
-                        <a
+                        <button
+                            data-testid='removeSettingPicture'
                             className={`${imageContext}-img__remove`}
                             onClick={handler}
                         >
-                            <span>{'×'}</span>
-                        </a>
+                            <span aria-hidden={true}>{'×'}</span>
+                            <span className='sr-only'>{title}</span>
+                        </button>
                     </OverlayTrigger>
                 </div>
             );
@@ -204,94 +245,123 @@ export default class SettingPicture extends Component {
     }
 
     render() {
-        const imageContext = this.props.imageContext;
-
         const img = this.renderImg();
 
         let confirmButtonClass = 'btn btn-sm';
+        let disableSaveButtonFocus = false;
         if (this.props.submitActive || this.state.removeSrc || this.state.setDefaultSrc) {
             confirmButtonClass += ' btn-primary';
         } else {
             confirmButtonClass += ' btn-inactive disabled';
+            disableSaveButtonFocus = true;
         }
 
-        let helpText;
-        if (imageContext === 'team') {
-            helpText = (
-                <FormattedMarkdownMessage
-                    id={'setting_picture.help.team'}
-                    defaultMessage='Upload a team icon in BMP, JPG or PNG format.\nSquare images with a solid background color are recommended.'
-                />
-            );
-        } else {
-            helpText = (
-                <FormattedMessage
-                    id={'setting_picture.help.profile'}
-                    defaultMessage='Upload a picture in BMP, JPG or PNG format. Maximum file size: {max}'
-                    values={{max: fileSizeToString(this.props.maxFileSize)}}
-                />
+        let imgRender;
+        if (img) {
+            imgRender = (
+                <li
+                    className='setting-list-item'
+                    role='presentation'
+                >
+                    {img}
+                </li>
             );
         }
 
+        let buttonRender;
+        if (this.props.onSubmit) {
+            buttonRender = (
+                <span>
+                    <input
+                        data-testid='uploadPicture'
+                        ref={this.selectInput}
+                        className='hidden'
+                        accept='.jpg,.png,.bmp'
+                        type='file'
+                        onChange={this.handleFileChange}
+                        disabled={this.props.loadingPicture}
+                        aria-hidden={true}
+                        tabIndex='-1'
+                    />
+                    <button
+                        data-testid='inputSettingPictureButton'
+                        className='btn btn-sm btn-primary btn-file sel-btn'
+                        disabled={this.props.loadingPicture}
+                        onClick={this.handleInputFile}
+                        aria-label={localizeMessage('setting_picture.select', 'Select')}
+                    >
+                        <FormattedMessage
+                            id='setting_picture.select'
+                            defaultMessage='Select'
+                        />
+                    </button>
+                    <button
+                        tabIndex={disableSaveButtonFocus ? '-1' : '0'}
+                        data-testid='saveSettingPicture'
+                        disabled={disableSaveButtonFocus}
+                        ref={this.confirmButton}
+                        className={confirmButtonClass}
+                        onClick={this.handleSave}
+                        aria-label={this.props.loadingPicture ? localizeMessage('setting_picture.uploading', 'Uploading...') : localizeMessage('setting_picture.save', 'Save')}
+                    >
+                        <LoadingWrapper
+                            loading={this.props.loadingPicture}
+                            text={localizeMessage('setting_picture.uploading', 'Uploading...')}
+                        >
+                            <FormattedMessage
+                                id='setting_picture.save'
+                                defaultMessage='Save'
+                            />
+                        </LoadingWrapper>
+                    </button>
+                </span>
+            );
+        }
         return (
-            <ul className='section-max form-horizontal'>
-                <li className='col-xs-12 section-title'>{this.props.title}</li>
-                <li className='col-xs-offset-3 col-xs-8'>
-                    <ul className='setting-list'>
-                        {img ? <li className='setting-list-item'> {img} </li> : ''}
-                        <li className='setting-list-item padding-top x2'>
-                            {helpText}
-                        </li>
-                        <li className='setting-list-item'>
+            <section className='section-max form-horizontal'>
+                <h4 className='col-xs-12 section-title'>
+                    {this.props.title}
+                </h4>
+                <div className='col-xs-offset-3 col-xs-8'>
+                    <div
+                        className='setting-list'
+                        ref={this.settingList}
+                        tabIndex='-1'
+                        aria-label={this.props.title}
+                        aria-describedby='setting-picture__helptext'
+                    >
+                        {imgRender}
+                        <div
+                            id='setting-picture__helptext'
+                            className='setting-list-item pt-3'
+                        >
+                            {this.props.helpText}
+                        </div>
+                        <div
+                            className='setting-list-item'
+                        >
                             <hr/>
                             <FormError
                                 errors={[this.props.clientError, this.props.serverError]}
                                 type={'modal'}
                             />
-                            <div
-                                className='btn btn-sm btn-primary btn-file sel-btn'
-                                disabled={this.props.loadingPicture}
-                            >
-                                <FormattedMessage
-                                    id='setting_picture.select'
-                                    defaultMessage='Select'
-                                />
-                                <input
-                                    ref='input'
-                                    accept='.jpg,.png,.bmp'
-                                    type='file'
-                                    onChange={this.handleFileChange}
-                                    disabled={this.props.loadingPicture}
-                                />
-                            </div>
-                            <a
-                                className={confirmButtonClass}
-                                onClick={this.props.loadingPicture ? () => true : this.handleSave}
-                            >
-                                <LoadingWrapper
-                                    loading={this.props.loadingPicture}
-                                    text={localizeMessage('setting_picture.uploading', 'Uploading...')}
-                                >
-                                    <FormattedMessage
-                                        id='setting_picture.save'
-                                        defaultMessage='Save'
-                                    />
-                                </LoadingWrapper>
-                            </a>
-                            <a
+                            {buttonRender}
+                            <button
+                                data-testid='cancelSettingPicture'
                                 className='btn btn-link btn-sm theme'
                                 href='#'
                                 onClick={this.handleCancel}
+                                aria-label={localizeMessage('setting_picture.cancel', 'Cancel')}
                             >
                                 <FormattedMessage
                                     id='setting_picture.cancel'
                                     defaultMessage='Cancel'
                                 />
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
         );
     }
 }

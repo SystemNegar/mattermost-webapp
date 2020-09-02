@@ -3,15 +3,17 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
+import {injectIntl} from 'react-intl';
 import debounce from 'lodash/debounce';
 import {getEmojiImageUrl} from 'mattermost-redux/utils/emoji_utils';
 
 import imgTrans from 'images/img_trans.gif';
+import {intlShape} from 'utils/react_intl';
 
 const SCROLLING_ADDITIONAL_VISUAL_SPACING = 10; // to make give the emoji some visual 'breathing room'
 const EMOJI_LAZY_LOAD_SCROLL_THROTTLE = 150;
 
-export default class EmojiPickerItem extends React.Component {
+class EmojiPickerItem extends React.Component {
     static propTypes = {
         emoji: PropTypes.object.isRequired,
         onItemOver: PropTypes.func.isRequired,
@@ -23,6 +25,7 @@ export default class EmojiPickerItem extends React.Component {
         containerRef: PropTypes.any,
         containerTop: PropTypes.number.isRequired,
         containerBottom: PropTypes.number.isRequired,
+        intl: intlShape.isRequired,
     };
 
     shouldComponentUpdate(nextProps) {
@@ -33,11 +36,22 @@ export default class EmojiPickerItem extends React.Component {
         this.emojiItem = emojiItem;
     };
 
-    UNSAFE_componentWillReceiveProps(nextProps) { // eslint-disable-line camelcase
-        if (!this.props.isSelected && nextProps.isSelected) {
+    emojiName = () => {
+        const {formatMessage} = this.props.intl;
+        return formatMessage({
+            id: 'emoji_picker_item.emoji_aria_label',
+            defaultMessage: '{emojiName} emoji',
+        },
+        {
+            emojiName: this.props.emoji.aliases[0].replace(/_/g, ' '),
+        });
+    }
+
+    componentDidUpdate(prevProps) {
+        if (!prevProps.isSelected && this.props.isSelected) {
             const topOfTheEmojiItem = this.emojiItem.offsetTop;
             const bottomOfTheEmojiItem = topOfTheEmojiItem + this.emojiItem.offsetHeight;
-            const {containerRef, containerTop, containerBottom} = nextProps;
+            const {containerRef, containerTop, containerBottom} = this.props;
             if (topOfTheEmojiItem < containerTop) {
                 containerRef.scrollTop = topOfTheEmojiItem - SCROLLING_ADDITIONAL_VISUAL_SPACING;
             } else if (bottomOfTheEmojiItem > containerBottom) {
@@ -75,11 +89,14 @@ export default class EmojiPickerItem extends React.Component {
             image = (
                 <img
                     alt={'emoji image'}
+                    data-testid={emoji.aliases}
                     onMouseOver={this.handleMouseOverThrottle}
                     src={imgTrans}
                     className={spriteClassName}
                     onClick={this.handleClick}
                     id={'emoji-' + emoji.filename}
+                    aria-label={this.emojiName()}
+                    role='button'
                 />
             );
         } else {
@@ -99,10 +116,12 @@ export default class EmojiPickerItem extends React.Component {
                 className={itemClassName}
                 ref={this.emojiItemRef}
             >
-                <div>
+                <div data-testid='emojiItem'>
                     {image}
                 </div>
             </div>
         );
     }
 }
+
+export default injectIntl(EmojiPickerItem);

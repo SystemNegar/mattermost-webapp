@@ -1,3 +1,4 @@
+
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
@@ -11,25 +12,12 @@ Cypress.Commands.add('logout', () => {
     cy.get('#logout').click({force: true});
 });
 
-Cypress.Commands.add('toMainChannelView', (username, {otherUsername, otherPassword, otherURL} = {}) => {
-    cy.apiLogin('user-1', {otherUsername, otherPassword, otherURL});
-    cy.visit('/');
-
-    cy.get('#post_textbox').should('be.visible');
-});
-
-Cypress.Commands.add('getSubpath', () => {
-    cy.visit('/');
-    cy.url().then((url) => {
-        cy.location().its('origin').then((origin) => {
-            if (url === origin) {
-                return '';
-            }
-
-            // Remove trailing slash
-            return url.replace(origin, '').substring(0, url.length - origin.length - 1);
+Cypress.Commands.add('getCurrentUserId', () => {
+    return cy.wrap(new Promise((resolve) => {
+        cy.getCookie('MMUSERID').then((cookie) => {
+            resolve(cookie.value);
         });
-    });
+    }));
 });
 
 // ***********************************************************
@@ -37,53 +25,21 @@ Cypress.Commands.add('getSubpath', () => {
 // ***********************************************************
 
 // Go to Account Settings modal
-Cypress.Commands.add('toAccountSettingsModal', (username = 'user-1', isLoggedInAlready = false, {otherUsername, otherPassword, otherURL} = {}) => {
-    if (!isLoggedInAlready) {
-        cy.apiLogin(username, {otherUsername, otherPassword, otherURL});
-    }
-
-    cy.visit('/');
-    cy.get('#channel_view').should('be.visible');
+Cypress.Commands.add('toAccountSettingsModal', () => {
+    cy.get('#channel_view', {timeout: TIMEOUTS.ONE_MIN}).should('be.visible');
     cy.get('#sidebarHeaderDropdownButton').should('be.visible').click();
     cy.get('#accountSettings').should('be.visible').click();
     cy.get('#accountSettingsModal').should('be.visible');
 });
 
-// Go to Account Settings modal > Sidebar > Channel Switcher
-Cypress.Commands.add('toAccountSettingsModalChannelSwitcher', (username, setToOn = true) => {
-    cy.toAccountSettingsModal(username);
-
-    cy.get('#sidebarButton').should('be.visible');
-    cy.get('#sidebarButton').click();
-
-    let isOn;
-    cy.get('#channelSwitcherDesc').should((desc) => {
-        if (desc.length > 0) {
-            isOn = Cypress.$(desc[0]).text() === 'On';
-        }
-    });
-
-    cy.get('#channelSwitcherEdit').click();
-
-    if (isOn && !setToOn) {
-        cy.get('#channelSwitcherSectionOff').click();
-    } else if (!isOn && setToOn) {
-        cy.get('#channelSwitcherSectionEnabled').click();
-    }
-
-    cy.get('#saveSetting').click();
-    cy.get('#accountSettingsHeader > .close').click();
-});
-
 /**
  * Change the message display setting
  * @param {String} setting - as 'STANDARD' or 'COMPACT'
- * @param {String} username - User to login as
  */
-Cypress.Commands.add('changeMessageDisplaySetting', (setting = 'STANDARD') => {
+Cypress.Commands.add('uiChangeMessageDisplaySetting', (setting = 'STANDARD') => {
     const SETTINGS = {STANDARD: '#message_displayFormatA', COMPACT: '#message_displayFormatB'};
 
-    cy.toAccountSettingsModal(null, true);
+    cy.toAccountSettingsModal();
     cy.get('#displayButton').click();
 
     cy.get('#displaySettingsTitle').should('be.visible').should('contain', 'Display Settings');
@@ -114,6 +70,11 @@ Cypress.Commands.add('typeCmdOrCtrl', () => {
     cy.get('#post_textbox').type(cmdOrCtrl, {release: false});
 });
 
+Cypress.Commands.add('cmdOrCtrlShortcut', {prevSubject: true}, (subject, text) => {
+    const cmdOrCtrl = isMac() ? '{cmd}' : '{ctrl}';
+    return cy.get(subject).type(`${cmdOrCtrl}${text}`);
+});
+
 function isMac() {
     return navigator.platform.toUpperCase().indexOf('MAC') >= 0;
 }
@@ -123,40 +84,86 @@ function isMac() {
 // ***********************************************************
 
 Cypress.Commands.add('postMessage', (message) => {
-    cy.get('#post_textbox', {timeout: TIMEOUTS.LARGE}).clear().type(message).type('{enter}');
-    cy.wait(TIMEOUTS.TINY);
+    postMessageAndWait('#post_textbox', message);
 });
 
 Cypress.Commands.add('postMessageReplyInRHS', (message) => {
-    cy.get('#reply_textbox').clear().type(message).type('{enter}');
-    cy.wait(TIMEOUTS.TINY);
+    postMessageAndWait('#reply_textbox', message);
 });
+
+function postMessageAndWait(textboxSelector, message) {
+    cy.get(textboxSelector, {timeout: TIMEOUTS.HALF_MIN}).should('be.visible').clear().type(`${message}{enter}`).wait(TIMEOUTS.HALF_SEC);
+    cy.waitUntil(() => {
+        return cy.get(textboxSelector).then((el) => {
+            return el[0].textContent === '';
+        });
+    });
+}
+
+function waitUntilPermanentPost() {
+    cy.get('#postListContent', {timeout: TIMEOUTS.HALF_MIN}).should('be.visible');
+    cy.waitUntil(() => cy.findAllByTestId('postView').last().then((el) => !(el[0].id.includes(':'))));
+}
 
 Cypress.Commands.add('getLastPost', () => {
-    cy.get('#post-list', {timeout: TIMEOUTS.HUGE}).should('be.visible');
-    return cy.get('#postListContent #postContent', {timeout: TIMEOUTS.HUGE}).last().scrollIntoView().should('be.visible');
+    waitUntilPermanentPost();
+
+    cy.findAllByTestId('postView').last();
 });
 
-Cypress.Commands.add('getLastPostId', (opts = {force: false}) => {
-    cy.getLastPost().parent().as('parent');
+Cypress.Commands.add('getLastPostId', () => {
+    waitUntilPermanentPost();
 
-    if (opts.force) {
-        cy.get('@parent').should('have.attr', 'id').invoke('replace', 'post_', '');
-    } else {
-        cy.get('@parent').should('have.attr', 'id').and('not.include', ':').
-            invoke('replace', 'post_', '');
-    }
+    cy.findAllByTestId('postView').last().should('have.attr', 'id').and('not.include', ':').
+        invoke('replace', 'post_', '');
 });
 
 /**
-* Get post ID for nth newest post
-* .eq() is 0-based index, hence nthPost-2 to get the nth post
-@param {Integer} nthPost - nth newest post
+ * @see `cy.uiWaitUntilMessagePostedIncludes` at ./ui_commands.d.ts
+ */
+Cypress.Commands.add('uiWaitUntilMessagePostedIncludes', (message) => {
+    const checkFn = () => {
+        return cy.getLastPost().then((el) => {
+            const postedMessageEl = el.find('.post-message__text')[0];
+            return Boolean(postedMessageEl && postedMessageEl.textContent.includes(message));
+        });
+    };
+
+    // Wait for 5 seconds with 500ms check interval
+    const options = {
+        timeout: TIMEOUTS.FIVE_SEC,
+        interval: TIMEOUTS.HALF_SEC,
+        errorMsg: `Expected "${message}" to be in the last message posted but not found.`,
+    };
+
+    return cy.waitUntil(checkFn, options);
+});
+
+Cypress.Commands.add('getLastPostIdRHS', () => {
+    waitUntilPermanentPost();
+
+    cy.get('#rhsPostList > div').last().should('have.attr', 'id').and('not.include', ':').
+        invoke('replace', 'rhsPost_', '');
+});
+
+/**
+* Get post ID based on index of post list
+* @param {Integer} index
+* zero (0)         : oldest post
+* positive number  : from old to latest post
+* negative number  : from new to oldest post
 */
-Cypress.Commands.add('getNthPostId', (nthPost) => {
-    return cy.get('#postListContent [id^=post]:first').parent().parent().siblings().eq(nthPost - 2).find('[id^=post]:first').invoke('attr', 'id').then((nthPostId) => {
-        return nthPostId.replace('post_', '');
-    });
+Cypress.Commands.add('getNthPostId', (index = 0) => {
+    waitUntilPermanentPost();
+
+    cy.findAllByTestId('postView').eq(index).should('have.attr', 'id').and('not.include', ':').
+        invoke('replace', 'post_', '');
+});
+
+Cypress.Commands.add('uiGetNthPost', (index) => {
+    waitUntilPermanentPost();
+
+    cy.findAllByTestId('postView').eq(index);
 });
 
 /**
@@ -167,7 +174,7 @@ Cypress.Commands.add('getNthPostId', (nthPost) => {
  */
 Cypress.Commands.add('postMessageFromFile', (file, target = '#post_textbox') => {
     cy.fixture(file, 'utf-8').then((text) => {
-        cy.get(target).clear().invoke('val', text).wait(TIMEOUTS.TINY).type(' {backspace}{enter}').should('have.text', '');
+        cy.get(target).clear().invoke('val', text).wait(TIMEOUTS.HALF_SEC).type(' {backspace}{enter}').should('have.text', '');
     });
 });
 
@@ -176,7 +183,7 @@ Cypress.Commands.add('postMessageFromFile', (file, target = '#post_textbox') => 
  * instead of typing into it which takes longer period of time.
  * @param {String} file - includes path and filename relative to cypress/fixtures
  */
-Cypress.Commands.add('compareLastPostHTMLContentFromFile', (file, timeout = TIMEOUTS.MEDIUM) => {
+Cypress.Commands.add('compareLastPostHTMLContentFromFile', (file, timeout = TIMEOUTS.TEN_SEC) => {
     // * Verify that HTML Content is correct
     cy.getLastPostId().then((postId) => {
         const postMessageTextId = `#postMessageText_${postId}`;
@@ -193,12 +200,12 @@ Cypress.Commands.add('compareLastPostHTMLContentFromFile', (file, timeout = TIME
 
 function clickPostHeaderItem(postId, location, item) {
     if (postId) {
-        cy.get(`#post_${postId}`).trigger('mouseover');
-        cy.get(`#${location}_${item}_${postId}`).scrollIntoView().click({force: true});
+        cy.get(`#post_${postId}`).trigger('mouseover', {force: true});
+        cy.wait(TIMEOUTS.HALF_SEC).get(`#${location}_${item}_${postId}`).click({force: true});
     } else {
         cy.getLastPostId().then((lastPostId) => {
-            cy.get(`#post_${lastPostId}`).trigger('mouseover');
-            cy.get(`#${location}_${item}_${lastPostId}`).scrollIntoView().click({force: true});
+            cy.get(`#post_${lastPostId}`).trigger('mouseover', {force: true});
+            cy.wait(TIMEOUTS.HALF_SEC).get(`#${location}_${item}_${lastPostId}`).click({force: true});
         });
     }
 }
@@ -249,6 +256,23 @@ Cypress.Commands.add('clickPostCommentIcon', (postId, location = 'CENTER') => {
     clickPostHeaderItem(postId, location, 'commentIcon');
 });
 
+/**
+ * Click comment icon by post ID or to most recent post (if post ID is not provided)
+ * This open up the RHS
+ * @param {String} postId - Post ID
+ * @param {String} menuItem - e.g. "Pin to channel"
+ * @param {String} location - as 'CENTER', 'SEARCH'
+ */
+Cypress.Commands.add('getPostMenu', (postId, menuItem, location = 'CENTER') => {
+    cy.clickPostDotMenu(postId, location).then(() => {
+        cy.get(`#post_${postId}`).should('be.visible').within(() => {
+            cy.get('.dropdown-menu').should('be.visible').within(() => {
+                return cy.findByText(menuItem).scrollIntoView().should('be.visible');
+            });
+        });
+    });
+});
+
 // Close RHS by clicking close button
 Cypress.Commands.add('closeRHS', () => {
     cy.get('#rhsCloseButton').should('be.visible').click();
@@ -280,7 +304,7 @@ Cypress.Commands.add('leaveTeam', () => {
     cy.get('#leaveTeamYes').click();
 
     // * Check that the "leave team modal" closed
-    cy.get('#leaveTeamModal').should('not.be.visible');
+    cy.get('#leaveTeamModal').should('not.exist');
 });
 
 // ***********************************************************
@@ -346,7 +370,7 @@ Cypress.Commands.add('userStatus', (statusInt) => {
 // ************************************************************
 
 Cypress.Commands.add('getCurrentChannelId', () => {
-    return cy.get('#channel-header').invoke('attr', 'data-channelid');
+    return cy.get('#channel-header', {timeout: TIMEOUTS.HALF_MIN}).invoke('attr', 'data-channelid');
 });
 
 /**
@@ -354,10 +378,10 @@ Cypress.Commands.add('getCurrentChannelId', () => {
  * @param {String} text - Text to set the header to
  */
 Cypress.Commands.add('updateChannelHeader', (text) => {
-    cy.get('#channelHeaderDropdownButton').
+    cy.get('#channelHeaderDropdownIcon').
         should('be.visible').
         click();
-    cy.get('#channelHeaderDropdownMenu').
+    cy.get('.Menu__content').
         should('be.visible').
         find('#channelEditHeader').
         click();
@@ -365,5 +389,46 @@ Cypress.Commands.add('updateChannelHeader', (text) => {
         clear().
         type(text).
         type('{enter}').
-        wait(TIMEOUTS.TINY);
+        wait(TIMEOUTS.HALF_SEC);
+});
+
+/**
+ * Navigate to system console-PluginManagement from account settings
+ */
+Cypress.Commands.add('checkRunLDAPSync', () => {
+    cy.apiGetLDAPSync().then((response) => {
+        var jobs = response.body;
+        var currentTime = new Date();
+
+        // # Run LDAP Sync if no job exists (or) last status is an error (or) last run time is more than 1 day old
+        if (jobs.length === 0 || jobs[0].status === 'error' || ((currentTime - (new Date(jobs[0].last_activity_at))) > 8640000)) {
+            // # Go to system admin LDAP page and run the group sync
+            cy.visit('/admin_console/authentication/ldap');
+
+            // # Click on AD/LDAP Synchronize Now button and verify if succesful
+            cy.findByText('AD/LDAP Test').click();
+            cy.findByText('AD/LDAP Test Successful').should('be.visible');
+
+            // # Click on AD/LDAP Synchronize Now button
+            cy.findByText('AD/LDAP Synchronize Now').click().wait(TIMEOUTS.ONE_SEC);
+
+            // * Get the First row
+            cy.findByTestId('jobTable').
+                find('tbody > tr').
+                eq(0).
+                as('firstRow');
+
+            // * Wait until first row updates to say Success
+            cy.waitUntil(() => {
+                return cy.get('@firstRow').then((el) => {
+                    return el.find('.status-icon-success').length > 0;
+                });
+            }
+            , {
+                timeout: TIMEOUTS.FIVE_MIN,
+                interval: TIMEOUTS.TWO_SEC,
+                errorMsg: 'AD/LDAP Sync Job did not finish',
+            });
+        }
+    });
 });

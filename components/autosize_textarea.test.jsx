@@ -4,12 +4,12 @@
 import React from 'react';
 import {shallow} from 'enzyme';
 
-import AutosizeTextarea from 'components/autosize_textarea.jsx';
+import AutosizeTextarea from 'components/autosize_textarea';
 
 describe('components/AutosizeTextarea', () => {
     test('should match snapshot, init', () => {
         const wrapper = shallow(
-            <AutosizeTextarea/>
+            <AutosizeTextarea/>,
         );
 
         expect(wrapper).toMatchSnapshot();

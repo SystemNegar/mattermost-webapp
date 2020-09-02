@@ -8,18 +8,14 @@ import {
 import {getMyChannelMemberships} from 'mattermost-redux/selectors/entities/common';
 import {getConfig} from 'mattermost-redux/selectors/entities/general';
 import {getCurrentTeamId} from 'mattermost-redux/selectors/entities/teams';
-import * as ChannelActions from 'mattermost-redux/actions/channels';
 import {getCurrentUserLocale} from 'mattermost-redux/selectors/entities/i18n';
 import {haveIChannelPermission} from 'mattermost-redux/selectors/entities/roles';
 import {Permissions} from 'mattermost-redux/constants';
 import {sortChannelsByTypeAndDisplayName} from 'mattermost-redux/utils/channel_utils';
 import {logError} from 'mattermost-redux/actions/errors';
 
-import GlobeIcon from 'components/svg/globe_icon';
-import LockIcon from 'components/svg/lock_icon';
-import ArchiveIcon from 'components/svg/archive_icon';
 import store from 'stores/redux_store.jsx';
-import {Constants} from 'utils/constants.jsx';
+import {Constants} from 'utils/constants';
 
 import Provider from './provider.jsx';
 import Suggestion from './suggestion.jsx';
@@ -45,15 +41,15 @@ class SearchChannelWithPermissionsSuggestion extends Suggestion {
         let icon = null;
         if (channelIsArchived) {
             icon = (
-                <ArchiveIcon className='icon icon__archive'/>
+                <i className='icon icon--no-spacing icon-archive-outline'/>
             );
         } else if (channel.type === Constants.OPEN_CHANNEL) {
             icon = (
-                <GlobeIcon className='icon icon__globe icon--body'/>
+                <i className='icon icon--no-spacing icon-globe'/>
             );
         } else if (channel.type === Constants.PRIVATE_CHANNEL) {
             icon = (
-                <LockIcon className='icon icon__lock icon--body'/>
+                <i className='icon icon--no-spacing icon-lock-outline'/>
             );
         }
 
@@ -61,9 +57,13 @@ class SearchChannelWithPermissionsSuggestion extends Suggestion {
             <div
                 onClick={this.handleClick}
                 className={className}
+                onMouseMove={this.handleMouseMove}
+                ref={(node) => {
+                    this.node = node;
+                }}
                 {...Suggestion.baseProps}
             >
-                {icon}
+                <span className='suggestion-list__icon suggestion-list__icon--large'>{icon}</span>
                 {displayName}
             </div>
         );
@@ -103,6 +103,11 @@ function channelSearchSorter(wrappedA, wrappedB) {
 }
 
 export default class SearchChannelWithPermissionsProvider extends Provider {
+    constructor(channelSearchFunc) {
+        super();
+        this.autocompleteChannelsForSearch = channelSearchFunc;
+    }
+
     makeChannelSearchFilter(channelPrefix) {
         const channelPrefixLower = channelPrefix.toLowerCase();
 
@@ -149,7 +154,7 @@ export default class SearchChannelWithPermissionsProvider extends Provider {
             return;
         }
 
-        const channelsAsync = ChannelActions.autocompleteChannelsForSearch(teamId, channelPrefix)(store.dispatch, store.getState);
+        const channelsAsync = this.autocompleteChannelsForSearch(teamId, channelPrefix);
 
         let channelsFromServer = [];
         try {

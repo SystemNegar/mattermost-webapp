@@ -6,12 +6,12 @@ import React from 'react';
 import {FormattedMessage} from 'react-intl';
 
 import icon50 from 'images/icon50x50.png';
-import FormError from 'components/form_error.jsx';
+import FormError from 'components/form_error';
 import {browserHistory} from 'utils/browser_history';
 
 import FormattedMarkdownMessage from 'components/formatted_markdown_message.jsx';
 
-export default class Authorize extends React.Component {
+export default class Authorize extends React.PureComponent {
     static get propTypes() {
         return {
             location: PropTypes.object.isRequired,
@@ -25,13 +25,15 @@ export default class Authorize extends React.Component {
     constructor(props) {
         super(props);
 
-        this.handleAllow = this.handleAllow.bind(this);
-        this.handleDeny = this.handleDeny.bind(this);
-
         this.state = {};
     }
 
-    UNSAFE_componentWillMount() { // eslint-disable-line camelcase
+    componentDidMount() {
+        // if we get to this point remove the antiClickjack blocker
+        const blocker = document.getElementById('antiClickjack');
+        if (blocker) {
+            blocker.parentNode.removeChild(blocker);
+        }
         const clientId = (new URLSearchParams(this.props.location.search)).get('client_id');
         if (!((/^[a-z0-9]+$/).test(clientId))) {
             return;
@@ -45,15 +47,7 @@ export default class Authorize extends React.Component {
             });
     }
 
-    componentDidMount() {
-        // if we get to this point remove the antiClickjack blocker
-        const blocker = document.getElementById('antiClickjack');
-        if (blocker) {
-            blocker.parentNode.removeChild(blocker);
-        }
-    }
-
-    handleAllow() {
+    handleAllow = () => {
         const searchParams = new URLSearchParams(this.props.location.search);
         const params = {
             responseType: searchParams.get('response_type'),
@@ -70,11 +64,11 @@ export default class Authorize extends React.Component {
                 } else if (error) {
                     this.setState({error: error.message});
                 }
-            }
+            },
         );
     }
 
-    handleDeny() {
+    handleDeny = () => {
         const redirectUri = (new URLSearchParams(this.props.location.search)).get('redirect_uri');
         if (redirectUri.startsWith('https://') || redirectUri.startsWith('http://')) {
             window.location.href = redirectUri + '?error=access_denied';
@@ -121,7 +115,7 @@ export default class Authorize extends React.Component {
                         <div className='text'>
                             <FormattedMarkdownMessage
                                 id='authorize.title'
-                                defaultMessage='**{appName}** would like to connect to your **Mattermost** user account'
+                                defaultMessage='Authorize **{appName}** to Connect to Your **Mattermost** User Account'
                                 values={{
                                     appName: app.name,
                                 }}

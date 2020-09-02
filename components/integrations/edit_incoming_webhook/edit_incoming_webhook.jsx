@@ -7,7 +7,7 @@ import React from 'react';
 import {browserHistory} from 'utils/browser_history';
 import {t} from 'utils/i18n';
 import AbstractIncomingWebhook from 'components/integrations/abstract_incoming_webhook.jsx';
-import LoadingScreen from 'components/loading_screen.jsx';
+import LoadingScreen from 'components/loading_screen';
 
 const HEADER = {id: t('integrations.edit'), defaultMessage: 'Edit'};
 const FOOTER = {id: t('update_incoming_webhook.update'), defaultMessage: 'Update'};
@@ -30,11 +30,6 @@ export default class EditIncomingWebhook extends React.PureComponent {
         * The id of the incoming webhook to edit
         */
         hookId: PropTypes.string.isRequired,
-
-        /**
-        * The request state for updateIncomingHook action. Contains status and error
-        */
-        updateIncomingHookRequest: PropTypes.object.isRequired,
 
         /**
         * Whether or not incoming webhooks are enabled.
@@ -97,15 +92,15 @@ export default class EditIncomingWebhook extends React.PureComponent {
     submitHook = async () => {
         this.setState({serverError: ''});
 
-        const {data} = await this.props.actions.updateIncomingHook(this.newHook);
+        const {data, error} = await this.props.actions.updateIncomingHook(this.newHook);
 
         if (data) {
             browserHistory.push(`/${this.props.team.name}/integrations/incoming_webhooks`);
             return;
         }
 
-        if (this.props.updateIncomingHookRequest.error) {
-            this.setState({serverError: this.props.updateIncomingHookRequest.error.message});
+        if (error) {
+            this.setState({serverError: error.message});
         }
     }
 

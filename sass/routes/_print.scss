@@ -56,7 +56,7 @@
     #channel-header,
     #post-create,
     #post-list .more-messages-text,
-    .post .post__header .col__reply,
+    .post .post__header .post-menu,
     .post .post__content > div.post__img,
     .attachment__content,
     .post__body .img-div,
@@ -113,11 +113,5 @@
         .post-image__name + div {
             display: none;
         }
-    }
-
-
-    .date-separator .separator__hr,
-    .new-separator .separator__hr {
-        top: 1.7em;
     }
 }

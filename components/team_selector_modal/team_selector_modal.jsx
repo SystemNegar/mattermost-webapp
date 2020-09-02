@@ -6,18 +6,19 @@ import React from 'react';
 import {Modal} from 'react-bootstrap';
 import {FormattedMessage} from 'react-intl';
 
-import Constants, {ModalIdentifiers} from 'utils/constants.jsx';
+import Constants, {ModalIdentifiers} from 'utils/constants';
 import {localizeMessage} from 'utils/utils.jsx';
 
-import MultiSelect from 'components/multiselect/multiselect.jsx';
-import TeamInfo from 'components/team_info.jsx';
-import ConfirmModal from 'components/confirm_modal.jsx';
+import MultiSelect from 'components/multiselect/multiselect';
+import ConfirmModal from 'components/confirm_modal';
+import TeamIcon from 'components/widgets/team_icon/team_icon';
 
 import FormattedMarkdownMessage from 'components/formatted_markdown_message.jsx';
+import {imageURLForTeam} from 'utils/utils';
 
 const TEAMS_PER_PAGE = 50;
 
-export default class TeamSelectorModal extends React.Component {
+export default class TeamSelectorModal extends React.PureComponent {
     static propTypes = {
         currentSchemeId: PropTypes.string,
         alreadySelected: PropTypes.array,
@@ -54,11 +55,11 @@ export default class TeamSelectorModal extends React.Component {
         });
     }
 
-    UNSAFE_componentWillReceiveProps(nextProps) { // eslint-disable-line camelcase
-        if (this.props.searchTerm !== nextProps.searchTerm) {
+    componentDidUpdate(prevProps) {
+        if (this.props.searchTerm !== prevProps.searchTerm) {
             clearTimeout(this.searchTimeoutId);
 
-            const searchTerm = nextProps.searchTerm;
+            const searchTerm = this.props.searchTerm;
             if (searchTerm === '') {
                 return;
             }
@@ -69,7 +70,7 @@ export default class TeamSelectorModal extends React.Component {
                     await this.props.actions.searchTeams(searchTerm);
                     this.setTeamsLoadingState(false);
                 },
-                Constants.SEARCH_TIMEOUT_MILLISECONDS
+                Constants.SEARCH_TIMEOUT_MILLISECONDS,
             );
         }
     }
@@ -138,7 +139,7 @@ export default class TeamSelectorModal extends React.Component {
         this.props.actions.setModalSearchTerm(term);
     }
 
-    renderOption(option, isSelected, onAdd) {
+    renderOption(option, isSelected, onAdd, onMouseMove) {
         var rowSelected = '';
         if (isSelected) {
             rowSelected = 'more-modal__row--selected';
@@ -150,11 +151,20 @@ export default class TeamSelectorModal extends React.Component {
                 ref={isSelected ? 'selected' : option.id}
                 className={'more-modal__row clickable ' + rowSelected}
                 onClick={() => onAdd(option)}
+                onMouseMove={() => onMouseMove(option)}
             >
                 <div
                     className='more-modal__details'
                 >
-                    <TeamInfo team={option}/>
+                    <div className='team-info-block'>
+                        <TeamIcon
+                            name={option.display_name}
+                            url={imageURLForTeam(option)}
+                        />
+                        <div className='team-data'>
+                            <div className='title'>{option.display_name}</div>
+                        </div>
+                    </div>
                 </div>
                 <div className='more-modal__actions'>
                     <div className='more-modal__actions--round'>
@@ -231,7 +241,7 @@ export default class TeamSelectorModal extends React.Component {
 
         return (
             <Modal
-                dialogClassName={'more-modal more-direct-channels team-selector-modal'}
+                dialogClassName='a11y__modal more-modal more-direct-channels team-selector-modal'
                 show={this.state.show}
                 onHide={this.handleHide}
                 onExited={this.handleExit}
@@ -245,7 +255,7 @@ export default class TeamSelectorModal extends React.Component {
                     >
                         <FormattedMarkdownMessage
                             id='add_teams_to_scheme.title'
-                            defaultMessage='Add Teams To **Team Selection** List'
+                            defaultMessage='Add Teams to **Team Selection** List'
                         />
                     </Modal.Title>
                 </Modal.Header>

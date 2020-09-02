@@ -4,7 +4,7 @@
 import {Client4} from 'mattermost-redux/client';
 import {unfavoriteChannel} from 'mattermost-redux/actions/channels';
 import {savePreferences} from 'mattermost-redux/actions/preferences';
-import {getCurrentChannel, getRedirectChannelNameForTeam} from 'mattermost-redux/selectors/entities/channels';
+import {getCurrentChannel, getRedirectChannelNameForTeam, isFavoriteChannel} from 'mattermost-redux/selectors/entities/channels';
 import {getCurrentUserId} from 'mattermost-redux/selectors/entities/users';
 import {getCurrentRelativeTeamUrl, getCurrentTeamId} from 'mattermost-redux/selectors/entities/teams';
 import {IntegrationTypes} from 'mattermost-redux/action_types';
@@ -13,11 +13,10 @@ import {openModal} from 'actions/views/modals';
 import * as GlobalActions from 'actions/global_actions.jsx';
 import * as PostActions from 'actions/post_actions.jsx';
 
-import {isUrlSafe, getSiteURL} from 'utils/url.jsx';
+import {isUrlSafe, getSiteURL} from 'utils/url';
 import {localizeMessage, getUserIdFromChannelName} from 'utils/utils.jsx';
-import * as UserAgent from 'utils/user_agent.jsx';
-import {Constants, ModalIdentifiers} from 'utils/constants.jsx';
-import {isFavoriteChannel} from 'utils/channel_utils.jsx';
+import * as UserAgent from 'utils/user_agent';
+import {Constants, ModalIdentifiers} from 'utils/constants';
 import {browserHistory} from 'utils/browser_history';
 
 import UserSettingsModal from 'components/user_settings/modal';
@@ -57,10 +56,12 @@ export function executeCommand(message, args) {
             if (channel.type === Constants.PRIVATE_CHANNEL) {
                 GlobalActions.showLeavePrivateChannelModal(channel);
                 return {data: true};
-            } else if (
+            }
+            if (
                 channel.type === Constants.DM_CHANNEL ||
                 channel.type === Constants.GM_CHANNEL
             ) {
+                const currentUserId = getCurrentUserId(state);
                 let name;
                 let category;
                 if (channel.type === Constants.DM_CHANNEL) {
@@ -70,20 +71,22 @@ export function executeCommand(message, args) {
                     name = channel.id;
                     category = Constants.Preferences.CATEGORY_GROUP_CHANNEL_SHOW;
                 }
-                const currentUserId = getCurrentUserId(state);
-                dispatch(savePreferences(currentUserId, [{category, name, user_id: currentUserId, value: 'false'}]));
-                if (isFavoriteChannel(channel)) {
-                    dispatch(unfavoriteChannel(channel.id));
-                }
                 const currentTeamId = getCurrentTeamId(state);
                 const redirectChannel = getRedirectChannelNameForTeam(state, currentTeamId);
-                browserHistory.push(`${getCurrentRelativeTeamUrl(state)}/channels/${redirectChannel}`);
+                const teamUrl = getCurrentRelativeTeamUrl(state);
+                browserHistory.push(`${teamUrl}/channels/${redirectChannel}`);
+
+                dispatch(savePreferences(currentUserId, [{category, name, user_id: currentUserId, value: 'false'}]));
+                if (isFavoriteChannel(state, channel.id)) {
+                    dispatch(unfavoriteChannel(channel.id));
+                }
+
                 return {data: true};
             }
             break;
         }
         case '/settings':
-            dispatch(openModal({ModalId: ModalIdentifiers.USER_SETTINGS, dialogType: UserSettingsModal}));
+            dispatch(openModal({modalId: ModalIdentifiers.USER_SETTINGS, dialogType: UserSettingsModal}));
             return {data: true};
         case '/collapse':
         case '/expand':

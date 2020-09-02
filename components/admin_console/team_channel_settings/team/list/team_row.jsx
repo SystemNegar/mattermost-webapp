@@ -7,10 +7,9 @@ import {Link} from 'react-router-dom';
 import {FormattedMessage} from 'react-intl';
 
 import * as Utils from 'utils/utils';
+import TeamIcon from 'components/widgets/team_icon/team_icon';
 
-import TeamImage from '../details/team_image.jsx';
-
-export default class TeamRow extends React.Component {
+export default class TeamRow extends React.PureComponent {
     static propTypes = {
         team: PropTypes.object.isRequired,
         onRowClick: PropTypes.func.isRequired,
@@ -20,52 +19,73 @@ export default class TeamRow extends React.Component {
         const {team, onRowClick} = this.props;
         onRowClick(team.id);
     }
+
+    renderManagementMethodText = () => {
+        const {team} = this.props;
+        if (team.group_constrained) {
+            return (
+                <FormattedMessage
+                    id='admin.team_settings.team_row.managementMethod.groupSync'
+                    defaultMessage='Group Sync'
+                />
+            );
+        } else if (team.allow_open_invite) {
+            return (
+                <FormattedMessage
+                    id='admin.team_settings.team_row.managementMethod.anyoneCanJoin'
+                    defaultMessage='Anyone Can Join'
+                />
+            );
+        }
+        return (
+            <FormattedMessage
+                id='admin.team_settings.team_row.managementMethod.inviteOnly'
+                defaultMessage='Invite Only'
+            />
+        );
+    }
+
     render = () => {
         const {team} = this.props;
         const teamIconUrl = Utils.imageURLForTeam(team);
         return (
             <div
-                className={'group '}
+                className='group'
                 onClick={this.handleRowClick}
             >
                 <div className='group-row group-row-large'>
-                    <div className='group-name'>
-                        <div className='col-sm-auto'>
-                            <TeamImage
-                                small={true}
-                                teamIconUrl={teamIconUrl}
-                                displayName={team.display_name}
-                            />
-
-                        </div>
-                        <div className='col-sm-auto'>
-                            <b>{team.display_name}</b>
+                    <div className='group-name adjusted center-row row-content'>
+                        <TeamIcon
+                            size='sm'
+                            url={teamIconUrl}
+                            name={team.display_name}
+                        />
+                        <div>
+                            <b data-testid='team-display-name'>{team.display_name}</b>
                             {team.description && (
-                                <div
-                                    className='overflow--ellipsis text-nowrap'
-                                    style={{maxWidth: 500}}
-                                >
+                                <div className='overflow--ellipsis text-nowrap team-descr-list-column'>
                                     {team.description}
                                 </div>)}
 
                         </div>
 
                     </div>
-
-                    <span className='group-description'>
-                        <FormattedMessage
-                            id={`admin.team_settings.team_row.managementMethod.${team.group_constrained ? 'group' : 'manual'}`}
-                            defaultMessage={team.group_constrained ? 'Group Sync' : 'Manual Invites'}
-                        />
-                    </span>
-                    <span className='group-actions'>
-                        <Link to={`/admin_console/user_management/teams/${team.id}`}>
-                            <FormattedMessage
-                                id='admin.team_settings.team_row.configure'
-                                defaultMessage='Edit'
-                            />
-                        </Link>
-                    </span>
+                    <div className='group-content'>
+                        <span className='group-description adjusted row-content'>
+                            {this.renderManagementMethodText()}
+                        </span>
+                        <span
+                            data-testid={`${team.display_name}edit`}
+                            className='group-actions'
+                        >
+                            <Link to={`/admin_console/user_management/teams/${team.id}`}>
+                                <FormattedMessage
+                                    id='admin.team_settings.team_row.configure'
+                                    defaultMessage='Edit'
+                                />
+                            </Link>
+                        </span>
+                    </div>
                 </div>
             </div>
         );

@@ -2,11 +2,15 @@
 // See LICENSE.txt for license information.
 
 import React from 'react';
-import {shallow} from 'enzyme';
+import {Posts} from 'mattermost-redux/constants';
 
+import {shallowWithIntl} from 'tests/helpers/intl-test-helper';
+
+import {Locations} from 'utils/constants';
 import {browserHistory} from 'utils/browser_history';
-import {getDisplayNameByUser, getDirectTeammate} from 'utils/utils.jsx';
-import SearchResultsItem from 'components/search_results_item/search_results_item.jsx';
+import SearchResultsItem from 'components/search_results_item/search_results_item';
+import PostFlagIcon from 'components/post_view/post_flag_icon';
+import PostPreHeader from 'components/post_view/post_pre_header';
 
 jest.mock('utils/browser_history', () => ({
     browserHistory: {
@@ -15,9 +19,7 @@ jest.mock('utils/browser_history', () => ({
 }));
 
 jest.mock('utils/utils.jsx', () => ({
-    getDisplayNameByUser: jest.fn().mockReturnValue('Other guy'),
-    getDirectTeammate: jest.fn().mockReturnValue({}),
-    isMobile: jest.fn().mockReturnValueOnce(false).mockReturnValue(true),
+    isMobile: jest.fn().mockReturnValueOnce(false).mockReturnValue(true).mockReturnValue(false),
     getDateForUnixTicks: jest.fn().mockReturnValue(new Date('2017-12-14T18:15:28.290Z')),
     localizeMessage: jest.fn(),
 }));
@@ -30,7 +32,6 @@ describe('components/SearchResultsItem', () => {
     let mockFunc;
     let user;
     let post;
-    let channel;
     let defaultProps;
 
     beforeEach(() => {
@@ -60,14 +61,10 @@ describe('components/SearchResultsItem', () => {
             user_id: 'user_id',
         };
 
-        channel = {
-            id: 'channel_id',
-            name: 'channel_name',
-            type: 'O',
-        };
-
         defaultProps = {
-            channel,
+            channelId: 'channel_id',
+            channelName: 'channel_name',
+            channelType: 'O',
             compactDisplay: true,
             post,
             user,
@@ -85,12 +82,14 @@ describe('components/SearchResultsItem', () => {
                 selectPostCard: mockFunc,
                 setRhsExpanded: mockFunc,
             },
+            directTeammate: '',
+            displayName: 'Other guy',
         };
     });
 
     test('should match snapshot for channel', () => {
-        const wrapper = shallow(
-            <SearchResultsItem {...defaultProps}/>
+        const wrapper = shallowWithIntl(
+            <SearchResultsItem {...defaultProps}/>,
         );
 
         expect(wrapper).toMatchSnapshot();
@@ -111,8 +110,29 @@ describe('components/SearchResultsItem', () => {
             enablePostUsernameOverride: true,
         };
 
-        const wrapper = shallow(
-            <SearchResultsItem {...props}/>
+        const wrapper = shallowWithIntl(
+            <SearchResultsItem {...props}/>,
+        );
+        expect(wrapper).toMatchSnapshot();
+    });
+
+    test('should match snapshot for deleted message', () => {
+        const props = {
+            ...defaultProps,
+            post: {
+                ...post,
+                file_ids: ['id', 'id2'],
+                state: Posts.POST_DELETED,
+                props: {
+                    from_webhook: true,
+                    override_username: 'overridden_username',
+                },
+            },
+            enablePostUsernameOverride: true,
+        };
+
+        const wrapper = shallowWithIntl(
+            <SearchResultsItem {...props}/>,
         );
         expect(wrapper).toMatchSnapshot();
     });
@@ -120,28 +140,23 @@ describe('components/SearchResultsItem', () => {
     test('should match snapshot for DM', () => {
         const props = {
             ...defaultProps,
-            channel: {
-                ...channel,
-                type: 'D',
-            },
+            channelType: 'D',
             post: {
                 ...post,
                 is_pinned: true,
             },
         };
 
-        const wrapper = shallow(
-            <SearchResultsItem {...props}/>
+        const wrapper = shallowWithIntl(
+            <SearchResultsItem {...props}/>,
         );
 
         expect(wrapper).toMatchSnapshot();
-        expect(getDirectTeammate).toHaveBeenCalledWith('channel_id');
-        expect(getDisplayNameByUser).toHaveBeenCalledWith({});
     });
 
     test('Check for dotmenu dropdownOpened state', () => {
-        const wrapper = shallow(
-            <SearchResultsItem {...defaultProps}/>
+        const wrapper = shallowWithIntl(
+            <SearchResultsItem {...defaultProps}/>,
         );
 
         const instance = wrapper.instance();
@@ -161,8 +176,8 @@ describe('components/SearchResultsItem', () => {
             },
         };
 
-        const wrapper = shallow(
-            <SearchResultsItem {...props}/>
+        const wrapper = shallowWithIntl(
+            <SearchResultsItem {...props}/>,
         );
 
         wrapper.find('CommentIcon').prop('handleCommentClick')({preventDefault: jest.fn()});
@@ -180,11 +195,11 @@ describe('components/SearchResultsItem', () => {
             },
         };
 
-        const wrapper = shallow(
-            <SearchResultsItem {...props}/>
+        const wrapper = shallowWithIntl(
+            <SearchResultsItem {...props}/>,
         );
 
-        wrapper.find('.search-item__jump').simulate('click');
+        wrapper.find('.search-item__jump').simulate('click', {preventDefault: jest.fn()});
         expect(setRhsExpanded).toHaveBeenCalledTimes(1);
         expect(setRhsExpanded).toHaveBeenLastCalledWith(false);
         expect(browserHistory.push).toHaveBeenLastCalledWith(`/${defaultProps.currentTeamName}/pl/${post.id}`);
@@ -193,16 +208,45 @@ describe('components/SearchResultsItem', () => {
     test('should match snapshot for archived channel', () => {
         const props = {
             ...defaultProps,
-            channel: {
-                ...channel,
-                delete_at: 1234,
-            },
+            channelIsArchived: true,
         };
 
-        const wrapper = shallow(
-            <SearchResultsItem {...props}/>
+        const wrapper = shallowWithIntl(
+            <SearchResultsItem {...props}/>,
         );
 
         expect(wrapper).toMatchSnapshot();
+    });
+
+    test('should pass props correctly to PostFlagIcon', () => {
+        const wrapper = shallowWithIntl(
+            <SearchResultsItem {...defaultProps}/>,
+        );
+
+        const flagIcon = wrapper.find(PostFlagIcon);
+        expect(flagIcon).toHaveLength(1);
+        expect(flagIcon.prop('location')).toEqual(Locations.SEARCH);
+        expect(flagIcon.prop('postId')).toEqual(defaultProps.post.id);
+        expect(flagIcon.prop('isFlagged')).toEqual(defaultProps.isFlagged);
+    });
+
+    test('should pass props correctly to PostPreHeader', () => {
+        const props = {
+            ...defaultProps,
+            isPinnedPosts: false,
+            isFlaggedPosts: true,
+        };
+
+        const wrapper = shallowWithIntl(
+            <SearchResultsItem {...props}/>,
+        );
+
+        const postPreHeader = wrapper.find(PostPreHeader);
+        expect(postPreHeader).toHaveLength(1);
+        expect(postPreHeader.prop('isFlagged')).toEqual(props.isFlagged);
+        expect(postPreHeader.prop('isPinned')).toEqual(props.post.is_pinned);
+        expect(postPreHeader.prop('skipPinned')).toEqual(props.isPinnedPosts);
+        expect(postPreHeader.prop('skipFlagged')).toEqual(props.isFlaggedPosts);
+        expect(postPreHeader.prop('channelId')).toEqual(defaultProps.post.channel_id);
     });
 });

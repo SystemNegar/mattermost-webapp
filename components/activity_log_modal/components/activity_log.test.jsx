@@ -25,7 +25,7 @@ describe('components/activity_log_modal/ActivityLog', () => {
 
     test('should match snapshot', () => {
         const wrapper = shallow(
-            <ActivityLog {...baseProps}/>
+            <ActivityLog {...baseProps}/>,
         );
 
         expect(wrapper).toMatchSnapshot();
@@ -33,7 +33,7 @@ describe('components/activity_log_modal/ActivityLog', () => {
 
     test('submitRevoke is called correctly', () => {
         const wrapper = shallow(
-            <ActivityLog {...baseProps}/>
+            <ActivityLog {...baseProps}/>,
         );
 
         wrapper.instance().submitRevoke('e');
@@ -44,7 +44,7 @@ describe('components/activity_log_modal/ActivityLog', () => {
 
     test('handleMoreInfo updates state correctly', () => {
         const wrapper = shallow(
-            <ActivityLog {...baseProps}/>
+            <ActivityLog {...baseProps}/>,
         );
 
         wrapper.instance().handleMoreInfo();
@@ -53,7 +53,7 @@ describe('components/activity_log_modal/ActivityLog', () => {
 
     test('should match when isMobileSession is called', () => {
         const wrapper = shallow(
-            <ActivityLog {...baseProps}/>
+            <ActivityLog {...baseProps}/>,
         );
 
         const isMobileSession = wrapper.instance().isMobileSession;
@@ -64,21 +64,49 @@ describe('components/activity_log_modal/ActivityLog', () => {
 
     test('should match when mobileSessionInfo is called', () => {
         const wrapper = shallow(
-            <ActivityLog {...baseProps}/>
+            <ActivityLog {...baseProps}/>,
         );
 
         const mobileSessionInfo = wrapper.instance().mobileSessionInfo;
 
-        const apple = {devicePicture: 'fa fa-apple', deviceTitle: localizeMessage('device_icons.apple', 'Apple Icon'), devicePlatform: <FormattedMessage defaultMessage='iPhone Native Classic App' id='activity_log_modal.iphoneNativeClassicApp' values={{}}/>}; //eslint-disable-line react/jsx-max-props-per-line
+        const appleText = (
+            <FormattedMessage
+                defaultMessage='iPhone Native Classic App'
+                id='activity_log_modal.iphoneNativeClassicApp'
+                values={{}}
+            />
+        );
+        const apple = {devicePicture: 'fa fa-apple', deviceTitle: localizeMessage('device_icons.apple', 'Apple Icon'), devicePlatform: appleText};
         expect(mobileSessionInfo({device_id: 'apple'})).toEqual(apple);
 
-        const android = {devicePicture: 'fa fa-android', deviceTitle: localizeMessage('device_icons.android', 'Android Icon'), devicePlatform: <FormattedMessage defaultMessage='Android Native Classic App' id='activity_log_modal.androidNativeClassicApp' values={{}}/>}; //eslint-disable-line react/jsx-max-props-per-line
+        const androidText = (
+            <FormattedMessage
+                defaultMessage='Android Native Classic App'
+                id='activity_log_modal.androidNativeClassicApp'
+                values={{}}
+            />
+        );
+        const android = {devicePicture: 'fa fa-android', deviceTitle: localizeMessage('device_icons.android', 'Android Icon'), devicePlatform: androidText};
         expect(mobileSessionInfo({device_id: 'android'})).toEqual(android);
 
-        const appleRN = {devicePicture: 'fa fa-apple', deviceTitle: localizeMessage('device_icons.apple', 'Apple Icon'), devicePlatform: <FormattedMessage defaultMessage='iPhone Native App' id='activity_log_modal.iphoneNativeApp' values={{}}/>}; //eslint-disable-line react/jsx-max-props-per-line
+        const appleRNText = (
+            <FormattedMessage
+                defaultMessage='iPhone Native App'
+                id='activity_log_modal.iphoneNativeApp'
+                values={{}}
+            />
+        );
+        const appleRN = {devicePicture: 'fa fa-apple', deviceTitle: localizeMessage('device_icons.apple', 'Apple Icon'), devicePlatform: appleRNText};
         expect(mobileSessionInfo({device_id: 'apple_rn'})).toEqual(appleRN);
 
-        const androidRN = {devicePicture: 'fa fa-android', deviceTitle: localizeMessage('device_icons.android', 'Android Icon'), devicePlatform: <FormattedMessage defaultMessage='Android Native App' id='activity_log_modal.androidNativeApp' values={{}}/>}; //eslint-disable-line react/jsx-max-props-per-line
+        const androidRNText = (
+            <FormattedMessage
+                defaultMessage='Android Native App'
+                id='activity_log_modal.androidNativeApp'
+                values={{}}
+            />
+        );
+        const androidRN = {devicePicture: 'fa fa-android', deviceTitle: localizeMessage('device_icons.android', 'Android Icon'), devicePlatform: androidRNText};
         expect(mobileSessionInfo({device_id: 'android_rn'})).toEqual(androidRN);
     });
 });

@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import * as TextFormatting from 'utils/text_formatting.jsx';
+import * as TextFormatting from 'utils/text_formatting';
 
 describe('TextFormatting.searchHighlighting', () => {
     const testCases = [{
@@ -46,12 +46,14 @@ describe('TextFormatting.searchHighlighting', () => {
         searchTerm: 'words',
         expected:
             '<div class="post-code post-code--wrap">' +
-                '<code class="hljs">' +
-                    '<div class="post-code__search-highlighting">' +
-                        '<span class="search-highlight">words</span> in a sentence\n' +
-                    '</div>' +
-                    'words in a sentence\n' +
-                '</code>' +
+                '<div class="hljs">' +
+                    '<code>' +
+                        '<div class="post-code__search-highlighting">' +
+                            '<span class="search-highlight">words</span> in a sentence' +
+                        '</div>' +
+                        'words in a sentence' +
+                    '</code>' +
+                '</div>' +
             '</div>',
     }, {
         name: 'search term highlighting in link text',
@@ -89,12 +91,14 @@ describe('TextFormatting.searchHighlighting', () => {
         searchMatches: ['words'],
         expected:
             '<div class="post-code post-code--wrap">' +
-                '<code class="hljs">' +
-                    '<div class="post-code__search-highlighting">' +
-                        '<span class="search-highlight">words</span> in a sentence\n' +
-                    '</div>' +
-                    'words in a sentence\n' +
-                '</code>' +
+                '<div class="hljs">' +
+                    '<code>' +
+                        '<div class="post-code__search-highlighting">' +
+                            '<span class="search-highlight">words</span> in a sentence' +
+                        '</div>' +
+                        'words in a sentence' +
+                    '</code>' +
+                '</div>' +
             '</div>',
     }, {
         name: 'search match highlighting in link text',

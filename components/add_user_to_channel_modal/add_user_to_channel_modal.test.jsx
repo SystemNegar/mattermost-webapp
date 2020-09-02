@@ -18,12 +18,13 @@ describe('components/AddUserToChannelModal', () => {
         actions: {
             addChannelMember: jest.fn().mockResolvedValue({}),
             getChannelMember: jest.fn().mockResolvedValue({}),
+            autocompleteChannelsForSearch: jest.fn().mockResolvedValue({}),
         },
     };
 
     it('should match snapshot', () => {
         const wrapper = shallow(
-            <AddUserToChannelModal {...baseProps}/>
+            <AddUserToChannelModal {...baseProps}/>,
         );
 
         expect(wrapper.find('#add-user-to-channel-modal__add-button').props().disabled).toBe(true);
@@ -34,7 +35,7 @@ describe('components/AddUserToChannelModal', () => {
 
     it('should enable the add button when a channel is selected', () => {
         const wrapper = shallow(
-            <AddUserToChannelModal {...baseProps}/>
+            <AddUserToChannelModal {...baseProps}/>,
         );
 
         wrapper.setState({selectedChannelId: 'someChannelId'});
@@ -44,7 +45,7 @@ describe('components/AddUserToChannelModal', () => {
 
     it('should show invite error when an error message is captured', () => {
         const wrapper = shallow(
-            <AddUserToChannelModal {...baseProps}/>
+            <AddUserToChannelModal {...baseProps}/>,
         );
 
         wrapper.setState({submitError: 'some error'});
@@ -54,7 +55,7 @@ describe('components/AddUserToChannelModal', () => {
 
     it('should disable add button when membership is being checked', () => {
         const wrapper = shallow(
-            <AddUserToChannelModal {...baseProps}/>
+            <AddUserToChannelModal {...baseProps}/>,
         );
 
         wrapper.setState({
@@ -75,7 +76,7 @@ describe('components/AddUserToChannelModal', () => {
         };
 
         const wrapper = shallow(
-            <AddUserToChannelModal {...props}/>
+            <AddUserToChannelModal {...props}/>,
         );
 
         wrapper.setState({selectedChannelId: 'someChannelId'});
@@ -85,7 +86,7 @@ describe('components/AddUserToChannelModal', () => {
 
     it('should disable the add button when saving', () => {
         const wrapper = shallow(
-            <AddUserToChannelModal {...baseProps}/>
+            <AddUserToChannelModal {...baseProps}/>,
         );
 
         wrapper.setState({
@@ -100,7 +101,7 @@ describe('components/AddUserToChannelModal', () => {
             const props = {...baseProps};
 
             const wrapper = shallow(
-                <AddUserToChannelModal {...props}/>
+                <AddUserToChannelModal {...props}/>,
             );
 
             const selection = {channel: {id: 'someChannelId', display_name: 'channelName'}};
@@ -121,7 +122,7 @@ describe('components/AddUserToChannelModal', () => {
             };
 
             const wrapper = shallow(
-                <AddUserToChannelModal {...props}/>
+                <AddUserToChannelModal {...props}/>,
             );
 
             expect(wrapper.state().text).toEqual('');
@@ -148,7 +149,7 @@ describe('components/AddUserToChannelModal', () => {
             const props = {...baseProps};
 
             const wrapper = shallow(
-                <AddUserToChannelModal {...props}/>
+                <AddUserToChannelModal {...props}/>,
             );
 
             wrapper.instance().handleSubmit();
@@ -166,7 +167,7 @@ describe('components/AddUserToChannelModal', () => {
             };
 
             const wrapper = shallow(
-                <AddUserToChannelModal {...props}/>
+                <AddUserToChannelModal {...props}/>,
             );
 
             wrapper.setState({selectedChannelId: 'someChannelId'});
@@ -183,7 +184,7 @@ describe('components/AddUserToChannelModal', () => {
             };
 
             const wrapper = shallow(
-                <AddUserToChannelModal {...props}/>
+                <AddUserToChannelModal {...props}/>,
             );
 
             wrapper.setState({selectedChannelId: 'someChannelId'});
@@ -205,7 +206,7 @@ describe('components/AddUserToChannelModal', () => {
             };
 
             const wrapper = shallow(
-                <AddUserToChannelModal {...props}/>
+                <AddUserToChannelModal {...props}/>,
             );
 
             expect(wrapper.state().show).toBe(true);
@@ -235,7 +236,7 @@ describe('components/AddUserToChannelModal', () => {
             };
 
             const wrapper = shallow(
-                <AddUserToChannelModal {...props}/>
+                <AddUserToChannelModal {...props}/>,
             );
 
             expect(wrapper.state().show).toBe(true);

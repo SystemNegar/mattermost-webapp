@@ -1,12 +1,16 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`components/ProfilePopover should match snapshot 1`] = `
+exports[`components/ProfilePopover should hide add-to-channel option if not on team 1`] = `
 <Popover
-  bsClass="popover"
   id="user-profile-popover"
+  isInCurrentTeam={false}
   placement="right"
+  popoverSize="sm"
+  popoverStyle="info"
   title={
-    <span>
+    <span
+      data-testid="profilePopoverTitle_some_username"
+    >
       <span
         className="user-popover__username"
       >
@@ -15,15 +19,14 @@ exports[`components/ProfilePopover should match snapshot 1`] = `
     </span>
   }
 >
-  <img
-    alt="some_username profile image"
-    className="user-popover__image"
-    height="128"
+  <Avatar
     key="user-popover-image"
-    src="src"
-    width="128"
+    size="xxl"
+    url="src"
+    username="some_username"
   />
   <Connect(Pluggable)
+    hide={[MockFunction]}
     key="profilePopoverPluggable2"
     pluggableName="PopoverUserAttributes"
     status="offline"
@@ -44,9 +47,94 @@ exports[`components/ProfilePopover should match snapshot 1`] = `
       href="#"
       onClick={[Function]}
     >
-      <i
+      <LocalizedIcon
         className="fa fa-paper-plane"
-        title="Send Message Icon"
+        component="i"
+        title={
+          Object {
+            "defaultMessage": "Send Message Icon",
+            "id": "user_profile.send.dm.icon",
+          }
+        }
+      />
+      <FormattedMessage
+        defaultMessage="Send Message"
+        id="user_profile.send.dm"
+        values={Object {}}
+      />
+    </a>
+  </div>
+  <Connect(Pluggable)
+    hide={[MockFunction]}
+    key="profilePopoverPluggable3"
+    pluggableName="PopoverUserActions"
+    status="offline"
+    user={
+      Object {
+        "name": "some name",
+        "username": "some_username",
+      }
+    }
+  />
+</Popover>
+`;
+
+exports[`components/ProfilePopover should match snapshot 1`] = `
+<Popover
+  id="user-profile-popover"
+  isInCurrentTeam={true}
+  placement="right"
+  popoverSize="sm"
+  popoverStyle="info"
+  title={
+    <span
+      data-testid="profilePopoverTitle_some_username"
+    >
+      <span
+        className="user-popover__username"
+      >
+        @some_username
+      </span>
+    </span>
+  }
+>
+  <Avatar
+    key="user-popover-image"
+    size="xxl"
+    url="src"
+    username="some_username"
+  />
+  <Connect(Pluggable)
+    hide={[MockFunction]}
+    key="profilePopoverPluggable2"
+    pluggableName="PopoverUserAttributes"
+    status="offline"
+    user={
+      Object {
+        "name": "some name",
+        "username": "some_username",
+      }
+    }
+  />
+  <div
+    className="popover__row first"
+    data-toggle="tooltip"
+    key="user-popover-dm"
+  >
+    <a
+      className="text-nowrap user-popover__email"
+      href="#"
+      onClick={[Function]}
+    >
+      <LocalizedIcon
+        className="fa fa-paper-plane"
+        component="i"
+        title={
+          Object {
+            "defaultMessage": "Send Message Icon",
+            "id": "user_profile.send.dm.icon",
+          }
+        }
       />
       <FormattedMessage
         defaultMessage="Send Message"
@@ -63,8 +151,9 @@ exports[`components/ProfilePopover should match snapshot 1`] = `
     <a
       className="text-nowrap"
       href="#"
+      onClick={[Function]}
     >
-      <Connect(ModalToggleButtonRedux)
+      <Connect(injectIntl(ModalToggleButtonRedux))
         accessibilityLabel="Add to a Channel"
         dialogProps={
           Object {
@@ -74,19 +163,35 @@ exports[`components/ProfilePopover should match snapshot 1`] = `
             },
           }
         }
-        dialogType={[Function]}
+        dialogType={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "WrappedComponent": [Function],
+            "compare": null,
+            "displayName": "Connect(AddUserToChannelModal)",
+            "type": [Function],
+          }
+        }
         modalId="add_user_to_channel"
+        onClick={[MockFunction]}
         role="menuitem"
       >
-        <i
+        <LocalizedIcon
           className="fa fa-user-plus"
-          title="Add User to Channel Icon"
+          component="i"
+          title={
+            Object {
+              "defaultMessage": "Add User to Channel Icon",
+              "id": "user_profile.add_user_to_channel.icon",
+            }
+          }
         />
         Add to a Channel
-      </Connect(ModalToggleButtonRedux)>
+      </Connect(injectIntl(ModalToggleButtonRedux))>
     </a>
   </div>
   <Connect(Pluggable)
+    hide={[MockFunction]}
     key="profilePopoverPluggable3"
     pluggableName="PopoverUserActions"
     status="offline"

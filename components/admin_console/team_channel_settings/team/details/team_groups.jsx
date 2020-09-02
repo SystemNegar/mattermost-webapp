@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import {FormattedMessage} from 'react-intl';
 
 import {t} from 'utils/i18n';
-import AdminPanel from 'components/widgets/admin_console/admin_panel.jsx';
+import AdminPanel from 'components/widgets/admin_console/admin_panel';
 
 import ToggleModalButton from 'components/toggle_modal_button.jsx';
 
@@ -14,7 +14,7 @@ import AddGroupsToTeamModal from 'components/add_groups_to_team_modal';
 
 import GroupList from '../../group';
 
-export const TeamGroups = ({onGroupRemoved, syncChecked, team, onAddCallback, totalGroups, groups, removedGroups}) => (
+export const TeamGroups = ({onGroupRemoved, syncChecked, team, onAddCallback, totalGroups, groups, removedGroups, setNewGroupRole, isDisabled}) => (
     <AdminPanel
         id='team_groups'
         titleId={syncChecked ? t('admin.team_settings.team_detail.syncedGroupsTitle') : t('admin.team_settings.team_detail.groupsTitle')}
@@ -23,6 +23,7 @@ export const TeamGroups = ({onGroupRemoved, syncChecked, team, onAddCallback, to
         subtitleDefault={syncChecked ? 'Add and remove team members based on their group membership.' : 'Group members will be added to the team.'}
         button={
             <ToggleModalButton
+                id='addGroupsToTeamToggle'
                 className='btn btn-primary'
                 dialogType={AddGroupsToTeamModal}
                 dialogProps={{
@@ -32,6 +33,7 @@ export const TeamGroups = ({onGroupRemoved, syncChecked, team, onAddCallback, to
                     excludeGroups: groups,
                     includeGroups: removedGroups,
                 }}
+                isDisabled={isDisabled}
             >
                 <FormattedMessage
                     id='admin.team_settings.team_details.add_group'
@@ -45,6 +47,9 @@ export const TeamGroups = ({onGroupRemoved, syncChecked, team, onAddCallback, to
             groups={groups}
             totalGroups={totalGroups}
             onGroupRemoved={onGroupRemoved}
+            setNewGroupRole={setNewGroupRole}
+            type='team'
+            isDisabled={isDisabled}
         />
     </AdminPanel>);
 
@@ -56,4 +61,6 @@ TeamGroups.propTypes = {
     removedGroups: PropTypes.arrayOf(PropTypes.object).isRequired,
     onAddCallback: PropTypes.func.isRequired,
     onGroupRemoved: PropTypes.func.isRequired,
+    setNewGroupRole: PropTypes.func.isRequired,
+    isDisabled: PropTypes.bool,
 };

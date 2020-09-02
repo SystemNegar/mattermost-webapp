@@ -5,14 +5,14 @@ import {bindActionCreators} from 'redux';
 
 import {getTeam} from 'mattermost-redux/selectors/entities/teams';
 
-import {getTeam as fetchTeam, membersMinusGroupMembers, patchTeam} from 'mattermost-redux/actions/teams';
-
+import {getTeam as fetchTeam, membersMinusGroupMembers, patchTeam, removeUserFromTeam, updateTeamMemberSchemeRoles, addUserToTeam} from 'mattermost-redux/actions/teams';
 import {getAllGroups, getGroupsAssociatedToTeam} from 'mattermost-redux/selectors/entities/groups';
 
 import {
     getGroupsAssociatedToTeam as fetchAssociatedGroups,
     linkGroupSyncable,
     unlinkGroupSyncable,
+    patchGroupSyncable,
 } from 'mattermost-redux/actions/groups';
 
 import {connect} from 'react-redux';
@@ -25,8 +25,8 @@ function mapStateToProps(state, props) {
     const teamID = props.match.params.team_id;
     const team = getTeam(state, teamID);
     const groups = getGroupsAssociatedToTeam(state, teamID);
-    const totalGroups = state.entities.teams.groupsAssociatedToTeam && state.entities.teams.groupsAssociatedToTeam[teamID] ? state.entities.teams.groupsAssociatedToTeam[teamID].totalCount : 0;
     const allGroups = getAllGroups(state, teamID);
+    const totalGroups = groups.length;
     return {
         team,
         groups,
@@ -46,6 +46,10 @@ function mapDispatchToProps(dispatch) {
             unlinkGroupSyncable,
             membersMinusGroupMembers,
             setNavigationBlocked,
+            patchGroupSyncable,
+            removeUserFromTeam,
+            addUserToTeam,
+            updateTeamMemberSchemeRoles,
         }, dispatch),
     };
 }

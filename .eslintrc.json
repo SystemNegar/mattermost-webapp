@@ -1,12 +1,14 @@
 {
   "extends": [
-    "./node_modules/eslint-config-mattermost/.eslintrc.json",
-    "./node_modules/eslint-config-mattermost/.eslintrc-react.json",
-    "plugin:cypress/recommended"
+    "plugin:mattermost/react",
+    "plugin:cypress/recommended",
+    "plugin:jquery/deprecated"
   ],
   "plugins": [
+    "mattermost",
     "import",
-    "cypress"
+    "cypress",
+    "jquery"
   ],
   "env": {
     "jest": true,
@@ -20,6 +22,7 @@
     }
   },
   "rules": {
+    "eol-last": ["error", "always"],
     "import/no-unresolved": 2,
     "import/order": [
       "error",
@@ -37,25 +40,8 @@
         ]
       }
     ],
-    "no-magic-numbers": [
-      1,
-      {
-        "ignore": [
-          -1,
-          0,
-          1,
-          2
-        ],
-        "enforceConst": true,
-        "detectObjects": true
-      }
-    ],
-    "react/jsx-filename-extension": [
-      1,
-      {
-        "extensions": [".js"]
-      }
-    ],
+    "no-undefined": 0,
+    "react/jsx-filename-extension": 0,
     "react/prop-types": [
       2,
       {
@@ -65,9 +51,55 @@
           "component"
         ]
       }
-    ]
+    ],
+    "react/no-string-refs": 2
   },
   "overrides": [
+    {
+      "files": ["**/*.tsx", "**/*.ts"],
+      "extends": [
+        "plugin:@typescript-eslint/recommended"
+      ],
+      "rules": {
+        "comma-dangle": 0,
+        "no-unused-expressions": 0,
+        "@typescript-eslint/no-unused-expressions": 2,
+        "@typescript-eslint/camelcase": [
+          2,
+          {
+            "properties": "never"
+          }
+        ],
+        "@typescript-eslint/no-non-null-assertion": 0,
+        "@typescript-eslint/no-unused-vars": [
+          2,
+          {
+            "vars": "all",
+            "args": "after-used"
+          }
+        ],
+        "@typescript-eslint/no-var-requires": 0,
+        "@typescript-eslint/no-empty-function": 0,
+        "@typescript-eslint/prefer-interface": 0,
+        "@typescript-eslint/explicit-function-return-type": 0,
+        "@typescript-eslint/indent": [
+          2,
+          4,
+          {
+            "SwitchCase": 0
+          }
+        ],
+        "@typescript-eslint/no-use-before-define": [
+          2,
+          {
+            "classes": false,
+            "functions": false,
+            "variables": false
+          }
+        ],
+        "react/jsx-filename-extension": 0
+      }
+    },
     {
       "files": ["tests/**"],
       "env": {
@@ -86,7 +118,57 @@
         "func-names": 0,
         "import/no-unresolved": 0,
         "max-nested-callbacks": 0,
-        "no-unused-expressions": 0
+        "no-process-env": 0,
+        "no-unused-expressions": 0,
+        "jquery/no-ajax": 0,
+        "jquery/no-ajax-events": 0,
+        "jquery/no-animate": 0,
+        "jquery/no-attr": 0,
+        "jquery/no-bind": 0,
+        "jquery/no-class": 0,
+        "jquery/no-clone": 0,
+        "jquery/no-closest": 0,
+        "jquery/no-css": 0,
+        "jquery/no-data": 0,
+        "jquery/no-deferred": 0,
+        "jquery/no-delegate": 0,
+        "jquery/no-each": 0,
+        "jquery/no-extend": 0,
+        "jquery/no-fade": 0,
+        "jquery/no-filter": 0,
+        "jquery/no-find": 0,
+        "jquery/no-global-eval": 0,
+        "jquery/no-grep": 0,
+        "jquery/no-has": 0,
+        "jquery/no-hide": 0,
+        "jquery/no-html": 0,
+        "jquery/no-in-array": 0,
+        "jquery/no-is-array": 0,
+        "jquery/no-is-function": 0,
+        "jquery/no-is": 0,
+        "jquery/no-load": 0,
+        "jquery/no-map": 0,
+        "jquery/no-merge": 0,
+        "jquery/no-param": 0,
+        "jquery/no-parent": 0,
+        "jquery/no-parents": 0,
+        "jquery/no-parse-html": 0,
+        "jquery/no-prop": 0,
+        "jquery/no-proxy": 0,
+        "jquery/no-ready": 0,
+        "jquery/no-serialize": 0,
+        "jquery/no-show": 0,
+        "jquery/no-size": 0,
+        "jquery/no-sizzle": 0,
+        "jquery/no-slide": 0,
+        "jquery/no-submit": 0,
+        "jquery/no-text": 0,
+        "jquery/no-toggle": 0,
+        "jquery/no-trigger": 0,
+        "jquery/no-trim": 0,
+        "jquery/no-val": 0,
+        "jquery/no-when": 0,
+        "jquery/no-wrap": 0
       }
     }
   ]

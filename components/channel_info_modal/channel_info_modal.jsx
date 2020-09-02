@@ -8,12 +8,12 @@ import {FormattedMessage} from 'react-intl';
 import {memoizeResult} from 'mattermost-redux/utils/helpers';
 
 import Markdown from 'components/markdown';
-import GlobeIcon from 'components/svg/globe_icon';
-import LockIcon from 'components/svg/lock_icon';
-import ArchiveIcon from 'components/svg/archive_icon';
+import GlobeIcon from 'components/widgets/icons/globe_icon';
+import LockIcon from 'components/widgets/icons/lock_icon';
+import ArchiveIcon from 'components/widgets/icons/archive_icon';
 
 import Constants from 'utils/constants.jsx';
-import {getSiteURL} from 'utils/url.jsx';
+import {getSiteURL} from 'utils/url';
 import * as Utils from 'utils/utils.jsx';
 
 const headerMarkdownOptions = {singleline: false, mentionHighlight: false};
@@ -32,9 +32,24 @@ export default class ChannelInfoModal extends React.PureComponent {
         channel: PropTypes.object.isRequired,
 
         /**
+         * Current channel object, used to determine if the current channel is different from the one this modal was instantiated with
+         */
+        currentChannel: PropTypes.object.isRequired,
+
+        /**
          * Current team object
          */
         currentTeam: PropTypes.object.isRequired,
+
+        /**
+         * Boolean whether the RHS is open, used to check if we need to hide the channel info modal
+         */
+        isRHSOpen: PropTypes.bool,
+
+        /**
+         * Relative url for the team, used to redirect to another channel within the team from the modal
+         */
+        currentRelativeTeamUrl: PropTypes.string,
     };
 
     constructor(props) {
@@ -47,9 +62,19 @@ export default class ChannelInfoModal extends React.PureComponent {
         ));
     }
 
+    componentDidUpdate(prevProps) {
+        const RHSChanged = !prevProps.isRHSOpen && this.props.isRHSOpen;
+        const channelChanged = prevProps.channel?.id !== this.props.currentChannel?.id;
+        if (RHSChanged || channelChanged) {
+            this.onHide();
+        }
+    }
+
     onHide = () => {
         this.setState({show: false});
     }
+
+    handleFormattedTextClick = (e) => Utils.handleFormattedTextClick(e, this.props.currentRelativeTeamUrl);
 
     render() {
         let channel = this.props.channel;
@@ -72,7 +97,7 @@ export default class ChannelInfoModal extends React.PureComponent {
 
         if (channelIsArchived) {
             channelIcon = (
-                <ArchiveIcon className='icon icon__archive'/>
+                <ArchiveIcon className='icon icon__archive svg-text-color'/>
             );
         } else if (channel.type === 'O') {
             channelIcon = (
@@ -123,7 +148,10 @@ export default class ChannelInfoModal extends React.PureComponent {
                             defaultMessage='Header:'
                         />
                     </div>
-                    <div className='info__value'>
+                    <div
+                        onClick={this.handleFormattedTextClick}
+                        className='info__value'
+                    >
                         <Markdown
                             message={channel.header}
                             options={this.getHeaderMarkdownOptions(channelNamesMap)}
@@ -135,7 +163,7 @@ export default class ChannelInfoModal extends React.PureComponent {
 
         return (
             <Modal
-                dialogClassName='about-modal'
+                dialogClassName='a11y__modal about-modal'
                 show={this.state.show}
                 onHide={this.onHide}
                 onExited={this.props.onHide}
@@ -154,7 +182,7 @@ export default class ChannelInfoModal extends React.PureComponent {
                         <strong>{channelIcon}{channel.display_name}</strong>
                     </Modal.Title>
                 </Modal.Header>
-                <Modal.Body ref='modalBody'>
+                <Modal.Body>
                     {channelPurposeElement}
                     {channelHeader}
                     <div className='form-group'>
@@ -166,7 +194,7 @@ export default class ChannelInfoModal extends React.PureComponent {
                         </div>
                         <div className='info__value'>{channelURL}</div>
                     </div>
-                    <div className='about-modal__hash form-group padding-top x2'>
+                    <div className='about-modal__hash form-group pt-3'>
                         <p>
                             <FormattedMessage
                                 id='channel_info.id'

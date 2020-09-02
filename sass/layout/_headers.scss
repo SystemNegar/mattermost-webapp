@@ -2,22 +2,33 @@
 
 .channel-header {
     @include flex(0 0 63px);
+    z-index: 15;
+    background: v(center-channel-bg);
+    max-height: 63px;
     border-bottom: 1px solid;
     font-size: 14px;
     position: relative;
     width: 100%;
-    z-index: 9;
 
-    .move--left & {
-        .flex-parent {
-            padding-right: 0;
-        }
+    .Badge {
+        display: inline-block;
     }
 
     .channel-header__trigger {
         display: flex;
         flex: 1 1 0;
         min-width: 0;
+
+        &:hover {
+            .header-dropdown__icon {
+                opacity: 1;
+            }
+        }
+
+        .heading span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
     }
 
 
@@ -74,13 +85,15 @@
         &:first-child {
             flex: 1;
             min-width: 0;
-            padding: 0 8px 0 0;
+            padding: 0 28px 0 0;
         }
 
         .markdown__paragraph-inline {
+            margin: 0 0 8px;
             overflow: hidden;
             text-overflow: ellipsis;
-            width: calc(100% - 50px);
+            display: inline-block;
+            width: 100%;
         }
     }
 
@@ -89,17 +102,20 @@
         max-width: 300px;
         padding: 0;
 
-        .fa {
+        .icon {
             text-align: center;
             width: 20px;
-            margin-left: -5px;
-        }
+            height: 20px;
+            margin-right: 8px;
+            font-size: 1.6rem;
+            fill: v(center-channel-color-56);
+            color: v(center-channel-color-56);
 
-        svg {
-            text-align: center;
-            width: 20px;
-            margin-left: -5px;
-            margin-right: 5px;
+            svg,
+            img {
+                width: 16px;
+                height: 16px;
+            }
         }
 
         a {
@@ -114,94 +130,6 @@
                     @include opacity(1);
                 }
             }
-        }
-    }
-
-    .channel-header__icon {
-        @include border-radius(50%);
-        border: 1px solid;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        height: 30px;
-        line-height: 30px;
-        margin: 16px 0 0 8px;
-        min-width: 30px;
-        position: relative;
-        text-align: center;
-        width: 30px;
-        z-index: 5;
-
-        &.wide {
-            @include border-radius(37px);
-            line-height: 28px;
-            padding: 0;
-            white-space: nowrap;
-            width: auto;
-
-            > div {
-                padding: 0 8px;
-            }
-        }
-
-        &.text {
-            font-weight: 600;
-            padding: 0 14px;
-
-            button {
-                @include opacity(.4);
-            }
-
-            &:hover {
-                button {
-                    @include opacity(1);
-                }
-            }
-        }
-
-        .icon__text {
-            font-weight: 600;
-            margin-right: 4px;
-            position: relative;
-        }
-
-        a {
-            display: block;
-        }
-
-        .fa {
-            font-size: 15px;
-        }
-
-        & + div {
-            display: none;
-        }
-
-        .icon {
-            position: relative;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .icon__ellipsis {
-            padding-top: 5px;
-        }
-
-        .icon__members {
-            top: 2px;
-        }
-
-        .icon__mentions {
-            top: 1px;
-        }
-
-        .icon__flag {
-            top: 1px;
-        }
-
-        .icon__search {
-            top: 1px;
         }
     }
 
@@ -232,7 +160,6 @@
     .heading {
         font-size: 14px;
         font-weight: 600;
-        flex: 1 1 0;
         overflow: hidden;
         text-overflow: ellipsis;
     }
@@ -274,6 +201,7 @@
 
 .channel-header__top {
     display: flex;
+    align-items: center;
     min-width: 0;
 }
 
@@ -289,6 +217,7 @@
     }
 
     .header-dropdown__icon {
+        opacity: .6;
         flex: 0 0 auto;
         color: $dark-gray;
     }
@@ -304,7 +233,7 @@
             opacity: .5;
         }
 
-        h2 {
+        > div {
             display: flex;
             flex: 0 1 auto;
             min-width: 0;
@@ -314,12 +243,6 @@
             display: inline-block;
             text-decoration: none;
             width: calc(100% - 65px);
-        }
-
-        h2 {
-            font-size: inherit;
-            line-height: inherit;
-            margin: 0;
         }
 
         .MenuWrapper {
@@ -333,12 +256,14 @@
 
     .channel-header__description {
         font-size: 12px;
-        margin-bottom: 3px;
         overflow: hidden;
         position: relative;
         text-overflow: ellipsis;
-        width: calc(100% - 18px);
-        height: 20px;
+        margin: 2px 0 0;
+        height: 27px;
+        width: 100%;
+        display: flex;
+        align-items: flex-start;
 
         span[data-emoticon] {
             .emoticon {
@@ -349,10 +274,9 @@
 
         blockquote {
             font-size: 13px;
-            padding: 1px 0 0 19px;
+            padding: 0 0 0 20px;
             overflow: hidden;
             text-overflow: ellipsis;
-            display: inline;
 
             &:before {
                 font-size: 15px;
@@ -361,8 +285,34 @@
             }
         }
 
-        .status {
-            margin-right: 3px;
+        .header-placeholder {
+            display: flex;
+            overflow: hidden;
+            span {
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+
+        .header-description__text {
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+
+            ul {
+                &:first-child {
+                    margin: 3px 0 0;
+                }
+            }
+
+            li {
+                margin-bottom: 8px;
+
+                p {
+                    margin: 0;
+                    display: inline;
+                }
+            }
         }
 
         .markdown__heading {
@@ -376,20 +326,48 @@
         }
 
         &.light {
-            @include opacity(.8);
+            opacity: 1;
             color: inherit;
             overflow: visible;
 
             button {
-                &:hover
-                &:focus {
-                    text-decoration: underline;
+                color: v(center-channel-color-64);
+
+                .button__edit {
+                    color: v(link-color);
+                    display: none;
+
+                    &:hover {
+                        text-decoration: underline;
+                    }
+                }
+
+                &:focus,
+                &:hover {
+                    text-decoration: none;
+                }
+
+                &:hover {
+                    .button__edit {
+                        display: inline;
+                    }
                 }
             }
         }
 
         .markdown-inline-img {
             max-height: 45px;
+        }
+    }
+
+    .has-guest-header {
+        margin-right: 3px;
+
+        &:after {
+            content: '\2022';
+            margin: 0 2px 0 5px;
+            position: relative;
+            top: 1px;
         }
     }
 
@@ -405,11 +383,11 @@
     }
 
     .status {
-        width: 18px;
+        margin: -1px 4px 0 0;
+        width: auto;
 
         svg {
-            max-height: 20px;
-            width: 16px;
+            width: 12px;
         }
     }
 }
@@ -423,7 +401,7 @@
 
 .channel-intro {
     margin: 0 auto 10px;
-    padding: 0 15px;
+    padding: 110px 15px 0;
 
     &.channel-intro--centered {
         max-width: 1020px;
@@ -475,6 +453,7 @@
 
 // Team Header in Sidebar
 .sidebar--left,
+#SidebarContainer,
 .sidebar--menu,
 .admin-sidebar {
 
@@ -497,7 +476,7 @@
         padding: 10px;
 
         &:before {
-            @include single-transition(all, .05s, linear);
+            @include single-transition(all, $transition-quick, ease-in-out);
             background: none;
             content: '';
             height: 100%;
@@ -539,10 +518,17 @@
             width: 100%;
 
             .MenuWrapper {
-                flex: auto;
+                flex: 1;
+
+                &.main-menu {
+                    .dropdown-menu {
+                        left: -50px;
+                    }
+                }
 
                 &:first-child {
-                    flex: 0 0 36px;
+                    flex: 0 0 50px;
+                    width: auto;
                 }
             }
         }
@@ -562,8 +548,9 @@
         }
 
         .dropdown-menu {
-            margin: 4px 0 0 10px;
-            min-width: 220px;
+            margin: 4px 0 0 6px;
+            min-width: 240px;
+            overflow: auto;
         }
 
         .sidebar-header-dropdown,
@@ -622,11 +609,8 @@
             }
         }
 
-        .user__picture {
-            @include border-radius(36px);
+        .Avatar {
             float: left;
-            height: 36px;
-            width: 36px;
         }
 
         .header__info {
@@ -637,6 +621,7 @@
             width: 100%;
 
             .sidebar-header-dropdown__icon {
+                @include single-transition(opacity, $transition-quick, ease-in-out);
                 @include opacity(.8);
                 border-radius: 36px;
                 fill: $white;
@@ -669,7 +654,7 @@
         }
 
         .user__name {
-            @include single-transition(all, .1s, linear);
+            @include single-transition(all, $transition-quick, ease-in-out);
             @include alpha-property(color, $white, .8);
             font-size: 14px;
             font-weight: 400;
@@ -683,7 +668,7 @@
     }
 }
 
-#navbar {
+#navbar_wrapper {
     .navbar-default {
         .navbar-toggle {
             &.menu-toggle {
@@ -706,7 +691,6 @@
 }
 
 .app__body {
-
     .channel-header__links {
         display: inline-block;
         font-family: 'Open Sans', sans-serif;
@@ -729,15 +713,6 @@
             position: absolute;
             right: -400px;
             top: 14px;
-        }
-
-        .icon__flag {
-            svg {
-                height: 19px;
-                position: relative;
-                top: 2px;
-                width: 19px;
-            }
         }
 
         > a {

@@ -9,28 +9,47 @@ import {Client4} from 'mattermost-redux/client';
 
 import {filterProfilesMatchingTerm} from 'mattermost-redux/utils/user_utils';
 
-import {displayEntireNameForUser, localizeMessage} from 'utils/utils.jsx';
-import ProfilePicture from 'components/profile_picture.jsx';
-import MultiSelect from 'components/multiselect/multiselect.jsx';
-import AddIcon from 'components/icon/add_icon';
-import BotBadge from 'components/widgets/badges/bot_badge.jsx';
+import {displayEntireNameForUser, localizeMessage, isGuest} from 'utils/utils.jsx';
+import ProfilePicture from 'components/profile_picture';
+import MultiSelect from 'components/multiselect/multiselect';
+import AddIcon from 'components/widgets/icons/fa_add_icon';
+import GuestBadge from 'components/widgets/badges/guest_badge';
+import BotBadge from 'components/widgets/badges/bot_badge';
 
-import Constants from 'utils/constants.jsx';
+import Constants from 'utils/constants';
 
 const USERS_PER_PAGE = 50;
 const MAX_SELECTABLE_VALUES = 20;
 
-export default class ChannelInviteModal extends React.Component {
+export default class ChannelInviteModal extends React.PureComponent {
     static propTypes = {
         profilesNotInCurrentChannel: PropTypes.array.isRequired,
+        profilesNotInCurrentTeam: PropTypes.array.isRequired,
         onHide: PropTypes.func.isRequired,
         channel: PropTypes.object.isRequired,
+
+        // skipCommit = true used with onAddCallback will result in users not being committed immediately
+        skipCommit: PropTypes.bool,
+
+        // onAddCallback takes an array of UserProfiles and should set usersToAdd in state of parent component
+        onAddCallback: PropTypes.func,
+
+        // Dictionaries of userid mapped users to exclude or include from this list
+        excludeUsers: PropTypes.object,
+        includeUsers: PropTypes.object,
+
         actions: PropTypes.shape({
             addUsersToChannel: PropTypes.func.isRequired,
             getProfilesNotInChannel: PropTypes.func.isRequired,
             getTeamStats: PropTypes.func.isRequired,
             searchProfiles: PropTypes.func.isRequired,
         }).isRequired,
+    };
+
+    static defaultProps = {
+        includeUsers: {},
+        excludeUsers: {},
+        skipCommit: false,
     };
 
     constructor(props) {
@@ -106,6 +125,16 @@ export default class ChannelInviteModal extends React.Component {
             return;
         }
 
+        if (this.props.skipCommit && this.props.onAddCallback) {
+            this.props.onAddCallback(this.state.values);
+            this.setState({
+                saving: false,
+                inviteError: null,
+            });
+            this.onHide();
+            return;
+        }
+
         this.setState({saving: true});
 
         actions.addUsersToChannel(channel.id, userIds).then((result) => {
@@ -130,6 +159,10 @@ export default class ChannelInviteModal extends React.Component {
 
         this.searchTimeoutId = setTimeout(
             async () => {
+                if (!term) {
+                    return;
+                }
+
                 this.setUsersLoadingState(true);
                 const options = {
                     team_id: this.props.channel.team_id,
@@ -139,11 +172,18 @@ export default class ChannelInviteModal extends React.Component {
                 await this.props.actions.searchProfiles(term, options);
                 this.setUsersLoadingState(false);
             },
-            Constants.SEARCH_TIMEOUT_MILLISECONDS
+            Constants.SEARCH_TIMEOUT_MILLISECONDS,
         );
     };
 
-    renderOption = (option, isSelected, onAdd) => {
+    renderAriaLabel = (option) => {
+        if (!option) {
+            return null;
+        }
+        return option.username;
+    }
+
+    renderOption = (option, isSelected, onAdd, onMouseMove) => {
         var rowSelected = '';
         if (isSelected) {
             rowSelected = 'more-modal__row--selected';
@@ -155,11 +195,12 @@ export default class ChannelInviteModal extends React.Component {
                 ref={isSelected ? 'selected' : option.id}
                 className={'more-modal__row clickable ' + rowSelected}
                 onClick={() => onAdd(option)}
+                onMouseMove={() => onMouseMove(option)}
             >
                 <ProfilePicture
                     src={Client4.getProfilePictureUrl(option.id, option.last_picture_update)}
-                    width='32'
-                    height='32'
+                    size='md'
+                    username={option.username}
                 />
                 <div className='more-modal__details'>
                     <div className='more-modal__name'>
@@ -167,6 +208,10 @@ export default class ChannelInviteModal extends React.Component {
                         <BotBadge
                             show={Boolean(option.is_bot)}
                             className='badge-popoverlist'
+                        />
+                        <GuestBadge
+                            show={isGuest(option)}
+                            className='popoverlist'
                         />
                     </div>
                 </div>
@@ -202,8 +247,14 @@ export default class ChannelInviteModal extends React.Component {
         const buttonSubmitText = localizeMessage('multiselect.add', 'Add');
         const buttonSubmitLoadingText = localizeMessage('multiselect.adding', 'Adding...');
 
-        let users = filterProfilesMatchingTerm(this.props.profilesNotInCurrentChannel, this.state.term);
-        users = users.filter((user) => user.delete_at === 0);
+        let users = filterProfilesMatchingTerm(this.props.profilesNotInCurrentChannel, this.state.term).filter((user) => {
+            return user.delete_at === 0 && !this.props.profilesNotInCurrentTeam.includes(user) && !this.props.excludeUsers[user.id];
+        });
+
+        if (this.props.includeUsers) {
+            const includeUsers = Object.values(this.props.includeUsers);
+            users = [...users, ...includeUsers];
+        }
 
         const content = (
             <MultiSelect
@@ -212,6 +263,7 @@ export default class ChannelInviteModal extends React.Component {
                 optionRenderer={this.renderOption}
                 values={this.state.values}
                 valueRenderer={this.renderValue}
+                ariaLabelRenderer={this.renderAriaLabel}
                 perPage={USERS_PER_PAGE}
                 handlePageChange={this.handlePageChange}
                 handleInput={this.search}
@@ -230,7 +282,8 @@ export default class ChannelInviteModal extends React.Component {
 
         return (
             <Modal
-                dialogClassName='more-modal'
+                id='addUsersToChannelModal'
+                dialogClassName='a11y__modal more-modal'
                 show={this.state.show}
                 onHide={this.onHide}
                 onExited={this.props.onHide}
@@ -249,7 +302,9 @@ export default class ChannelInviteModal extends React.Component {
                         <span className='name'>{this.props.channel.display_name}</span>
                     </Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
+                <Modal.Body
+                    role='application'
+                >
                     {inviteError}
                     {content}
                 </Modal.Body>

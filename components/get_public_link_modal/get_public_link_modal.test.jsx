@@ -5,7 +5,7 @@ import React from 'react';
 import {shallow} from 'enzyme';
 
 import GetPublicLinkModal from 'components/get_public_link_modal/get_public_link_modal.jsx';
-import GetLinkModal from 'components/get_link_modal.jsx';
+import GetLinkModal from 'components/get_link_modal';
 
 describe('components/GetPublicLinkModal', () => {
     test('should match snapshot when link is empty', () => {
@@ -13,7 +13,7 @@ describe('components/GetPublicLinkModal', () => {
             <GetPublicLinkModal
                 link={''}
                 actions={{getFilePublicLink: jest.fn()}}
-            />
+            />,
         );
 
         expect(wrapper).toMatchSnapshot();
@@ -23,7 +23,7 @@ describe('components/GetPublicLinkModal', () => {
         const wrapper = shallow(
             <GetPublicLinkModal
                 actions={{getFilePublicLink: jest.fn()}}
-            />
+            />,
         );
 
         expect(wrapper).toMatchSnapshot();
@@ -34,7 +34,7 @@ describe('components/GetPublicLinkModal', () => {
             <GetPublicLinkModal
                 link={'http://mattermost.com/files/n5bnoaz3e7g93nyipzo1bixdwr/public?h=atw9qQHI1nUPnxo1e48tPspo1Qvwd3kHtJZjysmI5zs'}
                 actions={{getFilePublicLink: jest.fn()}}
-            />
+            />,
         );
 
         expect(wrapper).toMatchSnapshot();
@@ -48,7 +48,7 @@ describe('components/GetPublicLinkModal', () => {
             <GetPublicLinkModal
                 link={'http://mattermost.com/files/n5bnoaz3e7g93nyipzo1bixdwr/public?h=atw9qQHI1nUPnxo1e48tPspo1Qvwd3kHtJZjysmI5zs'}
                 actions={{getFilePublicLink}}
-            />
+            />,
         );
 
         wrapper.setState({show: true, fileId});
@@ -64,7 +64,7 @@ describe('components/GetPublicLinkModal', () => {
             <GetPublicLinkModal
                 link={'http://mattermost.com/files/n5bnoaz3e7g93nyipzo1bixdwr/public?h=atw9qQHI1nUPnxo1e48tPspo1Qvwd3kHtJZjysmI5zs'}
                 actions={{getFilePublicLink}}
-            />
+            />,
         );
 
         wrapper.setState({show: true, fileId});
@@ -78,7 +78,7 @@ describe('components/GetPublicLinkModal', () => {
             <GetPublicLinkModal
                 link={'http://mattermost.com/files/n5bnoaz3e7g93nyipzo1bixdwr/public?h=atw9qQHI1nUPnxo1e48tPspo1Qvwd3kHtJZjysmI5zs'}
                 actions={{getFilePublicLink: jest.fn()}}
-            />
+            />,
         );
 
         wrapper.find(GetLinkModal).first().props().onHide();

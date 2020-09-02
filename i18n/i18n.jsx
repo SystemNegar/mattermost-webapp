@@ -2,55 +2,23 @@
 // See LICENSE.txt for license information.
 
 /* eslint-disable import/order */
-const de = require('./de.json');
+import de from './de.json';
+import es from './es.json';
+import fr from './fr.json';
+import it from './it.json';
+import ja from './ja.json';
+import ko from './ko.json';
+import nl from './nl.json';
+import pl from './pl.json';
+import ptBR from './pt-BR.json';
+import ro from './ro.json';
+import ru from './ru.json';
+import tr from './tr.json';
+import uk from './uk.json';
+import zhTW from './zh-TW.json';
+import zhCN from './zh-CN.json';
+import fa from './fa.json';
 
-const es = require('./es.json');
-
-const fr = require('./fr.json');
-
-const it = require('./it.json');
-
-const ja = require('./ja.json');
-
-const ko = require('./ko.json');
-
-const nl = require('./nl.json');
-
-const pl = require('./pl.json');
-
-const ptBR = require('./pt-BR.json');
-
-const ro = require('./ro.json');
-
-const ru = require('./ru.json');
-
-const tr = require('./tr.json');
-
-const uk = require('./uk.json');
-
-const zhTW = require('./zh-TW.json');
-
-const zhCN = require('./zh-CN.json');
-
-const fa = require('./fa.json');
-
-import {addLocaleData} from 'react-intl';
-import deLocaleData from 'react-intl/locale-data/de';
-import enLocaleData from 'react-intl/locale-data/en';
-import esLocaleData from 'react-intl/locale-data/es';
-import frLocaleData from 'react-intl/locale-data/fr';
-import itLocaleData from 'react-intl/locale-data/it';
-import jaLocaleData from 'react-intl/locale-data/ja';
-import koLocaleData from 'react-intl/locale-data/ko';
-import nlLocaleData from 'react-intl/locale-data/nl';
-import plLocaleData from 'react-intl/locale-data/pl';
-import ptLocaleData from 'react-intl/locale-data/pt';
-import roLocaleData from 'react-intl/locale-data/ro';
-import ruLocaleData from 'react-intl/locale-data/ru';
-import trLocaleData from 'react-intl/locale-data/tr';
-import ukLocaleData from 'react-intl/locale-data/uk';
-import zhLocaleData from 'react-intl/locale-data/zh';
-import faLocaleData from 'react-intl/locale-data/fa';
 import {getConfig} from 'mattermost-redux/selectors/entities/general';
 
 import store from 'stores/redux_store.jsx';
@@ -101,7 +69,7 @@ const languages = {
     },
     nl: {
         value: 'nl',
-        name: 'Nederlands (Alpha)',
+        name: 'Nederlands',
         order: 5,
         url: nl,
     },
@@ -125,7 +93,7 @@ const languages = {
     },
     ru: {
         value: 'ru',
-        name: 'Pусский (Alpha)',
+        name: 'Pусский',
         order: 10,
         url: ru,
     },
@@ -137,7 +105,7 @@ const languages = {
     },
     uk: {
         value: 'uk',
-        name: 'Yкраїнська (Beta)',
+        name: 'Yкраїнська (Alpha)',
         order: 11,
         url: uk,
     },
@@ -186,62 +154,14 @@ export function isLanguageAvailable(locale) {
     return Boolean(getLanguages()[locale]);
 }
 
-export function safariFix(callback) {
-    require.ensure([
-        'intl',
-        'intl/locale-data/jsonp/de.js',
-        'intl/locale-data/jsonp/en.js',
-        'intl/locale-data/jsonp/es.js',
-        'intl/locale-data/jsonp/fr.js',
-        'intl/locale-data/jsonp/it.js',
-        'intl/locale-data/jsonp/ja.js',
-        'intl/locale-data/jsonp/ko.js',
-        'intl/locale-data/jsonp/nl.js',
-        'intl/locale-data/jsonp/pl.js',
-        'intl/locale-data/jsonp/pt.js',
-        'intl/locale-data/jsonp/ro.js',
-        'intl/locale-data/jsonp/ru.js',
-        'intl/locale-data/jsonp/tr.js',
-        'intl/locale-data/jsonp/uk.js',
-        'intl/locale-data/jsonp/zh.js',
-        'intl/locale-data/jsonp/fa.js',
-    ], (require) => {
-        require('intl');
-        require('intl/locale-data/jsonp/de.js');
-        require('intl/locale-data/jsonp/en.js');
-        require('intl/locale-data/jsonp/es.js');
-        require('intl/locale-data/jsonp/fr.js');
-        require('intl/locale-data/jsonp/it.js');
-        require('intl/locale-data/jsonp/ja.js');
-        require('intl/locale-data/jsonp/ko.js');
-        require('intl/locale-data/jsonp/nl.js');
-        require('intl/locale-data/jsonp/pl.js');
-        require('intl/locale-data/jsonp/pt.js');
-        require('intl/locale-data/jsonp/ro.js');
-        require('intl/locale-data/jsonp/ru.js');
-        require('intl/locale-data/jsonp/tr.js');
-        require('intl/locale-data/jsonp/uk.js');
-        require('intl/locale-data/jsonp/zh.js');
-        require('intl/locale-data/jsonp/fa.js');
-        callback();
-    });
-}
-
 export function doAddLocaleData() {
-    addLocaleData(enLocaleData);
-    addLocaleData(deLocaleData);
-    addLocaleData(esLocaleData);
-    addLocaleData(frLocaleData);
-    addLocaleData(itLocaleData);
-    addLocaleData(jaLocaleData);
-    addLocaleData(koLocaleData);
-    addLocaleData(nlLocaleData);
-    addLocaleData(plLocaleData);
-    addLocaleData(ptLocaleData);
-    addLocaleData(roLocaleData);
-    addLocaleData(ruLocaleData);
-    addLocaleData(trLocaleData);
-    addLocaleData(ukLocaleData);
-    addLocaleData(zhLocaleData);
-    addLocaleData(faLocaleData);
+    if (!Intl.PluralRules) {
+        // eslint-disable-next-line global-require
+        require('@formatjs/intl-pluralrules/polyfill-locales');
+    }
+
+    if (!Intl.RelativeTimeFormat) {
+        // eslint-disable-next-line global-require
+        require('@formatjs/intl-relativetimeformat/polyfill-locales');
+    }
 }

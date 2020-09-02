@@ -44,12 +44,15 @@ export default class MessageAttachmentList extends React.PureComponent {
                     key={'att_' + i}
                     options={this.props.options}
                     imagesMetadata={this.props.imagesMetadata}
-                />
+                />,
             );
         });
 
         return (
-            <div className='attachment__list'>
+            <div
+                id={`messageAttachmentList_${this.props.postId}`}
+                className='attachment__list'
+            >
                 {content}
             </div>
         );

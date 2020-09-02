@@ -1,17 +1,49 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`components/post_view/post_list_row should render channel intro message 1`] = `
-<Connect(ChannelIntroMessage)
-  channel={
-    Object {
-      "id": "123",
-    }
-  }
-/>
+exports[`components/post_view/post_list_row should have class hideAnimation for NEWER_MESSAGES_LOADER if loadingNewerPosts is false 1`] = `
+<div
+  className="loading-screen"
+>
+  <div
+    className="loading__content hideAnimation"
+  >
+    <div
+      className="round round-1"
+    />
+    <div
+      className="round round-2"
+    />
+    <div
+      className="round round-3"
+    />
+  </div>
+</div>
 `;
 
+exports[`components/post_view/post_list_row should have class hideAnimation for OLDER_MESSAGES_LOADER if loadingOlderPosts is false 1`] = `
+<div
+  className="loading-screen"
+>
+  <div
+    className="loading__content hideAnimation"
+  >
+    <div
+      className="round round-1"
+    />
+    <div
+      className="round round-2"
+    />
+    <div
+      className="round round-3"
+    />
+  </div>
+</div>
+`;
+
+exports[`components/post_view/post_list_row should render channel intro message 1`] = `<Connect(ChannelIntroMessage) />`;
+
 exports[`components/post_view/post_list_row should render combined post 1`] = `
-<Connect(Connect(Post))
+<Connect(Connect(injectIntl(Post)))
   combinedId="user-activity-1234-5678"
   previousPostId="abcd"
   shouldHighlight={false}
@@ -19,7 +51,7 @@ exports[`components/post_view/post_list_row should render combined post 1`] = `
 `;
 
 exports[`components/post_view/post_list_row should render date line 1`] = `
-<Connect(DateSeparator)
+<Memo(DateSeparator)
   date={1553106600000}
   key="1553106600000"
 />
@@ -31,7 +63,7 @@ exports[`components/post_view/post_list_row should render manual load messages t
   onClick={[MockFunction]}
 >
   <FormattedMessage
-    defaultMessage="Load more messages"
+    defaultMessage="Load More Messages"
     id="posts_view.loadMore"
     values={Object {}}
   />
@@ -65,7 +97,7 @@ exports[`components/post_view/post_list_row should render new messages line 1`] 
 `;
 
 exports[`components/post_view/post_list_row should render post 1`] = `
-<Connect(Post)
+<Connect(injectIntl(Post))
   postId="1234"
   previousPostId="abcd"
   shouldHighlight={false}

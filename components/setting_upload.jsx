@@ -1,39 +1,32 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import $ from 'jquery';
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {FormattedMessage} from 'react-intl';
 
-export default class SettingsUpload extends React.Component {
+export default class SettingsUpload extends React.PureComponent {
     constructor(props) {
         super(props);
 
-        this.doFileSelect = this.doFileSelect.bind(this);
-        this.doSubmit = this.doSubmit.bind(this);
+        this.uploadinput = React.createRef();
 
         this.state = {
-            clientError: this.props.clientError,
-            serverError: this.props.serverError,
+            clientError: '',
+            serverError: '',
             filename: '',
         };
     }
 
-    UNSAFE_componentWillReceiveProps() { // eslint-disable-line camelcase
-        this.setState({
-            clientError: this.props.clientError,
-            serverError: this.props.serverError,
-        });
-    }
-
-    doFileSelect(e) {
+    doFileSelect = (e) => {
         e.preventDefault();
-        var filename = $(e.target).val();
+
+        let filename = e.target.value;
         if (filename.substring(3, 11) === 'fakepath') {
             filename = filename.substring(12);
         }
+
         this.setState({
             clientError: '',
             serverError: '',
@@ -41,9 +34,14 @@ export default class SettingsUpload extends React.Component {
         });
     }
 
-    doSubmit(e) {
+    openFileSelect = () => {
+        this.uploadinput.current.value = '';
+        this.uploadinput.current.click();
+    }
+
+    doSubmit = (e) => {
         e.preventDefault();
-        var inputnode = ReactDOM.findDOMNode(this.refs.uploadinput);
+        var inputnode = ReactDOM.findDOMNode(this.uploadinput.current);
         if (inputnode.files && inputnode.files[0]) {
             this.props.submit(inputnode.files[0]);
         } else {
@@ -85,18 +83,23 @@ export default class SettingsUpload extends React.Component {
                 <li className='col-sm-offset-3 col-sm-9'>
                     <ul className='setting-list'>
                         <li className='setting-list-item'>
-                            <span className='btn btn-sm btn-primary btn-file sel-btn'>
+                            <input
+                                ref={this.uploadinput}
+                                accept={this.props.fileTypesAccepted}
+                                type='file'
+                                onChange={this.doFileSelect}
+                                tabIndex='-1'
+                                aria-hidden={true}
+                            />
+                            <button
+                                onClick={this.openFileSelect}
+                                className='btn btn-sm btn-primary btn-file sel-btn'
+                            >
                                 <FormattedMessage
                                     id='setting_upload.select'
                                     defaultMessage='Select file'
                                 />
-                                <input
-                                    ref='uploadinput'
-                                    accept={this.props.fileTypesAccepted}
-                                    type='file'
-                                    onChange={this.doFileSelect}
-                                />
-                            </span>
+                            </button>
                             <a
                                 className={submitButtonClass}
                                 onClick={this.doSubmit}
@@ -118,10 +121,8 @@ export default class SettingsUpload extends React.Component {
 }
 
 SettingsUpload.propTypes = {
-    title: PropTypes.string.isRequired,
+    title: PropTypes.node.isRequired,
     submit: PropTypes.func.isRequired,
     fileTypesAccepted: PropTypes.string.isRequired,
-    clientError: PropTypes.string,
-    serverError: PropTypes.string,
     helpText: PropTypes.object,
 };

@@ -1,18 +1,19 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+/* eslint-disable react/no-string-refs */
 
 import React from 'react';
 import {FormattedMessage} from 'react-intl';
 
-import Constants from 'utils/constants.jsx';
+import Constants from 'utils/constants';
 import * as Utils from 'utils/utils.jsx';
 
 import FormattedMarkdownMessage from 'components/formatted_markdown_message.jsx';
 
-import AdminSettings from './admin_settings.jsx';
+import AdminSettings from './admin_settings';
 import DropdownSetting from './dropdown_setting.jsx';
 import SettingsGroup from './settings_group.jsx';
-import TextSetting from './text_setting.jsx';
+import TextSetting from './text_setting';
 
 const PUSH_NOTIFICATIONS_OFF = 'off';
 const PUSH_NOTIFICATIONS_MHPNS = 'mhpns';
@@ -20,27 +21,17 @@ const PUSH_NOTIFICATIONS_MTPNS = 'mtpns';
 const PUSH_NOTIFICATIONS_CUSTOM = 'custom';
 
 export default class PushSettings extends AdminSettings {
-    constructor(props) {
-        super(props);
-
-        this.canSave = this.canSave.bind(this);
-        this.handleAgreeChange = this.handleAgreeChange.bind(this);
-        this.getConfigFromState = this.getConfigFromState.bind(this);
-        this.renderSettings = this.renderSettings.bind(this);
-        this.handleDropdownChange = this.handleDropdownChange.bind(this);
-    }
-
-    canSave() {
+    canSave = () => {
         return this.state.pushNotificationServerType !== PUSH_NOTIFICATIONS_MHPNS || this.state.agree;
     }
 
-    handleAgreeChange(e) {
+    handleAgreeChange = (e) => {
         this.setState({
             agree: e.target.checked,
         });
     }
 
-    handleDropdownChange(id, value) {
+    handleDropdownChange = (id, value) => {
         if (id === 'pushNotificationServerType') {
             this.setState({
                 agree: false,
@@ -66,7 +57,7 @@ export default class PushSettings extends AdminSettings {
         this.handleChange(id, value);
     }
 
-    getConfigFromState(config) {
+    getConfigFromState = (config) => {
         config.EmailSettings.SendPushNotifications = this.state.pushNotificationServerType !== PUSH_NOTIFICATIONS_OFF;
         config.EmailSettings.PushNotificationServer = this.state.pushNotificationServer.trim();
         config.TeamSettings.MaxNotificationsPerChannel = this.state.maxNotificationsPerChannel;
@@ -120,7 +111,7 @@ export default class PushSettings extends AdminSettings {
         );
     }
 
-    renderSettings() {
+    renderSettings = () => {
         const pushNotificationServerTypes = [];
         pushNotificationServerTypes.push({value: PUSH_NOTIFICATIONS_OFF, text: Utils.localizeMessage('admin.email.pushOff', 'Do not send push notifications')});
         if (this.props.license.IsLicensed === 'true' && this.props.license.MHPNS === 'true') {
@@ -172,6 +163,7 @@ export default class PushSettings extends AdminSettings {
                             ref='agree'
                             checked={this.state.agree}
                             onChange={this.handleAgreeChange}
+                            disabled={this.props.isDisabled}
                         />
                         <FormattedMarkdownMessage
                             id='admin.email.agreeHPNS'
@@ -197,6 +189,7 @@ export default class PushSettings extends AdminSettings {
                     onChange={this.handleDropdownChange}
                     helpText={sendHelpText}
                     setByEnv={this.isPushNotificationServerSetByEnv()}
+                    disabled={this.props.isDisabled}
                 />
                 {tosCheckbox}
                 <TextSetting
@@ -211,7 +204,7 @@ export default class PushSettings extends AdminSettings {
                     helpText={pushServerHelpText}
                     value={this.state.pushNotificationServer}
                     onChange={this.handleChange}
-                    disabled={this.state.pushNotificationServerType !== PUSH_NOTIFICATIONS_CUSTOM}
+                    disabled={this.props.isDisabled || this.state.pushNotificationServerType !== PUSH_NOTIFICATIONS_CUSTOM}
                     setByEnv={this.isSetByEnv('EmailSettings.PushNotificationServer')}
                 />
                 <TextSetting
@@ -233,8 +226,10 @@ export default class PushSettings extends AdminSettings {
                     value={this.state.maxNotificationsPerChannel}
                     onChange={this.handleChange}
                     setByEnv={this.isSetByEnv('TeamSettings.MaxNotificationsPerChannel')}
+                    disabled={this.props.isDisabled}
                 />
             </SettingsGroup>
         );
     }
 }
+/* eslint-enable react/no-string-refs */

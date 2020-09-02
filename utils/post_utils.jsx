@@ -1,22 +1,28 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import {createSelector} from 'reselect';
+
 import {Client4} from 'mattermost-redux/client';
-import {getLicense, getConfig} from 'mattermost-redux/selectors/entities/general';
 import {haveIChannelPermission} from 'mattermost-redux/selectors/entities/roles';
-import {getCurrentUserId} from 'mattermost-redux/selectors/entities/users';
-import {getChannel} from 'mattermost-redux/selectors/entities/channels';
-import {Permissions} from 'mattermost-redux/constants';
+import {makeGetReactionsForPost} from 'mattermost-redux/selectors/entities/posts';
+import {get} from 'mattermost-redux/selectors/entities/preferences';
+import {makeGetDisplayName, getCurrentUserId} from 'mattermost-redux/selectors/entities/users';
+import {Permissions, Posts} from 'mattermost-redux/constants';
 import * as PostListUtils from 'mattermost-redux/utils/post_list';
-import {canEditPost as canEditPostRedux} from 'mattermost-redux/utils/post_utils';
+import {canEditPost as canEditPostRedux, isPostEphemeral} from 'mattermost-redux/utils/post_utils';
 
-import store from 'stores/redux_store.jsx';
+import {allAtMentions} from 'utils/text_formatting';
 
-import Constants, {PostListRowListIds} from 'utils/constants.jsx';
+import {getEmojiMap} from 'selectors/emojis';
+
+import Constants, {PostListRowListIds, Preferences} from 'utils/constants';
 import {formatWithRenderer} from 'utils/markdown';
 import MentionableRenderer from 'utils/markdown/mentionable_renderer';
 import * as Utils from 'utils/utils.jsx';
-import {isMobile} from 'utils/user_agent.jsx';
+import {isMobile} from 'utils/user_agent';
+
+import * as Emoticons from './emoticons';
 
 const CHANNEL_SWITCH_IGNORE_ENTER_THRESHOLD_MS = 500;
 
@@ -32,8 +38,8 @@ export function isFromWebhook(post) {
     return post.props && post.props.from_webhook === 'true';
 }
 
-export function isPostOwner(post) {
-    return getCurrentUserId(store.getState()) === post.user_id;
+export function isPostOwner(state, post) {
+    return getCurrentUserId(state) === post.user_id;
 }
 
 export function isComment(post) {
@@ -61,32 +67,30 @@ export function getImageSrc(src, hasImageProxy) {
     return src;
 }
 
-export function canDeletePost(post) {
+export function canDeletePost(state, post, channel) {
     if (post.type === Constants.PostTypes.FAKE_PARENT_DELETED) {
         return false;
     }
-    const channel = getChannel(store.getState(), post.channel_id);
 
     if (channel && channel.delete_at !== 0) {
         return false;
     }
 
-    if (isPostOwner(post)) {
-        return haveIChannelPermission(store.getState(), {channel: post.channel_id, team: channel && channel.team_id, permission: Permissions.DELETE_POST});
+    if (isPostOwner(state, post)) {
+        return haveIChannelPermission(state, {channel: post.channel_id, team: channel && channel.team_id, permission: Permissions.DELETE_POST});
     }
-    return haveIChannelPermission(store.getState(), {channel: post.channel_id, team: channel && channel.team_id, permission: Permissions.DELETE_OTHERS_POSTS});
+    return haveIChannelPermission(state, {channel: post.channel_id, team: channel && channel.team_id, permission: Permissions.DELETE_OTHERS_POSTS});
 }
 
-export function canEditPost(post) {
-    const state = store.getState();
-    const license = getLicense(state);
-    const config = getConfig(state);
-    const channel = getChannel(state, post.channel_id);
-    const userId = getCurrentUserId(state);
+export function canEditPost(state, post, license, config, channel, userId) {
     return canEditPostRedux(state, config, license, channel && channel.team_id, channel && channel.id, userId, post);
 }
 
-export function shouldShowDotMenu(post) {
+export function shouldShowDotMenu(state, post, channel) {
+    if (post && post.state === Posts.POST_DELETED) {
+        return false;
+    }
+
     if (Utils.isMobile()) {
         return true;
     }
@@ -95,27 +99,44 @@ export function shouldShowDotMenu(post) {
         return true;
     }
 
-    if (canDeletePost(post)) {
+    if (canDeletePost(state, post, channel)) {
         return true;
     }
 
-    if (canEditPost(post)) {
+    if (canEditPost(state, post)) {
         return true;
     }
 
     return false;
 }
 
-export function containsAtChannel(text) {
+export function containsAtChannel(text, options = {}) {
     // Don't warn for slash commands
     if (!text || text.startsWith('/')) {
         return false;
     }
 
-    const mentionableText = formatWithRenderer(text, new MentionableRenderer());
+    let mentionsRegex;
+    if (options.checkAllMentions === true) {
+        mentionsRegex = new RegExp(Constants.SPECIAL_MENTIONS_REGEX);
+    } else {
+        mentionsRegex = new RegExp(Constants.ALL_MEMBERS_MENTIONS_REGEX);
+    }
 
-    return (/\B@(all|channel)\b/i).test(mentionableText);
+    const mentionableText = formatWithRenderer(text, new MentionableRenderer());
+    return mentionsRegex.test(mentionableText);
 }
+
+export const groupsMentionedInText = (text, groups) => {
+    // Don't warn for slash commands
+    if (!text || text.startsWith('/')) {
+        return [];
+    }
+
+    const mentionableText = formatWithRenderer(text, new MentionableRenderer());
+    const mentions = allAtMentions(mentionableText);
+    return (mentions.length > 0 && mentions.map((mention) => groups && groups.get(mention)).filter((trueVal) => trueVal)) || [];
+};
 
 export function shouldFocusMainTextbox(e, activeElement) {
     if (!e) {
@@ -166,8 +187,8 @@ function canAutomaticallyCloseBackticks(message) {
     return {allowSending: true};
 }
 
-function sendOnCtrlEnter(message, ctrlOrMetaKeyPressed, isSendMessageOnCtrlEnter) {
-    const match = message.match(Constants.TRIPLE_BACK_TICKS);
+function sendOnCtrlEnter(message, ctrlOrMetaKeyPressed, isSendMessageOnCtrlEnter, caretPosition) {
+    const match = message.substring(0, caretPosition).match(Constants.TRIPLE_BACK_TICKS);
     if (isSendMessageOnCtrlEnter && ctrlOrMetaKeyPressed && (!match || match.length % 2 === 0)) {
         return {allowSending: true};
     } else if (!isSendMessageOnCtrlEnter && (!match || match.length % 2 === 0)) {
@@ -179,7 +200,7 @@ function sendOnCtrlEnter(message, ctrlOrMetaKeyPressed, isSendMessageOnCtrlEnter
     return {allowSending: false};
 }
 
-export function postMessageOnKeyPress(event, message, sendMessageOnCtrlEnter, sendCodeBlockOnCtrlEnter, now = 0, lastChannelSwitchAt = 0) {
+export function postMessageOnKeyPress(event, message, sendMessageOnCtrlEnter, sendCodeBlockOnCtrlEnter, now = 0, lastChannelSwitchAt = 0, caretPosition = 0) {
     if (!event) {
         return {allowSending: false};
     }
@@ -209,9 +230,9 @@ export function postMessageOnKeyPress(event, message, sendMessageOnCtrlEnter, se
     const ctrlOrMetaKeyPressed = event.ctrlKey || event.metaKey;
 
     if (sendMessageOnCtrlEnter) {
-        return sendOnCtrlEnter(message, ctrlOrMetaKeyPressed, true);
+        return sendOnCtrlEnter(message, ctrlOrMetaKeyPressed, true, caretPosition);
     } else if (sendCodeBlockOnCtrlEnter) {
-        return sendOnCtrlEnter(message, ctrlOrMetaKeyPressed, false);
+        return sendOnCtrlEnter(message, ctrlOrMetaKeyPressed, false, caretPosition);
     }
 
     return {allowSending: false};
@@ -225,13 +246,11 @@ export function isErrorInvalidSlashCommand(error) {
     return false;
 }
 
-function isIdNotPost(postId) {
+export function isIdNotPost(postId) {
     return (
         PostListUtils.isStartOfNewMessages(postId) ||
         PostListUtils.isDateLine(postId) ||
-        postId === PostListRowListIds.CHANNEL_INTRO_MESSAGE ||
-        postId === PostListRowListIds.MORE_MESSAGES_LOADER ||
-        postId === PostListRowListIds.MANUAL_TRIGGER_LOAD_MESSAGES
+        PostListRowListIds[postId]
     );
 }
 
@@ -306,4 +325,164 @@ export function getLatestPostId(postIds) {
     }
 
     return '';
+}
+
+export function makeCreateAriaLabelForPost() {
+    const getReactionsForPost = makeGetReactionsForPost();
+    const getDisplayName = makeGetDisplayName();
+
+    return createSelector(
+        (state, post) => post,
+        (state, post) => getDisplayName(state, post.user_id),
+        (state, post) => getReactionsForPost(state, post.id),
+        (state, post) => get(state, Preferences.CATEGORY_FLAGGED_POST, post.id, null) != null,
+        getEmojiMap,
+        (post, author, reactions, isFlagged, emojiMap) => {
+            return (intl) => createAriaLabelForPost(post, author, isFlagged, reactions, intl, emojiMap);
+        },
+    );
+}
+
+export function createAriaLabelForPost(post, author, isFlagged, reactions, intl, emojiMap) {
+    const {formatMessage, formatTime, formatDate} = intl;
+
+    let message = post.message;
+    let match;
+
+    // Match all the shorthand forms of emojis first
+    for (const name of Object.keys(Emoticons.emoticonPatterns)) {
+        const pattern = Emoticons.emoticonPatterns[name];
+        message = message.replace(pattern, `:${name}:`);
+    }
+
+    while ((match = Emoticons.EMOJI_PATTERN.exec(message)) !== null) {
+        if (emojiMap.has(match[2])) {
+            message = message.replace(match[0], `${match[2].replace(/_/g, ' ')} emoji`);
+        }
+    }
+
+    let ariaLabel;
+    if (post.root_id) {
+        ariaLabel = formatMessage({
+            id: 'post.ariaLabel.replyMessage',
+            defaultMessage: 'At {time} {date}, {authorName} replied, {message}',
+        },
+        {
+            authorName: author,
+            time: formatTime(post.create_at),
+            date: formatDate(post.create_at, {weekday: 'long', month: 'long', day: 'numeric'}),
+            message,
+        });
+    } else {
+        ariaLabel = formatMessage({
+            id: 'post.ariaLabel.message',
+            defaultMessage: 'At {time} {date}, {authorName} wrote, {message}',
+        },
+        {
+            authorName: author,
+            time: formatTime(post.create_at),
+            date: formatDate(post.create_at, {weekday: 'long', month: 'long', day: 'numeric'}),
+            message,
+        });
+    }
+
+    let attachmentCount = 0;
+    if (post.props && post.props.attachments) {
+        attachmentCount += post.props.attachments.length;
+    }
+    if (post.file_ids) {
+        attachmentCount += post.file_ids.length;
+    }
+
+    if (attachmentCount) {
+        if (attachmentCount > 1) {
+            ariaLabel += formatMessage({
+                id: 'post.ariaLabel.attachmentMultiple',
+                defaultMessage: ', {attachmentCount} attachments',
+            },
+            {
+                attachmentCount,
+            });
+        } else {
+            ariaLabel += formatMessage({
+                id: 'post.ariaLabel.attachment',
+                defaultMessage: ', 1 attachment',
+            });
+        }
+    }
+
+    if (reactions) {
+        const emojiNames = [];
+        for (const reaction of Object.values(reactions)) {
+            const emojiName = reaction.emoji_name;
+
+            if (emojiNames.indexOf(emojiName) < 0) {
+                emojiNames.push(emojiName);
+            }
+        }
+
+        if (emojiNames.length > 1) {
+            ariaLabel += formatMessage({
+                id: 'post.ariaLabel.reactionMultiple',
+                defaultMessage: ', {reactionCount} reactions',
+            },
+            {
+                reactionCount: emojiNames.length,
+            });
+        } else {
+            ariaLabel += formatMessage({
+                id: 'post.ariaLabel.reaction',
+                defaultMessage: ', 1 reaction',
+            });
+        }
+    }
+
+    if (isFlagged) {
+        if (post.is_pinned) {
+            ariaLabel += formatMessage({
+                id: 'post.ariaLabel.messageIsFlaggedAndPinned',
+                defaultMessage: ', message is saved and pinned',
+            });
+        } else {
+            ariaLabel += formatMessage({
+                id: 'post.ariaLabel.messageIsFlagged',
+                defaultMessage: ', message is saved',
+            });
+        }
+    } else if (!isFlagged && post.is_pinned) {
+        ariaLabel += formatMessage({
+            id: 'post.ariaLabel.messageIsPinned',
+            defaultMessage: ', message is pinned',
+        });
+    }
+
+    return ariaLabel;
+}
+
+// Splits text message based on the current caret position
+export function splitMessageBasedOnCaretPosition(caretPosition, message) {
+    const firstPiece = message.substring(0, caretPosition);
+    const lastPiece = message.substring(caretPosition, message.length);
+    return {firstPiece, lastPiece};
+}
+
+export function getNewMessageIndex(postListIds) {
+    return postListIds.findIndex(
+        (item) => item.indexOf(PostListRowListIds.START_OF_NEW_MESSAGES) === 0,
+    );
+}
+
+export function makeGetReplyCount() {
+    return createSelector(
+        (state) => state.entities.posts.posts,
+        (state, post) => state.entities.posts.postsInThread[post.root_id || post.id],
+        (allPosts, postIds) => {
+            if (!postIds) {
+                return 0;
+            }
+
+            // Count the number of non-ephemeral posts in the thread
+            return postIds.map((id) => allPosts[id]).filter((post) => post && !isPostEphemeral(post)).length;
+        },
+    );
 }

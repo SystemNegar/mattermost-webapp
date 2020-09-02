@@ -4,14 +4,14 @@
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 
-import {getConfig} from 'mattermost-redux/selectors/entities/general';
 import {doPostActionWithCookie} from 'mattermost-redux/actions/posts';
+import {getCurrentRelativeTeamUrl} from 'mattermost-redux/selectors/entities/teams';
 
 import MessageAttachment from './message_attachment';
 
 function mapStateToProps(state) {
     return {
-        hasImageProxy: getConfig(state).HasImageProxy === 'true',
+        getCurrentRelativeTeamUrl: getCurrentRelativeTeamUrl(state),
     };
 }
 

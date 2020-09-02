@@ -2,38 +2,36 @@
 // See LICENSE.txt for license information.
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {createSelector} from 'reselect';
+
 import {getBool} from 'mattermost-redux/selectors/entities/preferences';
 import {patchChannel} from 'mattermost-redux/actions/channels';
+import {Preferences} from 'mattermost-redux/constants';
 
-import Constants from 'utils/constants.jsx';
+import {closeModal} from 'actions/views/modals';
+import {setShowPreviewOnEditChannelHeaderModal} from 'actions/views/textbox';
+import {showPreviewOnEditChannelHeaderModal} from 'selectors/views/textbox';
+
+import {isModalOpen} from '../../selectors/views/modals';
+import {ModalIdentifiers} from '../../utils/constants';
 
 import EditChannelHeaderModal from './edit_channel_header_modal.jsx';
 
-const mapStateToProps = createSelector(
-    (state) => getBool(state, Constants.Preferences.CATEGORY_ADVANCED_SETTINGS, 'send_on_ctrl_enter'),
-    ({requests}) => {
-        const {channels: {updateChannel}} = requests;
-        return {
-            serverError: updateChannel.error,
-            requestStatus: updateChannel.status,
-        };
-    },
-    (ctrlSend, submitInfo) => ({
-        ctrlSend,
-        ...submitInfo,
-    }),
-);
-
-function mapDispatchToProps(dispatch) {
+function mapStateToProps(state) {
     return {
-        actions: {
-            patchChannel: bindActionCreators(patchChannel, dispatch),
-        },
+        shouldShowPreview: showPreviewOnEditChannelHeaderModal(state),
+        show: isModalOpen(state, ModalIdentifiers.EDIT_CHANNEL_HEADER),
+        ctrlSend: getBool(state, Preferences.CATEGORY_ADVANCED_SETTINGS, 'send_on_ctrl_enter'),
     };
 }
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps,
-)(EditChannelHeaderModal);
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: bindActionCreators({
+            closeModal,
+            patchChannel,
+            setShowPreview: setShowPreviewOnEditChannelHeaderModal,
+        }, dispatch),
+    };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(EditChannelHeaderModal);

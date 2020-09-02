@@ -6,7 +6,8 @@ import {shallow} from 'enzyme';
 
 import {Constants, NotificationLevels} from 'utils/constants';
 
-import MenuItemAction from 'components/widgets/menu/menu_items/menu_item_action.jsx';
+import Menu from 'components/widgets/menu/menu';
+import MenuItemAction from 'components/widgets/menu/menu_items/menu_item_action.tsx';
 
 import MenuItemToggleMuteChannel from './toggle_mute_channel';
 
@@ -40,12 +41,12 @@ describe('components/ChannelHeaderDropdown/MenuItemToggleMuteChannel', () => {
         };
         const wrapper = shallow(<MenuItemToggleMuteChannel {...props}/>);
 
-        wrapper.find(MenuItemAction).simulate('click');
+        wrapper.find(Menu.ItemAction).simulate('click');
 
         expect(props.actions.updateChannelNotifyProps).toBeCalledWith(
             props.user.id,
             props.channel.id,
-            {mark_unread: NotificationLevels.ALL}
+            {mark_unread: NotificationLevels.ALL},
         );
     });
 
@@ -59,24 +60,36 @@ describe('components/ChannelHeaderDropdown/MenuItemToggleMuteChannel', () => {
         };
         const wrapper = shallow(<MenuItemToggleMuteChannel {...props}/>);
 
-        wrapper.find(MenuItemAction).simulate('click');
+        wrapper.find(Menu.ItemAction).simulate('click');
 
         expect(props.actions.updateChannelNotifyProps).toBeCalledWith(
             props.user.id,
             props.channel.id,
-            {mark_unread: NotificationLevels.MENTION}
+            {mark_unread: NotificationLevels.MENTION},
         );
     });
 
-    it('should be hidden if the channel type is DM', () => {
-        const props = {
-            ...baseProps,
-            channel: {
-                ...baseProps.channel,
-                type: Constants.DM_CHANNEL,
-            },
-        };
-        const wrapper = shallow(<MenuItemToggleMuteChannel {...props}/>);
-        expect(wrapper).toMatchSnapshot();
+    it('should show Mute Channel to all channel types', () => {
+        [
+            Constants.DM_CHANNEL,
+            Constants.GM_CHANNEL,
+            Constants.OPEN_CHANNEL,
+            Constants.PRIVATE_CHANNEL,
+            Constants.ARCHIVED_CHANNEL,
+        ].forEach((channelType) => {
+            const channel = {
+                id: 'channel_id',
+                type: channelType,
+            };
+
+            const wrapper = shallow(
+                <MenuItemToggleMuteChannel
+                    {...baseProps}
+                    channel={channel}
+                />,
+            );
+            expect(wrapper.find(MenuItemAction).props().show).toEqual(true);
+            expect(wrapper.find(MenuItemAction).props().text).toEqual('Mute Channel');
+        });
     });
 });

@@ -1,30 +1,22 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+/* eslint-disable react/no-string-refs */
 
 import React from 'react';
 import {FormattedMessage} from 'react-intl';
 
-import Constants from 'utils/constants.jsx';
+import Constants from 'utils/constants';
 import * as Utils from 'utils/utils.jsx';
 import {t} from 'utils/i18n';
 
-import AdminSettings from './admin_settings.jsx';
-import Setting from './setting.jsx';
+import AdminSettings from './admin_settings';
+import Setting from './setting';
 import SettingsGroup from './settings_group.jsx';
-import TextSetting from './text_setting.jsx';
+import TextSetting from './text_setting';
 
 export default class PasswordSettings extends AdminSettings {
     constructor(props) {
         super(props);
-
-        this.getConfigFromState = this.getConfigFromState.bind(this);
-
-        this.renderSettings = this.renderSettings.bind(this);
-
-        this.getSampleErrorMsg = this.getSampleErrorMsg.bind(this);
-
-        this.handlePasswordLengthChange = this.handlePasswordLengthChange.bind(this);
-        this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
 
         this.state = Object.assign(this.state, {
             passwordMinimumLength: props.config.PasswordSettings.MinimumLength,
@@ -77,12 +69,12 @@ export default class PasswordSettings extends AdminSettings {
         );
     }
 
-    getConfigFromState(config) {
+    getConfigFromState = (config) => {
         config.PasswordSettings.MinimumLength = this.parseIntNonZero(this.state.passwordMinimumLength, Constants.MIN_PASSWORD_LENGTH);
-        config.PasswordSettings.Lowercase = this.refs.lowercase.checked;
-        config.PasswordSettings.Uppercase = this.refs.uppercase.checked;
-        config.PasswordSettings.Number = this.refs.number.checked;
-        config.PasswordSettings.Symbol = this.refs.symbol.checked;
+        config.PasswordSettings.Lowercase = this.state.passwordLowercase;
+        config.PasswordSettings.Uppercase = this.state.passwordUppercase;
+        config.PasswordSettings.Number = this.state.passwordNumber;
+        config.PasswordSettings.Symbol = this.state.passwordSymbol;
 
         config.ServiceSettings.MaximumLoginAttempts = this.parseIntNonZero(this.state.maximumLoginAttempts);
 
@@ -100,7 +92,7 @@ export default class PasswordSettings extends AdminSettings {
         };
     }
 
-    getSampleErrorMsg(minLength) {
+    getSampleErrorMsg = () => {
         if (this.props.config.PasswordSettings.MinimumLength > Constants.MAX_PASSWORD_LENGTH || this.props.config.PasswordSettings.MinimumLength < Constants.MIN_PASSWORD_LENGTH) {
             return (
                 <FormattedMessage
@@ -110,16 +102,16 @@ export default class PasswordSettings extends AdminSettings {
             );
         }
         let sampleErrorMsgId = 'user.settings.security.passwordError';
-        if (this.refs.lowercase.checked) {
+        if (this.state.passwordLowercase) {
             sampleErrorMsgId += 'Lowercase';
         }
-        if (this.refs.uppercase.checked) {
+        if (this.state.passwordUppercase) {
             sampleErrorMsgId += 'Uppercase';
         }
-        if (this.refs.number.checked) {
+        if (this.state.passwordNumber) {
             sampleErrorMsgId += 'Number';
         }
-        if (this.refs.symbol.checked) {
+        if (this.state.passwordSymbol) {
             sampleErrorMsgId += 'Symbol';
         }
         return (
@@ -127,21 +119,21 @@ export default class PasswordSettings extends AdminSettings {
                 id={sampleErrorMsgId}
                 default='Your password must contain between {min} and {max} characters.'
                 values={{
-                    min: (minLength || Constants.MIN_PASSWORD_LENGTH),
+                    min: (this.state.passwordMinimumLength || Constants.MIN_PASSWORD_LENGTH),
                     max: Constants.MAX_PASSWORD_LENGTH,
                 }}
             />
         );
     }
 
-    handlePasswordLengthChange(id, value) {
-        this.sampleErrorMsg = this.getSampleErrorMsg(value);
+    handlePasswordLengthChange = (id, value) => {
         this.handleChange(id, value);
     }
 
-    handleCheckboxChange(id, value) {
-        this.sampleErrorMsg = this.getSampleErrorMsg(this.state.passwordMinimumLength);
-        this.handleChange(id, value);
+    handleCheckboxChange = (id) => {
+        return ({target: {checked}}) => {
+            this.handleChange(id, checked);
+        };
     }
 
     renderTitle() {
@@ -153,7 +145,7 @@ export default class PasswordSettings extends AdminSettings {
         );
     }
 
-    renderSettings() {
+    renderSettings = () => {
         return (
             <SettingsGroup>
                 <div>
@@ -179,6 +171,7 @@ export default class PasswordSettings extends AdminSettings {
                         value={this.state.passwordMinimumLength}
                         onChange={this.handlePasswordLengthChange}
                         setByEnv={this.isSetByEnv('PasswordSettings.MinimumLength')}
+                        disabled={this.props.isDisabled}
                     />
                     <Setting
                         label={
@@ -192,10 +185,11 @@ export default class PasswordSettings extends AdminSettings {
                             <label className='checkbox-inline'>
                                 <input
                                     type='checkbox'
-                                    ref='lowercase'
+                                    ref={this.lowercase}
                                     defaultChecked={this.state.passwordLowercase}
                                     name='admin.password.lowercase'
-                                    onChange={this.handleCheckboxChange}
+                                    disabled={this.props.isDisabled}
+                                    onChange={this.handleCheckboxChange('passwordLowercase')}
                                 />
                                 <FormattedMessage
                                     id='admin.password.lowercase'
@@ -207,10 +201,11 @@ export default class PasswordSettings extends AdminSettings {
                             <label className='checkbox-inline'>
                                 <input
                                     type='checkbox'
-                                    ref='uppercase'
+                                    ref={this.uppercase}
                                     defaultChecked={this.state.passwordUppercase}
                                     name='admin.password.uppercase'
-                                    onChange={this.handleCheckboxChange}
+                                    disabled={this.props.isDisabled}
+                                    onChange={this.handleCheckboxChange('passwordUppercase')}
                                 />
                                 <FormattedMessage
                                     id='admin.password.uppercase'
@@ -222,10 +217,11 @@ export default class PasswordSettings extends AdminSettings {
                             <label className='checkbox-inline'>
                                 <input
                                     type='checkbox'
-                                    ref='number'
+                                    ref={this.number}
                                     defaultChecked={this.state.passwordNumber}
                                     name='admin.password.number'
-                                    onChange={this.handleCheckboxChange}
+                                    disabled={this.props.isDisabled}
+                                    onChange={this.handleCheckboxChange('passwordNumber')}
                                 />
                                 <FormattedMessage
                                     id='admin.password.number'
@@ -237,10 +233,11 @@ export default class PasswordSettings extends AdminSettings {
                             <label className='checkbox-inline'>
                                 <input
                                     type='checkbox'
-                                    ref='symbol'
+                                    ref={this.symbol}
                                     defaultChecked={this.state.passwordSymbol}
                                     name='admin.password.symbol'
-                                    onChange={this.handleCheckboxChange}
+                                    disabled={this.props.isDisabled}
+                                    onChange={this.handleCheckboxChange('passwordSymbol')}
                                 />
                                 <FormattedMessage
                                     id='admin.password.symbol'
@@ -257,7 +254,7 @@ export default class PasswordSettings extends AdminSettings {
                                 />
                             </label>
                             <br/>
-                            {this.sampleErrorMsg}
+                            {this.getSampleErrorMsg()}
                         </div>
                     </Setting>
                 </div>
@@ -279,8 +276,10 @@ export default class PasswordSettings extends AdminSettings {
                     value={this.state.maximumLoginAttempts}
                     onChange={this.handleChange}
                     setByEnv={this.isSetByEnv('ServiceSettings.MaximumLoginAttempts')}
+                    disabled={this.props.isDisabled}
                 />
             </SettingsGroup>
         );
     }
 }
+/* eslint-enable react/no-string-refs */

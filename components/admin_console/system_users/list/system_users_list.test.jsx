@@ -4,7 +4,7 @@
 import React from 'react';
 import {shallow} from 'enzyme';
 
-import {Constants} from 'utils/constants.jsx';
+import {Constants} from 'utils/constants';
 
 import SystemUsersList from 'components/admin_console/system_users/list/system_users_list.jsx';
 
@@ -31,6 +31,7 @@ describe('components/admin_console/system_users/list', () => {
             getTeamsForUser: jest.fn(),
             removeUserFromTeam: jest.fn(),
         },
+        isDisabled: false,
     };
 
     test('should match default snapshot', () => {
@@ -56,7 +57,7 @@ describe('components/admin_console/system_users/list', () => {
                 <SystemUsersList
                     {...props}
                     mfaEnabled={true}
-                />
+                />,
             );
             expect(wrapper).toMatchSnapshot();
         });
@@ -66,9 +67,49 @@ describe('components/admin_console/system_users/list', () => {
                 <SystemUsersList
                     {...props}
                     mfaEnabled={false}
-                />
+                />,
             );
             expect(wrapper).toMatchSnapshot();
+        });
+    });
+
+    describe('should reset page', () => {
+        it('when team changes', () => {
+            const wrapper = shallow(
+                <SystemUsersList {...defaultProps}/>,
+            );
+
+            expect(wrapper.state('page')).toBe(0);
+            wrapper.instance().nextPage();
+            expect(wrapper.state('page')).toBe(1);
+            wrapper.setProps({...defaultProps, teamId: 'new'});
+            expect(wrapper.state('page')).toBe(0);
+        });
+
+        it('when filter changes', () => {
+            const wrapper = shallow(
+                <SystemUsersList {...defaultProps}/>,
+            );
+
+            expect(wrapper.state('page')).toBe(0);
+            wrapper.instance().nextPage();
+            expect(wrapper.state('page')).toBe(1);
+            wrapper.setProps({...defaultProps, filter: 'new'});
+            expect(wrapper.state('page')).toBe(0);
+        });
+    });
+
+    describe('should not reset page', () => {
+        it('when term changes', () => {
+            const wrapper = shallow(
+                <SystemUsersList {...defaultProps}/>,
+            );
+
+            expect(wrapper.state('page')).toBe(0);
+            wrapper.instance().nextPage();
+            expect(wrapper.state('page')).toBe(1);
+            wrapper.setProps({...defaultProps, term: 'new term'});
+            expect(wrapper.state('page')).toBe(1);
         });
     });
 });

@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {FormattedMessage} from 'react-intl';
 
-import {Constants} from 'utils/constants.jsx';
+import {Constants} from 'utils/constants';
 import * as Utils from 'utils/utils.jsx';
 import ManageRolesModal from 'components/admin_console/manage_roles_modal';
 import ManageTeamsModal from 'components/admin_console/manage_teams_modal';
@@ -18,7 +18,7 @@ import FormattedMarkdownMessage from 'components/formatted_markdown_message.jsx'
 
 import SystemUsersDropdown from '../system_users_dropdown';
 
-export default class SystemUsersList extends React.Component {
+export default class SystemUsersList extends React.PureComponent {
     static propTypes = {
         users: PropTypes.arrayOf(PropTypes.object),
         usersPerPage: PropTypes.number,
@@ -32,6 +32,7 @@ export default class SystemUsersList extends React.Component {
         filter: PropTypes.string.isRequired,
         term: PropTypes.string.isRequired,
         onTermChange: PropTypes.func.isRequired,
+        isDisabled: PropTypes.bool,
 
         /**
          * Whether MFA is licensed and enabled.
@@ -59,6 +60,8 @@ export default class SystemUsersList extends React.Component {
         this.state = {
             page: 0,
 
+            filter: props.filter,
+            teamId: props.teamId,
             showManageTeamsModal: false,
             showManageRolesModal: false,
             showManageTokensModal: false,
@@ -68,10 +71,15 @@ export default class SystemUsersList extends React.Component {
         };
     }
 
-    UNSAFE_componentWillReceiveProps(nextProps) { // eslint-disable-line camelcase
-        if (nextProps.teamId !== this.props.teamId) {
-            this.setState({page: 0});
+    static getDerivedStateFromProps(nextProps, prevState) {
+        if (prevState.teamId !== nextProps.teamId || prevState.filter !== nextProps.filter) {
+            return {
+                page: 0,
+                teamId: nextProps.teamId,
+                filter: nextProps.filter,
+            };
         }
+        return null;
     }
 
     nextPage = () => {
@@ -199,7 +207,7 @@ export default class SystemUsersList extends React.Component {
                     values={{
                         service,
                     }}
-                />
+                />,
             );
         } else {
             info.push(
@@ -207,9 +215,22 @@ export default class SystemUsersList extends React.Component {
                     key='admin.user_item.authServiceEmail'
                     id='admin.user_item.authServiceEmail'
                     defaultMessage='**Sign-in Method:** Email'
-                />
+                />,
             );
         }
+
+        info.push(', ');
+        const userID = user.id;
+        info.push(
+            <FormattedMarkdownMessage
+                key='admin.user_item.user_id'
+                id='admin.user_item.user_id'
+                defaultMessage='**User ID:** {userID}'
+                values={{
+                    userID,
+                }}
+            />,
+        );
 
         if (this.props.mfaEnabled) {
             info.push(', ');
@@ -220,7 +241,7 @@ export default class SystemUsersList extends React.Component {
                         key='admin.user_item.mfaYes'
                         id='admin.user_item.mfaYes'
                         defaultMessage='**MFA**: Yes'
-                    />
+                    />,
                 );
             } else {
                 info.push(
@@ -228,7 +249,7 @@ export default class SystemUsersList extends React.Component {
                         key='admin.user_item.mfaNo'
                         id='admin.user_item.mfaNo'
                         defaultMessage='**MFA**: No'
-                    />
+                    />,
                 );
             }
         }
@@ -302,6 +323,7 @@ export default class SystemUsersList extends React.Component {
                         doManageTeams: this.doManageTeams,
                         doManageRoles: this.doManageRoles,
                         doManageTokens: this.doManageTokens,
+                        isDisabled: this.props.isDisabled,
                     }}
                     nextPage={this.nextPage}
                     previousPage={this.previousPage}

@@ -4,19 +4,21 @@
 
 import {connect} from 'react-redux';
 
-import {getPluginId} from 'selectors/rhs';
+import {getPluggableId} from 'selectors/rhs';
 
 import RHSPlugin from './rhs_plugin.jsx';
 
 function mapStateToProps(state) {
     const rhsPlugins = state.plugins.components.RightHandSidebarComponent;
-    const pluginId = getPluginId(state);
+    const pluggableId = getPluggableId(state);
 
-    const pluginName = rhsPlugins.find((element) => element.id === pluginId).title;
+    const pluginComponent = rhsPlugins.find((element) => element.id === pluggableId);
+    const pluginTitle = pluginComponent ? pluginComponent.title : '';
 
     return {
-        title: pluginName,
-        pluggableId: pluginId,
+        showPluggable: Boolean(pluginComponent),
+        pluggableId,
+        title: pluginTitle,
     };
 }
 

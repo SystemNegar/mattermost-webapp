@@ -4,7 +4,7 @@
 import {TeamTypes} from 'mattermost-redux/action_types';
 
 import lhsReducer from 'reducers/views/lhs';
-import {ActionTypes} from 'utils/constants.jsx';
+import {ActionTypes} from 'utils/constants';
 
 describe('Reducers.LHS', () => {
     const initialState = {
@@ -14,7 +14,7 @@ describe('Reducers.LHS', () => {
     test('Initial state', () => {
         const nextState = lhsReducer(
             {},
-            {}
+            {},
         );
 
         expect(nextState).toEqual(initialState);
@@ -27,7 +27,7 @@ describe('Reducers.LHS', () => {
             },
             {
                 type: ActionTypes.TOGGLE_LHS,
-            }
+            },
         );
 
         expect(nextState).toEqual({
@@ -43,7 +43,7 @@ describe('Reducers.LHS', () => {
             },
             {
                 type: ActionTypes.TOGGLE_LHS,
-            }
+            },
         );
 
         expect(nextState).toEqual({
@@ -59,7 +59,7 @@ describe('Reducers.LHS', () => {
             },
             {
                 type: ActionTypes.OPEN_LHS,
-            }
+            },
         );
 
         expect(nextState).toEqual({
@@ -75,7 +75,7 @@ describe('Reducers.LHS', () => {
             },
             {
                 type: ActionTypes.CLOSE_LHS,
-            }
+            },
         );
 
         expect(nextState).toEqual({
@@ -97,7 +97,7 @@ describe('Reducers.LHS', () => {
                     },
                     {
                         type: action,
-                    }
+                    },
                 );
 
                 expect(nextState).toEqual({

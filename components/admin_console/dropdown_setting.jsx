@@ -4,9 +4,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import Setting from './setting.jsx';
+import Setting from './setting';
 
-export default class DropdownSetting extends React.Component {
+export default class DropdownSetting extends React.PureComponent {
     static propTypes = {
         id: PropTypes.string.isRequired,
         values: PropTypes.array.isRequired,
@@ -35,7 +35,7 @@ export default class DropdownSetting extends React.Component {
                     key={value}
                 >
                     {text}
-                </option>
+                </option>,
             );
         }
 
@@ -47,6 +47,7 @@ export default class DropdownSetting extends React.Component {
                 setByEnv={this.props.setByEnv}
             >
                 <select
+                    data-testid={this.props.id + 'dropdown'}
                     className='form-control'
                     id={this.props.id}
                     value={this.props.value}

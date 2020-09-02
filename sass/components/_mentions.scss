@@ -41,6 +41,13 @@
         display: block;
     }
 
+    .Avatar {
+        margin-right: 7px;
+        margin-top: 3px;
+        text-align: center;
+        display: block;
+    }
+
     span {
         text-overflow: ellipsis;
         overflow: hidden;
@@ -48,24 +55,6 @@
 
     .admin-setting-user--align {
         margin-right: 5px;
-    }
-
-    .icon {
-        @include opacity(.5);
-        display: inline-block;
-        margin: 0 7px 0 0;
-        position: relative;
-        text-align: center;
-        top: 2px;
-        vertical-align: top;
-        width: 16px;
-
-        &.icon__globe {
-            svg {
-                height: 14px;
-                width: 14px;
-            }
-        }
     }
 
     .status {
@@ -109,14 +98,24 @@
 }
 
 .mention__fullname {
-    @include opacity(.5);
+    color: v(center-channel-color-56);
     margin: 0 0 0 4px;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .mention--highlight {
+    padding: 0 1px;
+    border-radius: 4px;
     background-color: $yellow;
+
+    .mention--highlight {
+        padding: 0;
+    }
+}
+
+.group-mention-link {
+    color: var(--link-color);
 }
 
 .mention__purpose {

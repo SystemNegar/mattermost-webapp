@@ -6,7 +6,7 @@ import {FormattedMessage} from 'react-intl';
 
 import {mountWithIntl} from 'tests/helpers/intl-test-helper';
 import DisplayName from 'components/create_team/components/display_name.jsx';
-import Constants from 'utils/constants.jsx';
+import Constants from 'utils/constants';
 
 jest.mock('images/logo.png', () => 'logo.png');
 
@@ -48,7 +48,7 @@ describe('/components/create_team/components/display_name', () => {
             <FormattedMessage
                 id='create_team.display_name.required'
                 defaultMessage='This field is required'
-            />
+            />,
         );
     });
 
@@ -69,7 +69,7 @@ describe('/components/create_team/components/display_name', () => {
                     min: Constants.MIN_TEAMNAME_LENGTH,
                     max: Constants.MAX_TEAMNAME_LENGTH,
                 }}
-            />
+            />,
         );
     });
 });

@@ -3,8 +3,11 @@
 exports[`components/AutosizeTextarea should match snapshot, init 1`] = `
 <div>
   <div
+    data-testid="undefined_placeholder"
     style={
       Object {
+        "background": "none",
+        "borderColor": "transparent",
         "opacity": 0.5,
         "overflow": "hidden",
         "pointerEvents": "none",
@@ -16,7 +19,10 @@ exports[`components/AutosizeTextarea should match snapshot, init 1`] = `
   />
   <textarea
     dir="auto"
+    aria-label=""
+    height={0}
     onChange={[Function]}
+    role="textbox"
     rows={1}
   />
   <div
@@ -28,9 +34,10 @@ exports[`components/AutosizeTextarea should match snapshot, init 1`] = `
     }
   >
     <textarea
+      aria-hidden={true}
       disabled={true}
       id="undefined-reference"
-      rows="1"
+      rows={1}
       style={
         Object {
           "height": "auto",

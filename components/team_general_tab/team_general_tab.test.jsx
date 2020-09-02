@@ -3,15 +3,24 @@
 import React from 'react';
 import {shallow} from 'enzyme';
 
+import FormattedMarkdownMessage from 'components/formatted_markdown_message.jsx';
 import GeneralTab from 'components/team_general_tab/team_general_tab.jsx';
 
+const helpText = (
+    <FormattedMarkdownMessage
+        id='setting_picture.help.team'
+        defaultMessage='Upload a team icon in BMP, JPG or PNG format.\\nSquare images with a solid background color are recommended.'
+    />
+);
+
 describe('components/TeamSettings', () => {
+    const getTeam = jest.fn().mockResolvedValue({data: true});
     const patchTeam = jest.fn().mockReturnValue({data: true});
     const regenerateTeamInviteId = jest.fn().mockReturnValue({data: true});
     const removeTeamIcon = jest.fn().mockReturnValue({data: true});
     const setTeamIcon = jest.fn().mockReturnValue({data: true});
-
     const baseActions = {
+        getTeam,
         patchTeam,
         regenerateTeamInviteId,
         removeTeamIcon,
@@ -26,6 +35,7 @@ describe('components/TeamSettings', () => {
         collapseModal: jest.fn(),
         actions: baseActions,
         canInviteTeamMembers: true,
+        helpText: {helpText},
     };
 
     test('should handle bad updateTeamIcon function call', () => {
@@ -178,5 +188,18 @@ describe('components/TeamSettings', () => {
         const wrapper = shallow(<GeneralTab {...props}/>);
 
         expect(wrapper).toMatchSnapshot();
+    });
+
+    test('should call actions.getTeam on handleUpdateSection if invite_id is empty', () => {
+        const actions = {...baseActions};
+        const props = {...defaultProps, actions};
+        props.team.invite_id = '';
+
+        const wrapper = shallow(<GeneralTab {...props}/>);
+
+        wrapper.instance().handleUpdateSection('invite_id');
+
+        expect(actions.getTeam).toHaveBeenCalledTimes(1);
+        expect(actions.getTeam).toHaveBeenCalledWith(props.team.id);
     });
 });

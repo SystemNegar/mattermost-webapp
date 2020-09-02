@@ -5,12 +5,12 @@ import $ from 'jquery';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import ScrollToBottomIcon from 'components/svg/scroll_to_bottom_icon';
+import ScrollToBottomIcon from 'components/widgets/icons/scroll_to_bottom_icon';
 
 export default class ScrollToBottomArrows extends React.PureComponent {
     static propTypes = {
         isScrolling: PropTypes.bool.isRequired,
-        atBottom: PropTypes.bool.isRequired,
+        atBottom: PropTypes.bool,
         onClick: PropTypes.func.isRequired,
     };
 
@@ -21,7 +21,7 @@ export default class ScrollToBottomArrows extends React.PureComponent {
         }
 
         let className = 'post-list__arrows';
-        if (this.props.isScrolling && !this.props.atBottom) {
+        if (this.props.isScrolling && this.props.atBottom === false) {
             className += ' scrolling';
         }
 

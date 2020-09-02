@@ -8,7 +8,7 @@ import {getDirectShowPreferences} from 'mattermost-redux/selectors/entities/pref
 import {getCurrentUserId} from 'mattermost-redux/selectors/entities/users';
 
 import store from 'stores/redux_store.jsx';
-import {Constants} from 'utils/constants.jsx';
+import {Constants} from 'utils/constants';
 
 export function loadStatusesForChannelAndSidebar() {
     return (dispatch, getState) => {
@@ -45,7 +45,7 @@ export function loadStatusesForChannelAndSidebar() {
 export function loadStatusesForProfilesList(users) {
     return (dispatch) => {
         if (users == null) {
-            return;
+            return {data: false};
         }
 
         const statusesToLoad = [];
@@ -54,6 +54,8 @@ export function loadStatusesForProfilesList(users) {
         }
 
         dispatch(loadStatusesByIds(statusesToLoad));
+
+        return {data: true};
     };
 }
 
@@ -93,7 +95,7 @@ export function startPeriodicStatusUpdates() {
         () => {
             store.dispatch(loadStatusesForChannelAndSidebar());
         },
-        Constants.STATUS_INTERVAL
+        Constants.STATUS_INTERVAL,
     );
 }
 

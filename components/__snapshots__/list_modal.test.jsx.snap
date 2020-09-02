@@ -7,7 +7,7 @@ exports[`components/ListModal should match snapshot 1`] = `
     autoFocus={true}
     backdrop={true}
     bsClass="modal"
-    dialogClassName="more-modal more-modal--action"
+    dialogClassName="a11y__modal more-modal more-modal--action"
     dialogComponentClass={[Function]}
     enforceFocus={true}
     keyboard={true}
@@ -58,6 +58,12 @@ exports[`components/ListModal should match snapshot 1`] = `
           <div
             className="col-xs-12"
           >
+            <label
+              className="hidden-label"
+              htmlFor="searchUsersInput"
+            >
+              search for foos
+            </label>
             <input
               className="form-control filter-textbox"
               id="searchUsersInput"
@@ -114,7 +120,7 @@ exports[`components/ListModal should match snapshot with title bar button 1`] = 
     autoFocus={true}
     backdrop={true}
     bsClass="modal"
-    dialogClassName="more-modal more-modal--action"
+    dialogClassName="a11y__modal more-modal more-modal--action"
     dialogComponentClass={[Function]}
     enforceFocus={true}
     keyboard={true}
@@ -165,6 +171,12 @@ exports[`components/ListModal should match snapshot with title bar button 1`] = 
           <div
             className="col-xs-12"
           >
+            <label
+              className="hidden-label"
+              htmlFor="searchUsersInput"
+            >
+              search for foos
+            </label>
             <input
               className="form-control filter-textbox"
               id="searchUsersInput"

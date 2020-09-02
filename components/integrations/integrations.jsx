@@ -20,7 +20,7 @@ import TeamPermissionGate from 'components/permissions_gates/team_permission_gat
 
 import IntegrationOption from './integration_option.jsx';
 
-export default class Integrations extends React.Component {
+export default class Integrations extends React.PureComponent {
     static get propTypes() {
         return {
             team: PropTypes.object,
@@ -58,7 +58,7 @@ export default class Integrations extends React.Component {
                         title={
                             <FormattedMessage
                                 id='integrations.incomingWebhook.title'
-                                defaultMessage='Incoming Webhook'
+                                defaultMessage='Incoming Webhooks'
                             />
                         }
                         description={
@@ -69,7 +69,7 @@ export default class Integrations extends React.Component {
                         }
                         link={'/' + this.props.team.name + '/integrations/incoming_webhooks'}
                     />
-                </TeamPermissionGate>
+                </TeamPermissionGate>,
             );
         }
 
@@ -86,7 +86,7 @@ export default class Integrations extends React.Component {
                         title={
                             <FormattedMessage
                                 id='integrations.outgoingWebhook.title'
-                                defaultMessage='Outgoing Webhook'
+                                defaultMessage='Outgoing Webhooks'
                             />
                         }
                         description={
@@ -97,7 +97,7 @@ export default class Integrations extends React.Component {
                         }
                         link={'/' + this.props.team.name + '/integrations/outgoing_webhooks'}
                     />
-                </TeamPermissionGate>
+                </TeamPermissionGate>,
             );
         }
 
@@ -114,7 +114,7 @@ export default class Integrations extends React.Component {
                         title={
                             <FormattedMessage
                                 id='integrations.command.title'
-                                defaultMessage='Slash Command'
+                                defaultMessage='Slash Commands'
                             />
                         }
                         description={
@@ -125,7 +125,7 @@ export default class Integrations extends React.Component {
                         }
                         link={'/' + this.props.team.name + '/integrations/commands'}
                     />
-                </TeamPermissionGate>
+                </TeamPermissionGate>,
             );
         }
 
@@ -152,7 +152,7 @@ export default class Integrations extends React.Component {
                         }
                         link={'/' + this.props.team.name + '/integrations/oauth2-apps'}
                     />
-                </SystemPermissionGate>
+                </SystemPermissionGate>,
             );
         }
 
@@ -177,7 +177,7 @@ export default class Integrations extends React.Component {
                     }
                     link={'/' + this.props.team.name + '/integrations/bots'}
                 />
-            </SystemPermissionGate>
+            </SystemPermissionGate>,
         );
 
         return (

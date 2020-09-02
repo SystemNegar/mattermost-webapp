@@ -8,9 +8,9 @@ import {getInt} from 'mattermost-redux/selectors/entities/preferences';
 import {savePreferences} from 'mattermost-redux/actions/preferences';
 
 import {closeMenu as closeRhsMenu} from 'actions/views/rhs';
-import {Preferences} from 'utils/constants.jsx';
+import {Preferences} from 'utils/constants';
 
-import TutorialTip from './tutorial_tip.jsx';
+import TutorialTip from './tutorial_tip';
 
 function mapStateToProps(state) {
     const currentUserId = getCurrentUserId(state);

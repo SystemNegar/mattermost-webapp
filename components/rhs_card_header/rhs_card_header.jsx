@@ -3,14 +3,17 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {OverlayTrigger, Tooltip} from 'react-bootstrap';
+import {Tooltip} from 'react-bootstrap';
 import {FormattedMessage} from 'react-intl';
 
-import Constants, {RHSStates} from 'utils/constants.jsx';
+import OverlayTrigger from 'components/overlay_trigger';
 
-export default class RhsCardHeader extends React.Component {
+import Constants, {RHSStates} from 'utils/constants';
+
+export default class RhsCardHeader extends React.PureComponent {
     static propTypes = {
         previousRhsState: PropTypes.oneOf(Object.values(RHSStates)),
+        isExpanded: PropTypes.bool.isRequired,
         actions: PropTypes.shape({
             showMentions: PropTypes.func,
             showSearchResults: PropTypes.func,
@@ -53,7 +56,7 @@ export default class RhsCardHeader extends React.Component {
                 <Tooltip id='backToResultsTooltip'>
                     <FormattedMessage
                         id='rhs_header.backToResultsTooltip'
-                        defaultMessage='Back to Search Results'
+                        defaultMessage='Back to search results'
                     />
                 </Tooltip>
             );
@@ -63,7 +66,7 @@ export default class RhsCardHeader extends React.Component {
                 <Tooltip id='backToResultsTooltip'>
                     <FormattedMessage
                         id='rhs_header.backToFlaggedTooltip'
-                        defaultMessage='Back to Flagged Posts'
+                        defaultMessage='Back to saved posts'
                     />
                 </Tooltip>
             );
@@ -73,7 +76,7 @@ export default class RhsCardHeader extends React.Component {
                 <Tooltip id='backToResultsTooltip'>
                     <FormattedMessage
                         id='rhs_header.backToPinnedTooltip'
-                        defaultMessage='Back to Pinned Posts'
+                        defaultMessage='Back to pinned posts'
                     />
                 </Tooltip>
             );
@@ -84,7 +87,7 @@ export default class RhsCardHeader extends React.Component {
             <Tooltip id='closeSidebarTooltip'>
                 <FormattedMessage
                     id='rhs_header.closeSidebarTooltip'
-                    defaultMessage='Close Sidebar'
+                    defaultMessage='Close'
                 />
             </Tooltip>
         );
@@ -101,8 +104,8 @@ export default class RhsCardHeader extends React.Component {
         const shrinkSidebarTooltip = (
             <Tooltip id='shrinkSidebarTooltip'>
                 <FormattedMessage
-                    id='rhs_header.shrinkSidebarTooltip'
-                    defaultMessage='Shrink Sidebar'
+                    id='rhs_header.collapseSidebarTooltip'
+                    defaultMessage='Collapse Sidebar'
                 />
             </Tooltip>
         );
@@ -115,7 +118,6 @@ export default class RhsCardHeader extends React.Component {
                     className='sidebar--right__back'
                 >
                     <OverlayTrigger
-                        trigger={['hover', 'focus']}
                         delayShow={Constants.OVERLAY_TIME_DELAY}
                         placement='top'
                         overlay={backToResultsTooltip}
@@ -126,7 +128,7 @@ export default class RhsCardHeader extends React.Component {
                         >
                             {(ariaLabel) => (
                                 <i
-                                    className='fa fa-angle-left'
+                                    className='icon icon-arrow-back-ios'
                                     aria-label={ariaLabel}
                                 />
                             )}
@@ -146,17 +148,16 @@ export default class RhsCardHeader extends React.Component {
                     />
                 </span>
                 <div className='pull-right'>
-                    <button
-                        type='button'
-                        className='sidebar--right__expand'
-                        aria-label='Expand'
-                        onClick={this.props.actions.toggleRhsExpanded}
+                    <OverlayTrigger
+                        delayShow={Constants.OVERLAY_TIME_DELAY}
+                        placement='top'
+                        overlay={this.props.isExpanded ? shrinkSidebarTooltip : expandSidebarTooltip}
                     >
-                        <OverlayTrigger
-                            trigger={['hover', 'focus']}
-                            delayShow={Constants.OVERLAY_TIME_DELAY}
-                            placement='top'
-                            overlay={expandSidebarTooltip}
+                        <button
+                            type='button'
+                            className='sidebar--right__expand btn-icon'
+                            aria-label='Expand'
+                            onClick={this.props.actions.toggleRhsExpanded}
                         >
                             <FormattedMessage
                                 id='rhs_header.expandSidebarTooltip.icon'
@@ -164,42 +165,34 @@ export default class RhsCardHeader extends React.Component {
                             >
                                 {(ariaLabel) => (
                                     <i
-                                        className='fa fa-expand'
+                                        className='icon icon-arrow-expand'
                                         aria-label={ariaLabel}
                                     />
                                 )}
                             </FormattedMessage>
-                        </OverlayTrigger>
-                        <OverlayTrigger
-                            trigger={['hover', 'focus']}
-                            delayShow={Constants.OVERLAY_TIME_DELAY}
-                            placement='top'
-                            overlay={shrinkSidebarTooltip}
-                        >
                             <FormattedMessage
-                                id='rhs_header.expandTooltip.icon'
-                                defaultMessage='Shrink Sidebar Icon'
+                                id='rhs_header.collapseSidebarTooltip.icon'
+                                defaultMessage='Collapse Sidebar Icon'
                             >
                                 {(ariaLabel) => (
                                     <i
-                                        className='fa fa-compress'
+                                        className='icon icon-arrow-collapse'
                                         aria-label={ariaLabel}
                                     />
                                 )}
                             </FormattedMessage>
-                        </OverlayTrigger>
-                    </button>
-                    <button
-                        type='button'
-                        className='sidebar--right__close'
-                        aria-label='Close'
-                        onClick={this.props.actions.closeRightHandSide}
+                        </button>
+                    </OverlayTrigger>
+                    <OverlayTrigger
+                        delayShow={Constants.OVERLAY_TIME_DELAY}
+                        placement='top'
+                        overlay={closeSidebarTooltip}
                     >
-                        <OverlayTrigger
-                            trigger={['hover', 'focus']}
-                            delayShow={Constants.OVERLAY_TIME_DELAY}
-                            placement='top'
-                            overlay={closeSidebarTooltip}
+                        <button
+                            type='button'
+                            className='sidebar--right__close btn-icon'
+                            aria-label='Close'
+                            onClick={this.props.actions.closeRightHandSide}
                         >
                             <FormattedMessage
                                 id='rhs_header.closeTooltip.icon'
@@ -207,13 +200,13 @@ export default class RhsCardHeader extends React.Component {
                             >
                                 {(ariaLabel) => (
                                     <i
-                                        className='fa fa-sign-out'
+                                        className='icon icon-close'
                                         aria-label={ariaLabel}
                                     />
                                 )}
                             </FormattedMessage>
-                        </OverlayTrigger>
-                    </button>
+                        </button>
+                    </OverlayTrigger>
                 </div>
             </div>
         );

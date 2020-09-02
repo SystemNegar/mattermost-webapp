@@ -4,11 +4,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {Constants, NotificationLevels} from 'utils/constants';
+import {NotificationLevels} from 'utils/constants';
 
 import {localizeMessage} from 'utils/utils';
 
-import MenuItemAction from 'components/widgets/menu/menu_items/menu_item_action';
+import Menu from 'components/widgets/menu/menu';
 
 export default class MenuItemToggleMuteChannel extends React.PureComponent {
     static propTypes = {
@@ -58,7 +58,6 @@ export default class MenuItemToggleMuteChannel extends React.PureComponent {
 
     render() {
         const {
-            channel,
             id,
             isMuted,
         } = this.props;
@@ -71,9 +70,8 @@ export default class MenuItemToggleMuteChannel extends React.PureComponent {
         }
 
         return (
-            <MenuItemAction
+            <Menu.ItemAction
                 id={id}
-                show={channel.type !== Constants.DM_CHANNEL}
                 onClick={this.handleClick}
                 text={text}
             />

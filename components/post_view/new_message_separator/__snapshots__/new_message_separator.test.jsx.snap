@@ -3,19 +3,15 @@
 exports[`components/post_view/new_message_separator should render new_message_separator 1`] = `
 <div
   className="new-separator"
-  id="1234"
 >
-  <hr
-    className="separator__hr"
-  />
-  <div
-    className="separator__text"
+  <NotificationSeparator
+    id="1234"
   >
     <FormattedMessage
       defaultMessage="New Messages"
       id="posts_view.newMsg"
       values={Object {}}
     />
-  </div>
+  </NotificationSeparator>
 </div>
 `;

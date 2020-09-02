@@ -6,11 +6,10 @@ import React from 'react';
 
 import MenuWrapper from 'components/widgets/menu/menu_wrapper';
 import Menu from 'components/widgets/menu/menu';
-import MenuItemAction from 'components/widgets/menu/menu_items/menu_item_action';
 
 import * as Utils from 'utils/utils.jsx';
 
-export default class ManageTeamsDropdown extends React.Component {
+export default class ManageTeamsDropdown extends React.PureComponent {
     static propTypes = {
         team: PropTypes.object.isRequired,
         user: PropTypes.object.isRequired,
@@ -45,10 +44,17 @@ export default class ManageTeamsDropdown extends React.Component {
 
     render() {
         const isTeamAdmin = Utils.isAdmin(this.props.teamMember.roles) || this.props.teamMember.scheme_admin;
+        const isSysAdmin = Utils.isSystemAdmin(this.props.user.roles);
+        const isGuest = Utils.isGuest(this.props.user);
+
         const {team} = this.props;
         let title;
-        if (isTeamAdmin) {
+        if (isSysAdmin) {
+            title = Utils.localizeMessage('admin.user_item.sysAdmin', 'System Admin');
+        } else if (isTeamAdmin) {
             title = Utils.localizeMessage('admin.user_item.teamAdmin', 'Team Admin');
+        } else if (isGuest) {
+            title = Utils.localizeMessage('admin.user_item.guest', 'Guest');
         } else {
             title = Utils.localizeMessage('admin.user_item.teamMember', 'Team Member');
         }
@@ -61,19 +67,19 @@ export default class ManageTeamsDropdown extends React.Component {
                 </a>
                 <Menu
                     openLeft={true}
-                    ariaLabel={Utils.localizeMessage('team_members_dropdown.menuAriaLabel', 'Team member role change')}
+                    ariaLabel={Utils.localizeMessage('team_members_dropdown.menuAriaLabel', 'Change the role of a team member')}
                 >
-                    <MenuItemAction
-                        show={!isTeamAdmin}
+                    <Menu.ItemAction
+                        show={!isTeamAdmin && !isGuest}
                         onClick={this.makeTeamAdmin}
                         text={Utils.localizeMessage('admin.user_item.makeTeamAdmin', 'Make Team Admin')}
                     />
-                    <MenuItemAction
+                    <Menu.ItemAction
                         show={isTeamAdmin}
                         onClick={this.makeMember}
-                        text={Utils.localizeMessage('admin.user_item.makeMember', 'Make Member')}
+                        text={Utils.localizeMessage('admin.user_item.makeMember', 'Make Team Member')}
                     />
-                    <MenuItemAction
+                    <Menu.ItemAction
                         show={!team.group_constrained}
                         onClick={this.removeFromTeam}
                         text={Utils.localizeMessage('team_members_dropdown.leave_team', 'Remove from Team')}

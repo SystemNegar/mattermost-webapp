@@ -5,6 +5,7 @@ import React from 'react';
 import {mount} from 'enzyme';
 
 import ChannelHeaderPlug from 'plugins/channel_header_plug/channel_header_plug.jsx';
+import {mountWithIntl} from '../../tests/helpers/intl-test-helper';
 
 describe('plugins/ChannelHeaderPlug', () => {
     const testPlug = {
@@ -23,7 +24,7 @@ describe('plugins/ChannelHeaderPlug', () => {
                 channel={{}}
                 channelMember={{}}
                 theme={{}}
-            />
+            />,
         );
         expect(wrapper).toMatchSnapshot();
     });
@@ -35,19 +36,26 @@ describe('plugins/ChannelHeaderPlug', () => {
                 channel={{}}
                 channelMember={{}}
                 theme={{}}
-            />
+            />,
         );
         expect(wrapper).toMatchSnapshot();
     });
 
-    test('should match snapshot with two extended components', () => {
-        const wrapper = mount(
+    test('should match snapshot with six extended components', () => {
+        const wrapper = mountWithIntl(
             <ChannelHeaderPlug
-                components={[testPlug, {...testPlug, id: 'someid2'}]}
+                components={[
+                    testPlug,
+                    {...testPlug, id: 'someid2'},
+                    {...testPlug, id: 'someid3'},
+                    {...testPlug, id: 'someid4'},
+                    {...testPlug, id: 'someid5'},
+                    {...testPlug, id: 'someid6'},
+                ]}
                 channel={{}}
                 channelMember={{}}
                 theme={{}}
-            />
+            />,
         );
         expect(wrapper).toMatchSnapshot();
     });

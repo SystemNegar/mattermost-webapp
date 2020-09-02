@@ -3,25 +3,27 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
+import {Link} from 'react-router-dom';
 import {Client4} from 'mattermost-redux/client';
 
 import * as Utils from 'utils/utils.jsx';
-import ProfilePicture from 'components/profile_picture.jsx';
-import BotBadge from 'components/widgets/badges/bot_badge.jsx';
+import ProfilePicture from 'components/profile_picture';
+import BotBadge from 'components/widgets/badges/bot_badge';
 
 import FormattedMarkdownMessage from 'components/formatted_markdown_message.jsx';
 
-export default class UserListRowWithError extends React.Component {
+export default class UserListRowWithError extends React.PureComponent {
     static propTypes = {
         user: PropTypes.object.isRequired,
         status: PropTypes.string,
-        extraInfo: PropTypes.arrayOf(PropTypes.object),
+        extraInfo: PropTypes.array,
         actions: PropTypes.arrayOf(PropTypes.func),
         actionProps: PropTypes.object,
         actionUserProps: PropTypes.object,
         index: PropTypes.number,
         totalUsers: PropTypes.number,
         userCount: PropTypes.number,
+        isDisabled: PropTypes.bool,
     };
 
     static defaultProps = {
@@ -34,11 +36,9 @@ export default class UserListRowWithError extends React.Component {
     constructor(props) {
         super(props);
         this.state = {};
-
-        this.onError = this.onError.bind(this);
     }
 
-    onError(errorObj) {
+    onError = (errorObj) => {
         this.setState({
             error: errorObj,
         });
@@ -107,14 +107,14 @@ export default class UserListRowWithError extends React.Component {
 
         return (
             <div
+                data-testid='userListRow'
                 key={this.props.user.id}
                 className='more-modal__row'
             >
                 <ProfilePicture
                     src={Client4.getProfilePictureUrl(this.props.user.id, this.props.user.last_picture_update)}
                     status={status}
-                    width='32'
-                    height='32'
+                    size='md'
                 />
                 <div className='more-modal__right'>
                     <div className='more-modal__top'>
@@ -123,7 +123,9 @@ export default class UserListRowWithError extends React.Component {
                                 id={userCountID}
                                 className='more-modal__name'
                             >
-                                {Utils.displayEntireNameForUser(this.props.user)}
+                                <Link to={'/admin_console/user_management/user/' + this.props.user.id}>
+                                    {Utils.displayEntireNameForUser(this.props.user)}
+                                </Link>
                                 <BotBadge
                                     className='badge-admin'
                                     show={Boolean(this.props.user.is_bot)}

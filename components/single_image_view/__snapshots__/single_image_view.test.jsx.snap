@@ -9,19 +9,20 @@ exports[`components/SingleImageView should match snapshot 1`] = `
   >
     <div
       className="image-name"
+      data-testid="image-name"
     >
-      <a
-        aria-label="Toggle Embed Visibility"
-        className="post__embed-visibility"
-        data-expanded={true}
-        key="toggle"
-        onClick={[Function]}
-      />
       <div
         onClick={[Function]}
       >
         name
       </div>
+      <button
+        aria-label="Toggle Embed Visibility"
+        className="style--none post__embed-visibility"
+        data-expanded={true}
+        key="toggle"
+        onClick={[Function]}
+      />
     </div>
     <div
       className="image-container"
@@ -39,6 +40,18 @@ exports[`components/SingleImageView should match snapshot 1`] = `
               "width": 350,
             }
           }
+          fileInfo={
+            Object {
+              "extension": "jpg",
+              "has_preview_image": true,
+              "height": 200,
+              "id": "file_info_id",
+              "name": "name",
+              "post_id": "post_id",
+              "width": 350,
+            }
+          }
+          handleSmallImageContainer={true}
           onClick={[Function]}
           onImageLoaded={[Function]}
           showLoader={true}
@@ -59,19 +72,20 @@ exports[`components/SingleImageView should match snapshot 2`] = `
   >
     <div
       className="image-name"
+      data-testid="image-name"
     >
-      <a
-        aria-label="Toggle Embed Visibility"
-        className="post__embed-visibility"
-        data-expanded={true}
-        key="toggle"
-        onClick={[Function]}
-      />
       <div
         onClick={[Function]}
       >
         name
       </div>
+      <button
+        aria-label="Toggle Embed Visibility"
+        className="style--none post__embed-visibility"
+        data-expanded={true}
+        key="toggle"
+        onClick={[Function]}
+      />
     </div>
     <div
       className="image-container"
@@ -89,6 +103,18 @@ exports[`components/SingleImageView should match snapshot 2`] = `
               "width": 350,
             }
           }
+          fileInfo={
+            Object {
+              "extension": "jpg",
+              "has_preview_image": true,
+              "height": 200,
+              "id": "file_info_id",
+              "name": "name",
+              "post_id": "post_id",
+              "width": 350,
+            }
+          }
+          handleSmallImageContainer={true}
           onClick={[Function]}
           onImageLoaded={[Function]}
           showLoader={true}
@@ -127,26 +153,27 @@ exports[`components/SingleImageView should match snapshot, SVG image 1`] = `
   >
     <div
       className="image-name"
+      data-testid="image-name"
     >
-      <a
-        aria-label="Toggle Embed Visibility"
-        className="post__embed-visibility"
-        data-expanded={true}
-        key="toggle"
-        onClick={[Function]}
-      />
       <div
         onClick={[Function]}
       >
         name_svg
       </div>
+      <button
+        aria-label="Toggle Embed Visibility"
+        className="style--none post__embed-visibility"
+        data-expanded={true}
+        key="toggle"
+        onClick={[Function]}
+      />
     </div>
     <div
       className="image-container"
       style={
         Object {
-          "height": 150,
-          "width": "auto",
+          "height": 350,
+          "maxWidth": "100%",
         }
       }
     >
@@ -162,6 +189,15 @@ exports[`components/SingleImageView should match snapshot, SVG image 1`] = `
               "width": undefined,
             }
           }
+          fileInfo={
+            Object {
+              "extension": "svg",
+              "id": "svg_file_info_id",
+              "name": "name_svg",
+              "post_id": "post_id",
+            }
+          }
+          handleSmallImageContainer={true}
           onClick={[Function]}
           onImageLoaded={[Function]}
           showLoader={true}
@@ -182,26 +218,27 @@ exports[`components/SingleImageView should match snapshot, SVG image 2`] = `
   >
     <div
       className="image-name"
+      data-testid="image-name"
     >
-      <a
-        aria-label="Toggle Embed Visibility"
-        className="post__embed-visibility"
-        data-expanded={true}
-        key="toggle"
-        onClick={[Function]}
-      />
       <div
         onClick={[Function]}
       >
         name_svg
       </div>
+      <button
+        aria-label="Toggle Embed Visibility"
+        className="style--none post__embed-visibility"
+        data-expanded={true}
+        key="toggle"
+        onClick={[Function]}
+      />
     </div>
     <div
       className="image-container"
       style={
         Object {
-          "height": 150,
-          "width": "auto",
+          "height": 350,
+          "maxWidth": "100%",
         }
       }
     >
@@ -217,6 +254,15 @@ exports[`components/SingleImageView should match snapshot, SVG image 2`] = `
               "width": undefined,
             }
           }
+          fileInfo={
+            Object {
+              "extension": "svg",
+              "id": "svg_file_info_id",
+              "name": "name_svg",
+              "post_id": "post_id",
+            }
+          }
+          handleSmallImageContainer={true}
           onClick={[Function]}
           onImageLoaded={[Function]}
           showLoader={true}
@@ -252,19 +298,20 @@ exports[`components/SingleImageView should set loaded state on callback of onIma
   >
     <div
       className="image-name"
+      data-testid="image-name"
     >
-      <a
-        aria-label="Toggle Embed Visibility"
-        className="post__embed-visibility"
-        data-expanded={true}
-        key="toggle"
-        onClick={[Function]}
-      />
       <div
         onClick={[Function]}
       >
         name
       </div>
+      <button
+        aria-label="Toggle Embed Visibility"
+        className="style--none post__embed-visibility"
+        data-expanded={true}
+        key="toggle"
+        onClick={[Function]}
+      />
     </div>
     <div
       className="image-container"
@@ -282,6 +329,18 @@ exports[`components/SingleImageView should set loaded state on callback of onIma
               "width": 350,
             }
           }
+          fileInfo={
+            Object {
+              "extension": "jpg",
+              "has_preview_image": true,
+              "height": 200,
+              "id": "file_info_id",
+              "name": "name",
+              "post_id": "post_id",
+              "width": 350,
+            }
+          }
+          handleSmallImageContainer={true}
           onClick={[Function]}
           onImageLoaded={[Function]}
           showLoader={true}

@@ -7,7 +7,7 @@ import {createSelector} from 'reselect';
 import {patchChannel} from 'mattermost-redux/actions/channels';
 import {getTeam} from 'mattermost-redux/selectors/entities/teams';
 
-import {getSiteURL} from 'utils/url.jsx';
+import {getSiteURL} from 'utils/url';
 
 import RenameChannelModal from './rename_channel_modal.jsx';
 
@@ -21,7 +21,7 @@ const mapStateToProps = createSelector(
             team,
         };
     },
-    (teamInfo) => ({...teamInfo})
+    (teamInfo) => ({...teamInfo}),
 );
 
 function mapDispatchToProps(dispatch) {

@@ -5,12 +5,12 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {FormattedMessage} from 'react-intl';
 
-import Constants from 'utils/constants.jsx';
+import Constants from 'utils/constants';
 import * as PostUtils from 'utils/post_utils.jsx';
 import PostInfo from 'components/post_view/post_info';
 import UserProfile from 'components/user_profile';
-import BotBadge from 'components/widgets/badges/bot_badge.jsx';
-import Badge from 'components/widgets/badges/badge.jsx';
+import BotBadge from 'components/widgets/badges/bot_badge';
+import Badge from 'components/widgets/badges/badge';
 
 export default class PostHeader extends React.PureComponent {
     static propTypes = {
@@ -69,6 +69,21 @@ export default class PostHeader extends React.PureComponent {
          * If the user that made the post is a bot.
          */
         isBot: PropTypes.bool.isRequired,
+
+        /**
+         * If the user that made the post is a guest.
+         */
+        isGuest: PropTypes.bool.isRequired,
+
+        /**
+         * To Check if the current post is last in the list
+         */
+        isLastPost: PropTypes.bool,
+
+        /**
+         * Source of image that should be override current user profile.
+         */
+        overwriteIcon: PropTypes.string,
     }
 
     render() {
@@ -86,13 +101,14 @@ export default class PostHeader extends React.PureComponent {
         let indicator;
         let colon;
 
-        if (fromWebhook && !this.props.isBot) {
+        if (fromWebhook) {
             if (post.props.override_username && this.props.enablePostUsernameOverride) {
                 userProfile = (
                     <UserProfile
                         userId={post.user_id}
                         hideStatus={true}
                         overwriteName={post.props.override_username}
+                        overwriteIcon={this.props.overwriteIcon}
                     />
                 );
             } else {
@@ -104,7 +120,9 @@ export default class PostHeader extends React.PureComponent {
                 );
             }
 
-            indicator = (<BotBadge/>);
+            if (!this.props.isBot) {
+                indicator = (<BotBadge/>);
+            }
         } else if (fromAutoResponder) {
             userProfile = (
                 <UserProfile
@@ -166,6 +184,7 @@ export default class PostHeader extends React.PureComponent {
                         isFirstReply={this.props.isFirstReply}
                         showTimeWithoutHover={this.props.showTimeWithoutHover}
                         hover={this.props.hover}
+                        isLastPost={this.props.isLastPost}
                     />
                 </div>
             </div>

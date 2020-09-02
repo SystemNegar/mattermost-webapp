@@ -4,7 +4,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import Constants from 'utils/constants.jsx';
+import Constants from 'utils/constants';
 import * as Utils from 'utils/utils.jsx';
 
 export default class ChannelSelect extends React.PureComponent {
@@ -46,7 +46,7 @@ export default class ChannelSelect extends React.PureComponent {
                         value={channel.id}
                     >
                         {channelName}
-                    </option>
+                    </option>,
                 );
             } else if (channel.type === Constants.PRIVATE_CHANNEL && this.props.selectPrivate) {
                 options.push(
@@ -55,7 +55,7 @@ export default class ChannelSelect extends React.PureComponent {
                         value={channel.id}
                     >
                         {channelName}
-                    </option>
+                    </option>,
                 );
             } else if (channel.type === Constants.DM_CHANNEL && this.props.selectDm) {
                 options.push(
@@ -64,7 +64,7 @@ export default class ChannelSelect extends React.PureComponent {
                         value={channel.id}
                     >
                         {channelName}
-                    </option>
+                    </option>,
                 );
             }
         });

@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+/* eslint-disable react/no-string-refs */
 
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -7,7 +8,6 @@ import {FormattedMessage} from 'react-intl';
 
 export default class PopoverBar extends React.PureComponent {
     static propTypes = {
-        show: PropTypes.bool.isRequired,
         fileIndex: PropTypes.number.isRequired,
         totalFiles: PropTypes.number.isRequired,
         filename: PropTypes.string.isRequired,
@@ -17,11 +17,9 @@ export default class PopoverBar extends React.PureComponent {
         canDownloadFiles: PropTypes.bool.isRequired,
         isExternalFile: PropTypes.bool.isRequired,
         onGetPublicLink: PropTypes.func,
-        isDesktopApp: PropTypes.bool.isRequired,
     };
 
     static defaultProps = {
-        show: false,
         fileIndex: 0,
         totalFiles: 0,
         filename: '',
@@ -42,7 +40,7 @@ export default class PopoverBar extends React.PureComponent {
                     >
                         <FormattedMessage
                             id='view_image_popover.publicLink'
-                            defaultMessage='Get Public Link'
+                            defaultMessage='Get a public link'
                         />
                     </a>
                     <span className='text'>{' | '}</span>
@@ -50,18 +48,11 @@ export default class PopoverBar extends React.PureComponent {
             );
         }
 
-        var footerClass = 'modal-button-bar';
-        if (this.props.show) {
-            footerClass += ' footer--show';
-        }
-
         let downloadLinks = null;
         if (this.props.canDownloadFiles) {
-            const shouldOpenFile = this.props.isExternalFile && !this.props.isDesktopApp;
-
             let downloadLinkText;
             const downloadLinkProps = {};
-            if (shouldOpenFile) {
+            if (this.props.isExternalFile) {
                 downloadLinkText = (
                     <FormattedMessage
                         id='view_image_popover.open'
@@ -97,8 +88,9 @@ export default class PopoverBar extends React.PureComponent {
 
         return (
             <div
+                data-testid='fileCountFooter'
                 ref='imageFooter'
-                className={footerClass}
+                className='modal-button-bar'
             >
                 <span className='pull-left text'>
                     <FormattedMessage
@@ -115,3 +107,4 @@ export default class PopoverBar extends React.PureComponent {
         );
     }
 }
+/* eslint-enable react/no-string-refs */

@@ -4,31 +4,28 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-export default class ModalToggleButton extends React.Component {
+export default class ModalToggleButton extends React.PureComponent {
     constructor(props) {
         super(props);
-
-        this.show = this.show.bind(this);
-        this.hide = this.hide.bind(this);
 
         this.state = {
             show: false,
         };
     }
 
-    show(e) {
+    show = (e) => {
         if (e) {
             e.preventDefault();
         }
         this.setState({show: true});
     }
 
-    hide() {
+    hide = () => {
         this.setState({show: false});
     }
 
     render() {
-        const {children, dialogType, dialogProps, onClick, ...props} = this.props;
+        const {children, dialogType, dialogProps, onClick, isDisabled, id, ...props} = this.props;
 
         // allow callers to provide an onClick which will be called before the modal is shown
         let clickHandler = this.show;
@@ -61,6 +58,8 @@ export default class ModalToggleButton extends React.Component {
                 {...props}
                 className={'style--none ' + props.className}
                 onClick={clickHandler}
+                data-testid={id}
+                disabled={isDisabled}
             >
                 {children}
                 {dialog}
@@ -71,10 +70,12 @@ export default class ModalToggleButton extends React.Component {
 
 ModalToggleButton.propTypes = {
     children: PropTypes.node.isRequired,
-    dialogType: PropTypes.func.isRequired,
+    dialogType: PropTypes.any.isRequired,
     dialogProps: PropTypes.object,
     onClick: PropTypes.func,
     className: PropTypes.string,
+    id: PropTypes.string,
+    isDisabled: PropTypes.bool,
 };
 
 ModalToggleButton.defaultProps = {

@@ -3,7 +3,7 @@
 
 import FlexSearch from 'flexsearch/dist/flexsearch.es5';
 
-import AdminDefinition from 'components/admin_console/admin_definition.jsx';
+import {getPluginEntries} from './admin_console_plugin_index';
 
 function extractTextsFromSection(section, intl) {
     const texts = [];
@@ -44,49 +44,45 @@ function extractTextsFromSection(section, intl) {
 
 export function adminDefinitionsToUrlsAndTexts(adminDefinition, intl) {
     const entries = {};
-    for (const item of Object.values(adminDefinition.about)) {
-        entries[item.url] = extractTextsFromSection(item, intl);
-    }
-    for (const item of Object.values(adminDefinition.reporting)) {
-        entries[item.url] = extractTextsFromSection(item, intl);
-    }
-    for (const item of Object.values(adminDefinition.user_management)) {
-        entries[item.url] = extractTextsFromSection(item, intl);
-    }
-    for (const item of Object.values(adminDefinition.environment)) {
-        entries[item.url] = extractTextsFromSection(item, intl);
-    }
-    for (const item of Object.values(adminDefinition.site)) {
-        entries[item.url] = extractTextsFromSection(item, intl);
-    }
-    for (const item of Object.values(adminDefinition.authentication)) {
-        entries[item.url] = extractTextsFromSection(item, intl);
-    }
-    for (const item of Object.values(adminDefinition.plugins)) {
-        entries[item.url] = extractTextsFromSection(item, intl);
-    }
-    for (const item of Object.values(adminDefinition.integrations)) {
-        entries[item.url] = extractTextsFromSection(item, intl);
-    }
-    for (const item of Object.values(adminDefinition.compliance)) {
-        entries[item.url] = extractTextsFromSection(item, intl);
-    }
-    for (const item of Object.values(adminDefinition.experimental)) {
-        entries[item.url] = extractTextsFromSection(item, intl);
+    const sections = [
+        adminDefinition.about,
+        adminDefinition.reporting,
+        adminDefinition.user_management,
+        adminDefinition.environment,
+        adminDefinition.site,
+        adminDefinition.authentication,
+        adminDefinition.plugins,
+        adminDefinition.integrations,
+        adminDefinition.compliance,
+        adminDefinition.experimental,
+    ];
+    for (const section of sections) {
+        for (const item of Object.values(section)) {
+            if (!item.isDiscovery) {
+                entries[item.url] = extractTextsFromSection(item, intl);
+            }
+        }
     }
     return entries;
 }
 
-export function generateIndex(intl) {
+export function generateIndex(AdminDefinition, plugins, intl) {
     const idx = new FlexSearch();
-    const mappingSectionsToTexts = adminDefinitionsToUrlsAndTexts(AdminDefinition, intl);
-    for (const key of Object.keys(mappingSectionsToTexts)) {
+
+    addToIndex(adminDefinitionsToUrlsAndTexts(AdminDefinition, intl), idx);
+
+    addToIndex(getPluginEntries(plugins), idx);
+
+    return idx;
+}
+
+function addToIndex(entries, idx) {
+    for (const key of Object.keys(entries)) {
         let text = '';
-        for (const str of mappingSectionsToTexts[key]) {
+        for (const str of entries[key]) {
             text += ' ' + str;
         }
         idx.add(key, text);
     }
-    return idx;
 }
 

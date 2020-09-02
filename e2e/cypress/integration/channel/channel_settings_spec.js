@@ -3,15 +3,26 @@
 // See LICENSE.txt for license information.
 
 // ***************************************************************
-// - [#] indicates a test step (e.g. 1. Go to a page)
+// - [#] indicates a test step (e.g. # Go to a page)
 // - [*] indicates an assertion (e.g. * Check the title)
 // - Use element ID when selecting an element. Create one if none.
 // ***************************************************************
 
+// Stage: @prod
+// Group: @channel @channel_settings
+
 describe('Channel Settings', () => {
     before(() => {
-        // # Go to Main Channel View with "user-1"
-        cy.toMainChannelView('user-1');
+        cy.apiInitSetup().then(({team, user}) => {
+            cy.apiCreateChannel(team.id, 'channel', 'Private Channel', 'P').then((res) => {
+                cy.apiAddUserToChannel(res.body.id, user.id);
+            });
+
+            cy.apiLogin(user);
+
+            // # Visit town-square channel
+            cy.visit(`/${team.name}/channels/town-square`);
+        });
     });
 
     it('C15052 All channel types have appropriate close button', () => {
@@ -24,7 +35,7 @@ describe('Channel Settings', () => {
         });
 
         // add a direct message incase there is not one
-        cy.get('#directChannel button').click();
+        cy.get('#addDirectChannel').click();
         cy.get('.more-modal__row.clickable').first().click();
         cy.get('#saveItems').click();
 

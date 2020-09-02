@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {FormattedMessage} from 'react-intl';
 
-import Constants from 'utils/constants.jsx';
+import Constants from 'utils/constants';
 import * as Utils from 'utils/utils.jsx';
 import BackstageList from 'components/backstage/components/backstage_list.jsx';
 import InstalledIncomingWebhook, {matchesFilter} from 'components/integrations/installed_incoming_webhook.jsx';
@@ -81,9 +81,9 @@ export default class InstalledIncomingWebhooks extends React.PureComponent {
             this.props.actions.loadIncomingHooksAndProfilesForTeam(
                 this.props.teamId,
                 Constants.Integrations.START_PAGE_NUM,
-                Constants.Integrations.PAGE_SIZE
+                Constants.Integrations.PAGE_SIZE,
             ).then(
-                () => this.setState({loading: false})
+                () => this.setState({loading: false}),
             );
         }
     }
@@ -169,7 +169,7 @@ export default class InstalledIncomingWebhooks extends React.PureComponent {
                                 >
                                     <FormattedMessage
                                         id='installed_incoming_webhooks.help.buildYourOwn'
-                                        defaultMessage='Build your own'
+                                        defaultMessage='Build Your Own'
                                     />
                                 </a>
                             ),

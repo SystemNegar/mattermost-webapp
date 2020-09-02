@@ -3,16 +3,13 @@
 
 import React from 'react';
 
-import {getMyChannels, getChannel, getMyChannelMemberships} from 'mattermost-redux/selectors/entities/channels';
+import {getMyChannels, getMyChannelMemberships} from 'mattermost-redux/selectors/entities/channels';
 
 import {sortChannelsByTypeAndDisplayName} from 'mattermost-redux/utils/channel_utils';
 
-import {ChannelTypes} from 'mattermost-redux/action_types';
-
-import {autocompleteChannels} from 'actions/channel_actions.jsx';
 import store from 'stores/redux_store.jsx';
 
-import {Constants} from 'utils/constants.jsx';
+import {Constants} from 'utils/constants';
 
 import Provider from './provider.jsx';
 import Suggestion from './suggestion.jsx';
@@ -23,32 +20,30 @@ class ChannelMentionSuggestion extends Suggestion {
         const item = this.props.item;
 
         const channelName = item.channel.display_name;
-        const purpose = item.channel.purpose;
+        const channelIcon = (<span className='suggestion-list__icon suggestion-list__icon--large'><i className='icon icon--no-spacing icon-globe'/></span>);
 
         let className = 'mentions__name no-flex';
         if (isSelection) {
             className += ' suggestion--selected';
         }
 
-        const description = '(~' + item.channel.name + ')';
+        const description = '~' + item.channel.name;
 
         return (
             <div
                 className={className}
                 onClick={this.handleClick}
+                onMouseMove={this.handleMouseMove}
                 {...Suggestion.baseProps}
             >
-                <div className='mention__align'>
+                <div className='d-flex align-items-center'>
+                    {channelIcon}
                     <span>
                         {channelName}
                     </span>
-                    <span className='mention__channelname'>
-                        {' '}
+                    <span className='mention__channelname ml-2'>
                         {description}
                     </span>
-                </div>
-                <div className='mention__purpose'>
-                    {purpose}
                 </div>
             </div>
         );
@@ -56,12 +51,14 @@ class ChannelMentionSuggestion extends Suggestion {
 }
 
 export default class ChannelMentionProvider extends Provider {
-    constructor() {
+    constructor(channelSearchFunc) {
         super();
 
         this.lastPrefixTrimmed = '';
         this.lastPrefixWithNoResults = '';
         this.lastCompletedWord = '';
+
+        this.autocompleteChannels = channelSearchFunc;
     }
 
     handlePretextChanged(pretext, resultCallback) {
@@ -154,65 +151,73 @@ export default class ChannelMentionProvider extends Provider {
             matchedPretext: captured[1],
         });
 
-        autocompleteChannels(
-            prefix,
-            (channels) => {
-                const myMembers = getMyChannelMemberships(store.getState());
-                if (this.shouldCancelDispatch(prefix)) {
+        const handleChannels = (channels, withError) => {
+            if (prefix !== this.latestPrefix || this.shouldCancelDispatch(prefix)) {
+                return;
+            }
+
+            const myMembers = getMyChannelMemberships(store.getState());
+
+            if (channels.length === 0 && !withError) {
+                this.lastPrefixWithNoResults = prefix;
+            }
+
+            // Wrap channels in an outer object to avoid overwriting the 'type' property.
+            const wrappedMoreChannels = [];
+            channels.forEach((item) => {
+                if (item.delete_at > 0 && !myMembers[item.id]) {
                     return;
                 }
 
-                if (channels.length === 0) {
-                    this.lastPrefixWithNoResults = prefix;
-                }
-
-                // Wrap channels in an outer object to avoid overwriting the 'type' property.
-                const wrappedMoreChannels = [];
-                const moreChannels = [];
-                channels.forEach((item) => {
-                    if (item.delete_at > 0 && !myMembers[item.id]) {
-                        return;
-                    }
-                    if (getChannel(store.getState(), item.id)) {
-                        if (!wrappedChannelIds[item.id]) {
-                            wrappedChannelIds[item.id] = true;
-                            wrappedChannels.push({
-                                type: Constants.MENTION_CHANNELS,
-                                channel: item,
-                            });
-                        }
-                        return;
-                    }
-
-                    wrappedMoreChannels.push({
-                        type: Constants.MENTION_MORE_CHANNELS,
+                if (myMembers[item.id] && !wrappedChannelIds[item.id]) {
+                    wrappedChannelIds[item.id] = true;
+                    wrappedChannels.push({
+                        type: Constants.MENTION_CHANNELS,
                         channel: item,
                     });
+                    return;
+                }
 
-                    moreChannels.push(item);
-                });
+                if (myMembers[item.id] && wrappedChannelIds[item.id]) {
+                    return;
+                }
 
-                wrappedChannels = wrappedChannels.sort((a, b) => {
-                    //
-                    // MM-12677 When this is migrated this needs to be fixed to pull the user's locale
-                    //
-                    return sortChannelsByTypeAndDisplayName('en', a.channel, b.channel);
-                });
-                const wrapped = wrappedChannels.concat(wrappedMoreChannels);
-                const mentions = wrapped.map((item) => '~' + item.channel.name);
+                if (!myMembers[item.id] && wrappedChannelIds[item.id]) {
+                    delete wrappedChannelIds[item.id];
+                    const idx = wrappedChannels.map((el) => el.channel.id).indexOf(item.id);
+                    if (idx >= 0) {
+                        wrappedChannels.splice(idx, 1);
+                    }
+                }
 
-                store.dispatch({
-                    type: ChannelTypes.RECEIVED_CHANNELS,
-                    data: moreChannels,
+                wrappedMoreChannels.push({
+                    type: Constants.MENTION_MORE_CHANNELS,
+                    channel: item,
                 });
+            });
 
-                resultCallback({
-                    matchedPretext: captured[1],
-                    terms: mentions,
-                    items: wrapped,
-                    component: ChannelMentionSuggestion,
-                });
-            }
+            wrappedChannels = wrappedChannels.sort((a, b) => {
+                //
+                // MM-12677 When this is migrated this needs to be fixed to pull the user's locale
+                //
+                return sortChannelsByTypeAndDisplayName('en', a.channel, b.channel);
+            });
+
+            const wrapped = wrappedChannels.concat(wrappedMoreChannels);
+            const mentions = wrapped.map((item) => '~' + item.channel.name);
+
+            resultCallback({
+                matchedPretext: captured[1],
+                terms: mentions,
+                items: wrapped,
+                component: ChannelMentionSuggestion,
+            });
+        };
+
+        this.autocompleteChannels(
+            prefix,
+            (channels) => handleChannels(channels, false),
+            () => handleChannels([], true),
         );
 
         return true;

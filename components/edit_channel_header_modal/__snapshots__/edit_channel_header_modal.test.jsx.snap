@@ -1,15 +1,16 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`components/EditChannelHeaderModal edit dirrect message channel 1`] = `
+exports[`components/EditChannelHeaderModal edit direct message channel 1`] = `
 <Modal
   animation={true}
   aria-labelledby="editChannelHeaderModalLabel"
   autoFocus={true}
   backdrop={true}
   bsClass="modal"
+  dialogClassName="a11y__modal"
   dialogComponentClass={[Function]}
   enforceFocus={true}
-  keyboard={true}
+  keyboard={false}
   manager={
     ModalManager {
       "add": [Function],
@@ -25,10 +26,11 @@ exports[`components/EditChannelHeaderModal edit dirrect message channel 1`] = `
   onEntering={[Function]}
   onExited={[Function]}
   onHide={[Function]}
+  onKeyDown={[Function]}
   renderBackdrop={[Function]}
   restoreFocus={true}
   role="dialog"
-  show={true}
+  show={false}
 >
   <ModalHeader
     bsClass="modal-header"
@@ -59,18 +61,33 @@ exports[`components/EditChannelHeaderModal edit dirrect message channel 1`] = `
           values={Object {}}
         />
       </p>
-      <Connect(Textbox)
-        characterLimit={1024}
-        createMessage="Edit the Channel Header..."
-        id="edit_textbox"
-        onChange={[Function]}
-        onKeyDown={[Function]}
-        onKeyPress={[Function]}
-        previewMessageLink="Edit Header"
-        suggestionListStyle="bottom"
-        supportsCommands={false}
-        value="Fake Channel"
-      />
+      <div
+        className="textarea-wrapper"
+      >
+        <Connect(Textbox)
+          characterLimit={1024}
+          createMessage="Edit the Channel Header..."
+          id="edit_textbox"
+          onChange={[Function]}
+          onKeyDown={[Function]}
+          onKeyPress={[Function]}
+          preview={false}
+          previewMessageLink="Edit Header"
+          suggestionListStyle="bottom"
+          supportsCommands={false}
+          value="Fake Channel"
+        />
+      </div>
+      <div
+        className="post-create-footer"
+      >
+        <Connect(TextboxLinks)
+          characterLimit={1024}
+          message="Fake Channel"
+          showPreview={false}
+          updatePreview={[Function]}
+        />
+      </div>
       <br />
     </div>
   </ModalBody>
@@ -112,9 +129,10 @@ exports[`components/EditChannelHeaderModal error with intl message 1`] = `
   autoFocus={true}
   backdrop={true}
   bsClass="modal"
+  dialogClassName="a11y__modal"
   dialogComponentClass={[Function]}
   enforceFocus={true}
-  keyboard={true}
+  keyboard={false}
   manager={
     ModalManager {
       "add": [Function],
@@ -130,10 +148,11 @@ exports[`components/EditChannelHeaderModal error with intl message 1`] = `
   onEntering={[Function]}
   onExited={[Function]}
   onHide={[Function]}
+  onKeyDown={[Function]}
   renderBackdrop={[Function]}
   restoreFocus={true}
   role="dialog"
-  show={true}
+  show={false}
 >
   <ModalHeader
     bsClass="modal-header"
@@ -168,18 +187,33 @@ exports[`components/EditChannelHeaderModal error with intl message 1`] = `
           values={Object {}}
         />
       </p>
-      <Connect(Textbox)
-        characterLimit={1024}
-        createMessage="Edit the Channel Header..."
-        id="edit_textbox"
-        onChange={[Function]}
-        onKeyDown={[Function]}
-        onKeyPress={[Function]}
-        previewMessageLink="Edit Header"
-        suggestionListStyle="bottom"
-        supportsCommands={false}
-        value="Fake Channel"
-      />
+      <div
+        className="textarea-wrapper"
+      >
+        <Connect(Textbox)
+          characterLimit={1024}
+          createMessage="Edit the Channel Header..."
+          id="edit_textbox"
+          onChange={[Function]}
+          onKeyDown={[Function]}
+          onKeyPress={[Function]}
+          preview={false}
+          previewMessageLink="Edit Header"
+          suggestionListStyle="bottom"
+          supportsCommands={false}
+          value="Fake Channel"
+        />
+      </div>
+      <div
+        className="post-create-footer"
+      >
+        <Connect(TextboxLinks)
+          characterLimit={1024}
+          message="Fake Channel"
+          showPreview={false}
+          updatePreview={[Function]}
+        />
+      </div>
       <br />
       <div
         className="form-group has-error"
@@ -231,9 +265,10 @@ exports[`components/EditChannelHeaderModal error without intl message 1`] = `
   autoFocus={true}
   backdrop={true}
   bsClass="modal"
+  dialogClassName="a11y__modal"
   dialogComponentClass={[Function]}
   enforceFocus={true}
-  keyboard={true}
+  keyboard={false}
   manager={
     ModalManager {
       "add": [Function],
@@ -249,10 +284,11 @@ exports[`components/EditChannelHeaderModal error without intl message 1`] = `
   onEntering={[Function]}
   onExited={[Function]}
   onHide={[Function]}
+  onKeyDown={[Function]}
   renderBackdrop={[Function]}
   restoreFocus={true}
   role="dialog"
-  show={true}
+  show={false}
 >
   <ModalHeader
     bsClass="modal-header"
@@ -287,18 +323,33 @@ exports[`components/EditChannelHeaderModal error without intl message 1`] = `
           values={Object {}}
         />
       </p>
-      <Connect(Textbox)
-        characterLimit={1024}
-        createMessage="Edit the Channel Header..."
-        id="edit_textbox"
-        onChange={[Function]}
-        onKeyDown={[Function]}
-        onKeyPress={[Function]}
-        previewMessageLink="Edit Header"
-        suggestionListStyle="bottom"
-        supportsCommands={false}
-        value="Fake Channel"
-      />
+      <div
+        className="textarea-wrapper"
+      >
+        <Connect(Textbox)
+          characterLimit={1024}
+          createMessage="Edit the Channel Header..."
+          id="edit_textbox"
+          onChange={[Function]}
+          onKeyDown={[Function]}
+          onKeyPress={[Function]}
+          preview={false}
+          previewMessageLink="Edit Header"
+          suggestionListStyle="bottom"
+          supportsCommands={false}
+          value="Fake Channel"
+        />
+      </div>
+      <div
+        className="post-create-footer"
+      >
+        <Connect(TextboxLinks)
+          characterLimit={1024}
+          message="Fake Channel"
+          showPreview={false}
+          updatePreview={[Function]}
+        />
+      </div>
       <br />
       <div
         className="form-group has-error"
@@ -343,115 +394,6 @@ exports[`components/EditChannelHeaderModal error without intl message 1`] = `
 </Modal>
 `;
 
-exports[`components/EditChannelHeaderModal hide error message on new request 1`] = `
-<Modal
-  animation={true}
-  aria-labelledby="editChannelHeaderModalLabel"
-  autoFocus={true}
-  backdrop={true}
-  bsClass="modal"
-  dialogComponentClass={[Function]}
-  enforceFocus={true}
-  keyboard={true}
-  manager={
-    ModalManager {
-      "add": [Function],
-      "containers": Array [],
-      "data": Array [],
-      "handleContainerOverflow": true,
-      "hideSiblingNodes": true,
-      "isTopModal": [Function],
-      "modals": Array [],
-      "remove": [Function],
-    }
-  }
-  onEntering={[Function]}
-  onExited={[Function]}
-  onHide={[Function]}
-  renderBackdrop={[Function]}
-  restoreFocus={true}
-  role="dialog"
-  show={true}
->
-  <ModalHeader
-    bsClass="modal-header"
-    closeButton={true}
-    closeLabel="Close"
-  >
-    <ModalTitle
-      bsClass="modal-title"
-      componentClass="h1"
-      id="editChannelHeaderModalLabel"
-    >
-      <FormattedMessage
-        defaultMessage="Edit Header for {channel}"
-        id="edit_channel_header_modal.title"
-        values={
-          Object {
-            "channel": undefined,
-          }
-        }
-      />
-    </ModalTitle>
-  </ModalHeader>
-  <ModalBody
-    bsClass="modal-body edit-modal-body"
-    componentClass="div"
-  >
-    <div>
-      <p>
-        <FormattedMessage
-          defaultMessage="Edit the text appearing next to the channel name in the channel header."
-          id="edit_channel_header_modal.description"
-          values={Object {}}
-        />
-      </p>
-      <Connect(Textbox)
-        characterLimit={1024}
-        createMessage="Edit the Channel Header..."
-        id="edit_textbox"
-        onChange={[Function]}
-        onKeyDown={[Function]}
-        onKeyPress={[Function]}
-        previewMessageLink="Edit Header"
-        suggestionListStyle="bottom"
-        supportsCommands={false}
-        value="Fake Channel"
-      />
-      <br />
-    </div>
-  </ModalBody>
-  <ModalFooter
-    bsClass="modal-footer"
-    componentClass="div"
-  >
-    <button
-      className="btn btn-link cancel-button"
-      onClick={[Function]}
-      type="button"
-    >
-      <FormattedMessage
-        defaultMessage="Cancel"
-        id="edit_channel_header_modal.cancel"
-        values={Object {}}
-      />
-    </button>
-    <button
-      className="btn btn-primary save-button"
-      disabled={true}
-      onClick={[Function]}
-      type="button"
-    >
-      <FormattedMessage
-        defaultMessage="Save"
-        id="edit_channel_header_modal.save"
-        values={Object {}}
-      />
-    </button>
-  </ModalFooter>
-</Modal>
-`;
-
 exports[`components/EditChannelHeaderModal should match snapshot, init 1`] = `
 <Modal
   animation={true}
@@ -459,9 +401,10 @@ exports[`components/EditChannelHeaderModal should match snapshot, init 1`] = `
   autoFocus={true}
   backdrop={true}
   bsClass="modal"
+  dialogClassName="a11y__modal"
   dialogComponentClass={[Function]}
   enforceFocus={true}
-  keyboard={true}
+  keyboard={false}
   manager={
     ModalManager {
       "add": [Function],
@@ -477,10 +420,11 @@ exports[`components/EditChannelHeaderModal should match snapshot, init 1`] = `
   onEntering={[Function]}
   onExited={[Function]}
   onHide={[Function]}
+  onKeyDown={[Function]}
   renderBackdrop={[Function]}
   restoreFocus={true}
   role="dialog"
-  show={true}
+  show={false}
 >
   <ModalHeader
     bsClass="modal-header"
@@ -515,18 +459,33 @@ exports[`components/EditChannelHeaderModal should match snapshot, init 1`] = `
           values={Object {}}
         />
       </p>
-      <Connect(Textbox)
-        characterLimit={1024}
-        createMessage="Edit the Channel Header..."
-        id="edit_textbox"
-        onChange={[Function]}
-        onKeyDown={[Function]}
-        onKeyPress={[Function]}
-        previewMessageLink="Edit Header"
-        suggestionListStyle="bottom"
-        supportsCommands={false}
-        value="Fake Channel"
-      />
+      <div
+        className="textarea-wrapper"
+      >
+        <Connect(Textbox)
+          characterLimit={1024}
+          createMessage="Edit the Channel Header..."
+          id="edit_textbox"
+          onChange={[Function]}
+          onKeyDown={[Function]}
+          onKeyPress={[Function]}
+          preview={false}
+          previewMessageLink="Edit Header"
+          suggestionListStyle="bottom"
+          supportsCommands={false}
+          value="Fake Channel"
+        />
+      </div>
+      <div
+        className="post-create-footer"
+      >
+        <Connect(TextboxLinks)
+          characterLimit={1024}
+          message="Fake Channel"
+          showPreview={false}
+          updatePreview={[Function]}
+        />
+      </div>
       <br />
     </div>
   </ModalBody>
@@ -568,9 +527,10 @@ exports[`components/EditChannelHeaderModal submitted 1`] = `
   autoFocus={true}
   backdrop={true}
   bsClass="modal"
+  dialogClassName="a11y__modal"
   dialogComponentClass={[Function]}
   enforceFocus={true}
-  keyboard={true}
+  keyboard={false}
   manager={
     ModalManager {
       "add": [Function],
@@ -586,10 +546,11 @@ exports[`components/EditChannelHeaderModal submitted 1`] = `
   onEntering={[Function]}
   onExited={[Function]}
   onHide={[Function]}
+  onKeyDown={[Function]}
   renderBackdrop={[Function]}
   restoreFocus={true}
   role="dialog"
-  show={true}
+  show={false}
 >
   <ModalHeader
     bsClass="modal-header"
@@ -624,18 +585,33 @@ exports[`components/EditChannelHeaderModal submitted 1`] = `
           values={Object {}}
         />
       </p>
-      <Connect(Textbox)
-        characterLimit={1024}
-        createMessage="Edit the Channel Header..."
-        id="edit_textbox"
-        onChange={[Function]}
-        onKeyDown={[Function]}
-        onKeyPress={[Function]}
-        previewMessageLink="Edit Header"
-        suggestionListStyle="bottom"
-        supportsCommands={false}
-        value="Fake Channel"
-      />
+      <div
+        className="textarea-wrapper"
+      >
+        <Connect(Textbox)
+          characterLimit={1024}
+          createMessage="Edit the Channel Header..."
+          id="edit_textbox"
+          onChange={[Function]}
+          onKeyDown={[Function]}
+          onKeyPress={[Function]}
+          preview={false}
+          previewMessageLink="Edit Header"
+          suggestionListStyle="bottom"
+          supportsCommands={false}
+          value="Fake Channel"
+        />
+      </div>
+      <div
+        className="post-create-footer"
+      >
+        <Connect(TextboxLinks)
+          characterLimit={1024}
+          message="Fake Channel"
+          showPreview={false}
+          updatePreview={[Function]}
+        />
+      </div>
       <br />
     </div>
   </ModalBody>

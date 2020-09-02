@@ -19,8 +19,8 @@ describe('components/permissions_gates', () => {
             },
             teams: {
                 teams: {
-                    team_id: {id: 'team_id'},
-                    team_id2: {id: 'team_id2'},
+                    team_id: {id: 'team_id', delete_at: 0},
+                    team_id2: {id: 'team_id2', delete_at: 0},
                 },
                 myMembers: {
                     team_id: {team_id: 'team_id', roles: 'team_role'},
@@ -55,7 +55,7 @@ describe('components/permissions_gates', () => {
                     <AnyTeamPermissionGate permissions={['test_team_permission']}>
                         <p>{'Valid permission (shown)'}</p>
                     </AnyTeamPermissionGate>
-                </Provider>
+                </Provider>,
             );
 
             expect(wrapper).toMatchSnapshot();
@@ -66,7 +66,7 @@ describe('components/permissions_gates', () => {
                     <AnyTeamPermissionGate permissions={['other_permission']}>
                         <p>{'Valid permission (shown)'}</p>
                     </AnyTeamPermissionGate>
-                </Provider>
+                </Provider>,
             );
 
             expect(wrapper).toMatchSnapshot();
@@ -77,7 +77,7 @@ describe('components/permissions_gates', () => {
                     <AnyTeamPermissionGate permissions={['test_team_permission', 'not_existing_permission']}>
                         <p>{'Valid permission (shown)'}</p>
                     </AnyTeamPermissionGate>
-                </Provider>
+                </Provider>,
             );
 
             expect(wrapper).toMatchSnapshot();
@@ -91,7 +91,7 @@ describe('components/permissions_gates', () => {
                     >
                         <p>{'Valid permission but inverted (not shown)'}</p>
                     </AnyTeamPermissionGate>
-                </Provider>
+                </Provider>,
             );
 
             expect(wrapper).toMatchSnapshot();
@@ -105,7 +105,7 @@ describe('components/permissions_gates', () => {
                     >
                         <p>{'Invalid permission but inverted (shown)'}</p>
                     </AnyTeamPermissionGate>
-                </Provider>
+                </Provider>,
             );
 
             expect(wrapper).toMatchSnapshot();
@@ -119,7 +119,7 @@ describe('components/permissions_gates', () => {
                     >
                         <p>{'Valid permission but inverted (not shown)'}</p>
                     </AnyTeamPermissionGate>
-                </Provider>
+                </Provider>,
             );
 
             expect(wrapper).toMatchSnapshot();
@@ -132,7 +132,7 @@ describe('components/permissions_gates', () => {
                     >
                         <p>{'Invalid permission (not shown)'}</p>
                     </AnyTeamPermissionGate>
-                </Provider>
+                </Provider>,
             );
 
             expect(wrapper).toMatchSnapshot();
@@ -145,7 +145,7 @@ describe('components/permissions_gates', () => {
                     >
                         <p>{'Valid permission (shown)'}</p>
                     </AnyTeamPermissionGate>
-                </Provider>
+                </Provider>,
             );
 
             expect(wrapper).toMatchSnapshot();

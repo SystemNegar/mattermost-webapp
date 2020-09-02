@@ -60,6 +60,7 @@ export default class PostMessageView extends React.PureComponent {
          * Post type components from plugins
          */
         pluginPostTypes: PropTypes.object,
+        currentRelativeTeamUrl: PropTypes.string.isRequired,
     };
 
     static defaultProps = {
@@ -122,6 +123,8 @@ export default class PostMessageView extends React.PureComponent {
         );
     }
 
+    handleFormattedTextClick = (e) => Utils.handleFormattedTextClick(e, this.props.currentRelativeTeamUrl);
+
     render() {
         const {
             post,
@@ -162,15 +165,19 @@ export default class PostMessageView extends React.PureComponent {
             message = message.concat(visibleMessage);
         }
 
+        const id = isRHS ? `rhsPostMessageText_${post.id}` : `postMessageText_${post.id}`;
+
         return (
             <ShowMore
                 checkOverflow={this.state.checkOverflow}
                 text={message}
             >
                 <div
-                    id={`postMessageText_${post.id}`}
+                    aria-readonly='true'
+                    tabIndex='0'
+                    id={id}
                     className='post-message__text'
-                    onClick={Utils.handleFormattedTextClick}
+                    onClick={this.handleFormattedTextClick}
                 >
                     <PostMarkdown
                         message={message}

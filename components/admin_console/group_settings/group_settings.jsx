@@ -3,15 +3,20 @@
 
 import React from 'react';
 import {FormattedMessage} from 'react-intl';
+import PropTypes from 'prop-types';
 
 import {t} from 'utils/i18n';
 import GroupsList from 'components/admin_console/group_settings/groups_list';
-import AdminPanel from 'components/widgets/admin_console/admin_panel.jsx';
+import AdminPanel from 'components/widgets/admin_console/admin_panel';
 import FormattedMarkdownMessage from 'components/formatted_markdown_message.jsx';
 
-import {getSiteURL} from 'utils/url.jsx';
+import {getSiteURL} from 'utils/url';
 
 export default class GroupSettings extends React.PureComponent {
+    static propTypes = {
+        isDisabled: PropTypes.func,
+    }
+
     render = () => {
         const siteURL = getSiteURL();
         return (
@@ -39,10 +44,12 @@ export default class GroupSettings extends React.PureComponent {
                             titleId={t('admin.group_settings.ldapGroupsTitle')}
                             titleDefault='AD/LDAP Groups'
                             subtitleId={t('admin.group_settings.ldapGroupsDescription')}
-                            subtitleDefault={`Link and configure groups from your AD/LDAP to Mattermost. Please ensure you have configured a [group filter](${siteURL}/admin_console/authentication/ldap).`}
+                            subtitleDefault={`Connect AD/LDAP and create groups in Mattermost. To get started, configure group attributes on the [AD/LDAP] (${siteURL}/admin_console/authentication/ldap) configuration page.`}
                             subtitleValues={{siteURL}}
                         >
-                            <GroupsList/>
+                            <GroupsList
+                                readOnly={this.props.isDisabled}
+                            />
                         </AdminPanel>
                     </div>
                 </div>

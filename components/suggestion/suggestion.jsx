@@ -4,7 +4,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-export default class Suggestion extends React.Component {
+export default class Suggestion extends React.PureComponent {
     static get propTypes() {
         return {
             item: PropTypes.oneOfType([
@@ -15,23 +15,24 @@ export default class Suggestion extends React.Component {
             matchedPretext: PropTypes.string.isRequired,
             isSelection: PropTypes.bool,
             onClick: PropTypes.func,
+            onMouseMove: PropTypes.func,
         };
     }
 
     static baseProps = {
         role: 'button',
-        tabIndex: 0,
+        tabIndex: -1,
     };
 
-    constructor(props) {
-        super(props);
-
-        this.handleClick = this.handleClick.bind(this);
-    }
-
-    handleClick(e) {
+    handleClick = (e) => {
         e.preventDefault();
 
         this.props.onClick(this.props.term, this.props.matchedPretext);
+    }
+
+    handleMouseMove = (e) => {
+        e.preventDefault();
+
+        this.props.onMouseMove(this.props.term);
     }
 }

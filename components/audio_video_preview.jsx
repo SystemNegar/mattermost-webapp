@@ -1,12 +1,13 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+/* eslint-disable react/no-string-refs */
 
 import $ from 'jquery';
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import Constants from 'utils/constants.jsx';
+import Constants from 'utils/constants';
 import * as Utils from 'utils/utils.jsx';
 
 import FileInfoPreview from 'components/file_info_preview';
@@ -28,33 +29,30 @@ export default class AudioVideoPreview extends React.PureComponent {
     constructor(props) {
         super(props);
 
-        this.handleFileInfoChanged = this.handleFileInfoChanged.bind(this);
-        this.handleLoadError = this.handleLoadError.bind(this);
-
-        this.stop = this.stop.bind(this);
-
         this.state = {
             canPlay: true,
         };
     }
 
-    UNSAFE_componentWillMount() { // eslint-disable-line camelcase
-        this.handleFileInfoChanged(this.props.fileInfo);
-    }
-
     componentDidMount() {
+        this.handleFileInfoChanged(this.props.fileInfo);
+
         if (this.refs.source) {
             $(ReactDOM.findDOMNode(this.refs.source)).one('error', this.handleLoadError);
         }
     }
 
-    UNSAFE_componentWillReceiveProps(nextProps) { // eslint-disable-line camelcase
-        if (this.props.fileUrl !== nextProps.fileUrl) {
-            this.handleFileInfoChanged(nextProps.fileInfo);
+    componentDidUpdate(prevProps) {
+        if (this.props.fileUrl !== prevProps.fileUrl) {
+            this.handleFileInfoChanged(this.props.fileInfo);
+        }
+
+        if (this.refs.source) {
+            $(ReactDOM.findDOMNode(this.refs.source)).one('error', this.handleLoadError);
         }
     }
 
-    handleFileInfoChanged(fileInfo) {
+    handleFileInfoChanged = (fileInfo) => {
         let video = ReactDOM.findDOMNode(this.refs.video);
         if (!video) {
             video = document.createElement('video');
@@ -67,19 +65,13 @@ export default class AudioVideoPreview extends React.PureComponent {
         });
     }
 
-    componentDidUpdate() {
-        if (this.refs.source) {
-            $(ReactDOM.findDOMNode(this.refs.source)).one('error', this.handleLoadError);
-        }
-    }
-
-    handleLoadError() {
+    handleLoadError = () => {
         this.setState({
             canPlay: false,
         });
     }
 
-    stop() {
+    stop = () => {
         if (this.refs.video) {
             const video = ReactDOM.findDOMNode(this.refs.video);
             video.pause();
@@ -122,3 +114,4 @@ export default class AudioVideoPreview extends React.PureComponent {
         );
     }
 }
+/* eslint-enable react/no-string-refs */

@@ -18,7 +18,7 @@ exports[`components/dot_menu/DotMenu should match snapshot, canDelete 1`] = `
         placement="right"
       >
         <FormattedMessage
-          defaultMessage="More Actions"
+          defaultMessage="More actions"
           id="post_info.dot_menu.tooltip.more_actions"
           values={Object {}}
         />
@@ -35,10 +35,15 @@ exports[`components/dot_menu/DotMenu should match snapshot, canDelete 1`] = `
   >
     <button
       aria-expanded="false"
-      className="post__dropdown color--link style--none"
+      aria-label="more actions"
+      className="post-menu__item"
       id="CENTER_button_post_id_1"
       type="button"
-    />
+    >
+      <DotsHorizontalIcon
+        className="icon icon--small"
+      />
+    </button>
   </OverlayTrigger>
   <Menu
     ariaLabel="Post extra options"
@@ -46,6 +51,11 @@ exports[`components/dot_menu/DotMenu should match snapshot, canDelete 1`] = `
     openLeft={true}
     openUp={false}
   >
+    <MenuItemAction
+      onClick={[MockFunction]}
+      show={true}
+      text="Reply"
+    />
     <Connect(ChannelPermissionGate)
       permissions={
         Array [
@@ -60,24 +70,26 @@ exports[`components/dot_menu/DotMenu should match snapshot, canDelete 1`] = `
       />
     </Connect(ChannelPermissionGate)>
     <MenuItemAction
-      onClick={[Function]}
-      show={false}
-      text="Unflag"
-    />
-    <MenuItemAction
-      onClick={[Function]}
-      show={false}
-      text="Flag"
-    />
-    <MenuItemAction
-      onClick={[MockFunction]}
-      show={true}
-      text="Reply"
-    />
-    <MenuItemAction
+      id="unread_post_post_id_1"
       onClick={[Function]}
       show={true}
-      text="Permalink"
+      text="Mark as Unread"
+    />
+    <MenuItemAction
+      id="permalink_post_id_1"
+      onClick={[Function]}
+      show={true}
+      text="Copy Link"
+    />
+    <MenuItemAction
+      onClick={[Function]}
+      show={false}
+      text="Remove from Saved"
+    />
+    <MenuItemAction
+      onClick={[Function]}
+      show={false}
+      text="Save"
     />
     <MenuItemAction
       id="unpin_post_post_id_1"
@@ -91,17 +103,23 @@ exports[`components/dot_menu/DotMenu should match snapshot, canDelete 1`] = `
       show={true}
       text="Pin"
     />
-    <MenuItemAction
-      id="delete_post_post_id_1"
-      onClick={[Function]}
-      show={true}
-      text="Delete"
+    <li
+      className="MenuItem__divider"
+      id="divider_post_post_id_1_edit"
+      role="menuitem"
     />
     <MenuItemAction
       id="edit_post_post_id_1"
       onClick={[Function]}
       show={true}
       text="Edit"
+    />
+    <MenuItemAction
+      id="delete_post_post_id_1"
+      isDangerous={true}
+      onClick={[Function]}
+      show={true}
+      text="Delete"
     />
     <Connect(Pluggable)
       pluggableName="PostDropdownMenuItem"
@@ -129,7 +147,7 @@ exports[`components/dot_menu/DotMenu should match snapshot, on Center 1`] = `
         placement="right"
       >
         <FormattedMessage
-          defaultMessage="More Actions"
+          defaultMessage="More actions"
           id="post_info.dot_menu.tooltip.more_actions"
           values={Object {}}
         />
@@ -146,10 +164,15 @@ exports[`components/dot_menu/DotMenu should match snapshot, on Center 1`] = `
   >
     <button
       aria-expanded="false"
-      className="post__dropdown color--link style--none"
+      aria-label="more actions"
+      className="post-menu__item"
       id="CENTER_button_post_id_1"
       type="button"
-    />
+    >
+      <DotsHorizontalIcon
+        className="icon icon--small"
+      />
+    </button>
   </OverlayTrigger>
   <Menu
     ariaLabel="Post extra options"
@@ -157,6 +180,11 @@ exports[`components/dot_menu/DotMenu should match snapshot, on Center 1`] = `
     openLeft={true}
     openUp={false}
   >
+    <MenuItemAction
+      onClick={[MockFunction]}
+      show={true}
+      text="Reply"
+    />
     <Connect(ChannelPermissionGate)
       permissions={
         Array [
@@ -171,24 +199,26 @@ exports[`components/dot_menu/DotMenu should match snapshot, on Center 1`] = `
       />
     </Connect(ChannelPermissionGate)>
     <MenuItemAction
-      onClick={[Function]}
-      show={false}
-      text="Unflag"
-    />
-    <MenuItemAction
-      onClick={[Function]}
-      show={false}
-      text="Flag"
-    />
-    <MenuItemAction
-      onClick={[MockFunction]}
-      show={true}
-      text="Reply"
-    />
-    <MenuItemAction
+      id="unread_post_post_id_1"
       onClick={[Function]}
       show={true}
-      text="Permalink"
+      text="Mark as Unread"
+    />
+    <MenuItemAction
+      id="permalink_post_id_1"
+      onClick={[Function]}
+      show={true}
+      text="Copy Link"
+    />
+    <MenuItemAction
+      onClick={[Function]}
+      show={false}
+      text="Remove from Saved"
+    />
+    <MenuItemAction
+      onClick={[Function]}
+      show={false}
+      text="Save"
     />
     <MenuItemAction
       id="unpin_post_post_id_1"
@@ -202,17 +232,23 @@ exports[`components/dot_menu/DotMenu should match snapshot, on Center 1`] = `
       show={true}
       text="Pin"
     />
-    <MenuItemAction
-      id="delete_post_post_id_1"
-      onClick={[Function]}
-      show={false}
-      text="Delete"
+    <li
+      className="MenuItem__divider"
+      id="divider_post_post_id_1_edit"
+      role="menuitem"
     />
     <MenuItemAction
       id="edit_post_post_id_1"
       onClick={[Function]}
       show={true}
       text="Edit"
+    />
+    <MenuItemAction
+      id="delete_post_post_id_1"
+      isDangerous={true}
+      onClick={[Function]}
+      show={false}
+      text="Delete"
     />
     <Connect(Pluggable)
       pluggableName="PostDropdownMenuItem"
