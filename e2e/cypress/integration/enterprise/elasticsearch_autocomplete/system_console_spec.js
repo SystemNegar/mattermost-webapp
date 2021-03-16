@@ -1,4 +1,3 @@
-
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
@@ -8,13 +7,14 @@
 // - Use element ID when selecting an element. Create one if none.
 // ***************************************************************
 
+// Stage: @prod
 // Group: @enterprise @elasticsearch @autocomplete
 
 import * as TIMEOUTS from '../../../fixtures/timeouts';
 
 describe('Elasticsearch system console', () => {
     before(() => {
-        // * Check if server has license for Elasticsearch
+        // # Check if server has license for Elasticsearch
         cy.apiRequireLicenseForFeature('Elasticsearch');
 
         // # Enable Elasticsearch
@@ -35,7 +35,7 @@ describe('Elasticsearch system console', () => {
         cy.get('.alert-success').should('have.text', 'Test successful. Configuration saved.');
     });
 
-    it('can purge indexes', () => {
+    it('MM-T2519 can purge indexes', () => {
         cy.get('#purgeIndexesSection').within(() => {
             // # Click Purge Indexes button
             cy.contains('button', 'Purge Indexes').click();
@@ -45,27 +45,18 @@ describe('Elasticsearch system console', () => {
         });
     });
 
-    it('can perform bulk index', () => {
+    it('MM-T2520 Can perform a bulk index', () => {
         // # Click the Index Now button to start the index
         cy.contains('button', 'Index Now').click();
 
         // # Small wait to ensure new row is added
         cy.wait(TIMEOUTS.HALF_SEC);
 
-        // * First row should now say Pending
+        // # Get the first row
         cy.get('.job-table__table').
             find('tbody > tr').
             eq(0).
-            as('firstRow').
-            find('.status-icon-warning', {timeout: TIMEOUTS.HALF_MIN}).
-            should('be.visible').
-            and('have.text', 'Pending');
-
-        // * First row should update to say In Progress
-        cy.get('@firstRow').
-            find('.status-icon-warning', {timeout: TIMEOUTS.TWO_MIN}).
-            should('be.visible').
-            and('have.text', 'In Progress');
+            as('firstRow');
 
         // * First row update to say Success
         cy.waitUntil(() => {
@@ -85,12 +76,12 @@ describe('Elasticsearch system console', () => {
             and('have.text', 'Success');
     });
 
-    it('autocomplete queries can be disabled', () => {
+    it('MM-T2521 Elasticsearch for autocomplete queries can be disabled', () => {
         //  Check the false checkbox for enable autocomplete
         cy.get('#enableAutocompletefalse').check().should('be.checked');
 
         // # Save the settings
-        cy.get('#saveSetting').click();
+        cy.get('#saveSetting').click().wait(TIMEOUTS.TWO_SEC);
 
         // * Get config from API and verify that EnableAutocomplete setting is false
         cy.apiGetConfig().then(({config}) => {

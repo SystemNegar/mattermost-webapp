@@ -167,6 +167,7 @@ export default class PermissionSchemesSettings extends React.PureComponent {
                     {schemes.length > 0 && schemes}
                     {schemes.length === (PAGE_SIZE * (this.state.page + 1)) &&
                         <button
+                            type='button'
                             className='more-schemes theme style--none color--link'
                             onClick={this.loadMoreSchemes}
                             disabled={this.props.isDisabled || this.state.loadingMore}
@@ -215,6 +216,7 @@ export default class PermissionSchemesSettings extends React.PureComponent {
                         </div>
 
                         <AdminPanelWithLink
+                            id='systemScheme'
                             titleId={t('admin.permissions.systemSchemeBannerTitle')}
                             titleDefault='System Scheme'
                             subtitleId={t('admin.permissions.systemSchemeBannerText')}
@@ -255,6 +257,10 @@ t('admin.permissions.group.teams_team_scope.description');
 t('admin.permissions.group.teams_team_scope.name');
 t('admin.permissions.permission.assign_system_admin_role.description');
 t('admin.permissions.permission.assign_system_admin_role.name');
+t('admin.permissions.permission.convert_public_channel_to_private.description');
+t('admin.permissions.permission.convert_public_channel_to_private.name');
+t('admin.permissions.permission.convert_private_channel_to_public.description');
+t('admin.permissions.permission.convert_private_channel_to_public.name');
 t('admin.permissions.permission.create_direct_channel.description');
 t('admin.permissions.permission.create_direct_channel.name');
 t('admin.permissions.permission.create_group_channel.description');
@@ -319,6 +325,8 @@ t('admin.permissions.permission.manage_private_channel_properties.description');
 t('admin.permissions.permission.manage_private_channel_properties.name');
 t('admin.permissions.group.manage_public_channel_members_and_read_groups.description');
 t('admin.permissions.group.manage_public_channel_members_and_read_groups.name');
+t('admin.permissions.group.convert_public_channel_to_private.description');
+t('admin.permissions.group.convert_public_channel_to_private.name');
 t('admin.permissions.permission.manage_public_channel_properties.description');
 t('admin.permissions.permission.manage_public_channel_properties.name');
 t('admin.permissions.permission.manage_roles.description');
@@ -364,3 +372,9 @@ t('admin.permissions.roles.system_admin.name');
 t('admin.permissions.roles.system_user.name');
 t('admin.permissions.roles.team_admin.name');
 t('admin.permissions.roles.team_user.name');
+t('admin.permissions.group.manage_shared_channels.name');
+t('admin.permissions.group.manage_shared_channels.description');
+t('admin.permissions.permission.manage_shared_channels.name');
+t('admin.permissions.permission.manage_shared_channels.description');
+t('admin.permissions.permission.manage_remote_clusters.name');
+t('admin.permissions.permission.manage_remote_clusters.description');

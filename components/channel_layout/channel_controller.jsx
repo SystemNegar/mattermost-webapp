@@ -27,17 +27,17 @@ import * as UserAgent from 'utils/user_agent';
 import CenterChannel from 'components/channel_layout/center_channel';
 import LoadingScreen from 'components/loading_screen';
 import FaviconTitleHandler from 'components/favicon_title_handler';
+import ProductNoticesModal from 'components/product_notices_modal';
 
 export default class ChannelController extends React.Component {
     static propTypes = {
         pathName: PropTypes.string.isRequired,
-        teamType: PropTypes.string.isRequired,
         fetchingChannels: PropTypes.bool.isRequired,
         useLegacyLHS: PropTypes.bool.isRequired,
     };
 
     shouldComponentUpdate(nextProps) {
-        return this.props.teamType !== nextProps.teamType || this.props.pathName !== nextProps.pathName || this.props.fetchingChannels !== nextProps.fetchingChannels || this.props.useLegacyLHS !== nextProps.useLegacyLHS;
+        return this.props.pathName !== nextProps.pathName || this.props.fetchingChannels !== nextProps.fetchingChannels || this.props.useLegacyLHS !== nextProps.useLegacyLHS;
     }
 
     componentDidMount() {
@@ -74,10 +74,10 @@ export default class ChannelController extends React.Component {
                 <AnnouncementBarController/>
                 <SystemNotice/>
                 <FaviconTitleHandler/>
-
+                <ProductNoticesModal/>
                 <div className='container-fluid'>
                     <SidebarRight/>
-                    <SidebarRightMenu teamType={this.props.teamType}/>
+                    <SidebarRightMenu/>
                     <Route component={PreferredTeamSidebar}/>
                     <Route component={PreferredSidebar}/>
                     {!this.props.fetchingChannels && <Route component={CenterChannel}/>}

@@ -8,10 +8,13 @@ import UserLimitModal from './user_limit_modal';
 
 describe('component/UserLimitModal', () => {
     const requiredProps = {
+        userIsAdmin: false,
+        cloudUserLimit: '10',
         show: true,
         actions: {
-            closeModal: () => { }
-        }
+            closeModal: () => { },
+            openModal: jest.fn(),
+        },
     };
 
     test('should match snapshot without children', () => {

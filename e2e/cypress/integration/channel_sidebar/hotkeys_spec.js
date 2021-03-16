@@ -10,18 +10,10 @@
 // Stage: @prod
 // Group: @channel_sidebar
 
-import {testWithConfig} from '../../support/hooks';
-
 import {getRandomId} from '../../utils';
 import {getAdminAccount} from '../../support/env';
 
 describe('Channel switching', () => {
-    testWithConfig({
-        ServiceSettings: {
-            ExperimentalChannelSidebarOrganization: 'default_on',
-        },
-    });
-
     const sysadmin = getAdminAccount();
 
     before(() => {
@@ -40,6 +32,9 @@ describe('Channel switching', () => {
 
         // * Verify that we've switched to the new team
         cy.get('#headerTeamName').should('contain', teamName);
+
+        // # Post any message
+        cy.postMessage('hello');
 
         // # Press alt + up
         cy.get('body').type('{alt}', {release: false}).type('{uparrow}').type('{alt}', {release: true});
@@ -63,15 +58,18 @@ describe('Channel switching', () => {
 
         // # Create a new channel
         cy.getCurrentTeamId().then((teamId) => {
-            cy.apiCreateChannel(teamId, 'test-channel', 'Test Channel').then((response) => {
+            cy.apiCreateChannel(teamId, 'test-channel', 'Test Channel').then(({channel}) => {
                 // # Have another user post a message in the new channel
                 cy.reload();
-                cy.postMessageAs({sender: sysadmin, message: 'Test', channelId: response.body.id});
+                cy.postMessageAs({sender: sysadmin, message: 'Test', channelId: channel.id});
             });
         });
 
         // * Verify that we've switched to the new team
         cy.get('#headerTeamName').should('contain', teamName);
+
+        // # Post any message
+        cy.postMessage('hello');
 
         cy.getCurrentChannelId().as('townSquareId');
 

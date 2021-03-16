@@ -1,6 +1,5 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-/* eslint-disable react/no-string-refs */
 
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -27,6 +26,7 @@ import InfoSmallIcon from 'components/widgets/icons/info_small_icon';
 
 import UserProfile from 'components/user_profile';
 import PostPreHeader from 'components/post_view/post_pre_header';
+import CustomStatusEmoji from 'components/custom_status/custom_status_emoji';
 
 class RhsRootPost extends React.PureComponent {
     static propTypes = {
@@ -86,6 +86,7 @@ class RhsRootPost extends React.PureComponent {
         };
 
         this.postHeaderRef = React.createRef();
+        this.dotMenuRef = React.createRef();
     }
 
     handleShortcutReactToLastPost = (isLastPost) => {
@@ -133,7 +134,7 @@ class RhsRootPost extends React.PureComponent {
         const {shortcutReactToLastPostEmittedFrom, isLastPost} = this.props;
 
         const shortcutReactToLastPostEmittedFromRHS = prevProps.shortcutReactToLastPostEmittedFrom !== shortcutReactToLastPostEmittedFrom &&
-        shortcutReactToLastPostEmittedFrom === Locations.RHS_ROOT;
+            shortcutReactToLastPostEmittedFrom === Locations.RHS_ROOT;
         if (shortcutReactToLastPostEmittedFromRHS) {
             this.handleShortcutReactToLastPost(isLastPost);
         }
@@ -221,7 +222,7 @@ class RhsRootPost extends React.PureComponent {
     }
 
     getDotMenuRef = () => {
-        return this.refs.dotMenu;
+        return this.dotMenuRef.current;
     };
 
     render() {
@@ -342,7 +343,7 @@ class RhsRootPost extends React.PureComponent {
         if (!isPostDeleted && this.props.post.type !== Constants.PostTypes.FAKE_PARENT_DELETED) {
             dotMenuContainer = (
                 <div
-                    ref='dotMenu'
+                    ref={this.dotMenuRef}
                     className='col post-menu'
                 >
                     {dotMenu}
@@ -383,6 +384,21 @@ class RhsRootPost extends React.PureComponent {
             );
         }
 
+        let customStatus;
+        if (!isSystemMessage) {
+            customStatus = (
+                <CustomStatusEmoji
+                    userID={post.user_id}
+                    showTooltip={true}
+                    emojiSize={14}
+                    emojiStyle={{
+                        marginLeft: 4,
+                        marginTop: 1,
+                    }}
+                />
+            );
+        }
+
         return (
             <div
                 role='listitem'
@@ -420,6 +436,7 @@ class RhsRootPost extends React.PureComponent {
                             <div className='col__name'>
                                 {userProfile}
                                 {botIndicator}
+                                {customStatus}
                             </div>
                             <div className='col'>
                                 {this.renderPostTime(isEphemeral)}
@@ -454,4 +471,4 @@ class RhsRootPost extends React.PureComponent {
 }
 
 export default injectIntl(RhsRootPost);
-/* eslint-enable react/no-string-refs */
+

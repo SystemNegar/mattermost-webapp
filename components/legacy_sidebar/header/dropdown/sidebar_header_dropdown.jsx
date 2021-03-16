@@ -4,7 +4,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import * as GlobalActions from 'actions/global_actions.jsx';
+import * as GlobalActions from 'actions/global_actions';
 import {Constants, ModalIdentifiers} from 'utils/constants';
 import {cmdOrCtrlPressed, isKeyPressed} from 'utils/utils';
 
@@ -73,6 +73,7 @@ export default class SidebarHeaderDropdown extends React.PureComponent {
                     currentUser={this.props.currentUser}
                     teamDisplayName={this.props.teamDisplayName}
                     teamId={this.props.teamId}
+                    openModal={this.props.actions.openModal}
                 />
                 <MainMenu id='sidebarDropdownMenu'/>
             </MenuWrapper>

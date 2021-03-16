@@ -1,8 +1,8 @@
-
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
 import * as TIMEOUTS from '../fixtures/timeouts';
+import {isMac} from '../utils';
 
 // ***********************************************************
 // Read more: https://on.cypress.io/custom-commands
@@ -60,6 +60,14 @@ Cypress.Commands.add('uiChangeMessageDisplaySetting', (setting = 'STANDARD') => 
 
 // Type Cmd or Ctrl depending on OS
 Cypress.Commands.add('typeCmdOrCtrl', () => {
+    typeCmdOrCtrlInt('#post_textbox');
+});
+
+Cypress.Commands.add('typeCmdOrCtrlForEdit', () => {
+    typeCmdOrCtrlInt('#edit_textbox');
+});
+
+function typeCmdOrCtrlInt(textboxSelector) {
     let cmdOrCtrl;
     if (isMac()) {
         cmdOrCtrl = '{cmd}';
@@ -67,17 +75,13 @@ Cypress.Commands.add('typeCmdOrCtrl', () => {
         cmdOrCtrl = '{ctrl}';
     }
 
-    cy.get('#post_textbox').type(cmdOrCtrl, {release: false});
-});
+    cy.get(textboxSelector).type(cmdOrCtrl, {release: false});
+}
 
 Cypress.Commands.add('cmdOrCtrlShortcut', {prevSubject: true}, (subject, text) => {
     const cmdOrCtrl = isMac() ? '{cmd}' : '{ctrl}';
     return cy.get(subject).type(`${cmdOrCtrl}${text}`);
 });
-
-function isMac() {
-    return navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-}
 
 // ***********************************************************
 // Post
@@ -91,8 +95,28 @@ Cypress.Commands.add('postMessageReplyInRHS', (message) => {
     postMessageAndWait('#reply_textbox', message);
 });
 
+Cypress.Commands.add('uiPostMessageQuickly', (message) => {
+    cy.get('#post_textbox', {timeout: TIMEOUTS.HALF_MIN}).should('be.visible').clear().
+        invoke('val', message).wait(TIMEOUTS.HALF_SEC).type(' {backspace}{enter}');
+    cy.waitUntil(() => {
+        return cy.get('#post_textbox').then((el) => {
+            return el[0].textContent === '';
+        });
+    });
+});
+
 function postMessageAndWait(textboxSelector, message) {
-    cy.get(textboxSelector, {timeout: TIMEOUTS.HALF_MIN}).should('be.visible').clear().type(`${message}{enter}`).wait(TIMEOUTS.HALF_SEC);
+    // Add explicit wait to let the page load freely since `cy.get` seemed to block
+    // some operation which caused to prolong complete page loading.
+    cy.wait(TIMEOUTS.HALF_SEC);
+
+    cy.get(textboxSelector, {timeout: TIMEOUTS.HALF_MIN}).as('textboxSelector');
+    cy.get('@textboxSelector').should('be.visible').clear().type(`${message}{enter}`).wait(TIMEOUTS.HALF_SEC);
+    cy.get('@textboxSelector').invoke('val').then((value) => {
+        if (value.length > 0) {
+            cy.get('@textboxSelector').type('{enter}').wait(TIMEOUTS.HALF_SEC);
+        }
+    });
     cy.waitUntil(() => {
         return cy.get(textboxSelector).then((el) => {
             return el[0].textContent === '';
@@ -101,7 +125,10 @@ function postMessageAndWait(textboxSelector, message) {
 }
 
 function waitUntilPermanentPost() {
-    cy.get('#postListContent', {timeout: TIMEOUTS.HALF_MIN}).should('be.visible');
+    // Add explicit wait to let the page load freely since `cy.get` seemed to block
+    // some operation which caused to prolong complete page loading.
+    cy.wait(TIMEOUTS.HALF_SEC);
+    cy.get('#postListContent', {timeout: TIMEOUTS.ONE_MIN}).should('be.visible');
     cy.waitUntil(() => cy.findAllByTestId('postView').last().then((el) => !(el[0].id.includes(':'))));
 }
 
@@ -195,16 +222,113 @@ Cypress.Commands.add('compareLastPostHTMLContentFromFile', (file, timeout = TIME
 });
 
 // ***********************************************************
+// DM
+// ***********************************************************
+
+/**
+ * Sends a DM to a given user
+ * @param {User} user - the user that should get the message
+ * @param {String} message - the message to send
+ */
+Cypress.Commands.add('sendDirectMessageToUser', (user, message) => {
+    // # Open a new direct message with firstDMUser
+    cy.uiAddDirectMessage().click();
+
+    // # Type username
+    cy.get('#selectItems input').should('be.enabled').type(`@${user.username}`, {force: true});
+
+    // * Expect user count in the list to be 1
+    cy.get('#multiSelectList').
+        should('be.visible').
+        children().
+        should('have.length', 1);
+
+    // # Select first user in the list
+    cy.get('body').
+        type('{downArrow}').
+        type('{enter}');
+
+    // # Click on "Go" in the group message's dialog to begin the conversation
+    cy.get('#saveItems').click();
+
+    // * Expect the channel title to be the user's username
+    // In the channel header, it seems there is a space after the username, justifying the use of contains.text instead of have.text
+    cy.get('#channelHeaderTitle').should('be.visible').and('contain.text', user.username);
+
+    // # Type message and send it to the user
+    cy.get('#post_textbox').
+        type(message).
+        type('{enter}');
+});
+
+/**
+ * Sends a GM to a given user list
+ * @param {User[]} users - the users that should get the message
+ * @param {String} message - the message to send
+ */
+Cypress.Commands.add('sendDirectMessageToUsers', (users, message) => {
+    // # Open a new direct message
+    cy.uiAddDirectMessage().click();
+
+    users.forEach((user) => {
+        // # Type username
+        cy.get('#selectItems input').should('be.enabled').type(`@${user.username}`, {force: true});
+
+        // * Expect user count in the list to be 1
+        cy.get('#multiSelectList').
+            should('be.visible').
+            children().
+            should('have.length', 1);
+
+        // # Select first user in the list
+        cy.get('body').
+            type('{downArrow}').
+            type('{enter}');
+    });
+
+    // # Click on "Go" in the group message's dialog to begin the conversation
+    cy.get('#saveItems').click();
+
+    // * Expect the channel title to be the user's username
+    // In the channel header, it seems there is a space after the username, justifying the use of contains.text instead of have.text
+    users.forEach((user) => {
+        cy.get('#channelHeaderTitle').should('be.visible').and('contain.text', user.username);
+    });
+
+    // # Type message and send it to the user
+    cy.get('#post_textbox').
+        type(message).
+        type('{enter}');
+});
+
+// ***********************************************************
 // Post header
 // ***********************************************************
 
 function clickPostHeaderItem(postId, location, item) {
+    let idPrefix;
+    switch (location) {
+    case 'CENTER':
+        idPrefix = 'post';
+        break;
+    case 'RHS_ROOT':
+    case 'RHS_COMMENT':
+        idPrefix = 'rhsPost';
+        break;
+    case 'SEARCH':
+        idPrefix = 'searchResult';
+        break;
+
+    default:
+        idPrefix = 'post';
+    }
+
     if (postId) {
-        cy.get(`#post_${postId}`).trigger('mouseover', {force: true});
+        cy.get(`#${idPrefix}_${postId}`).trigger('mouseover', {force: true});
         cy.wait(TIMEOUTS.HALF_SEC).get(`#${location}_${item}_${postId}`).click({force: true});
     } else {
         cy.getLastPostId().then((lastPostId) => {
-            cy.get(`#post_${lastPostId}`).trigger('mouseover', {force: true});
+            cy.get(`#${idPrefix}_${lastPostId}`).trigger('mouseover', {force: true});
             cy.wait(TIMEOUTS.HALF_SEC).get(`#${location}_${item}_${lastPostId}`).click({force: true});
         });
     }
@@ -220,11 +344,11 @@ Cypress.Commands.add('clickPostTime', (postId, location = 'CENTER') => {
 });
 
 /**
- * Click flag icon by post ID or to most recent post (if post ID is not provided)
+ * Click save icon by post ID or to most recent post (if post ID is not provided)
  * @param {String} postId - Post ID
  * @param {String} location - as 'CENTER', 'RHS_ROOT', 'RHS_COMMENT', 'SEARCH'
  */
-Cypress.Commands.add('clickPostFlagIcon', (postId, location = 'CENTER') => {
+Cypress.Commands.add('clickPostSaveIcon', (postId, location = 'CENTER') => {
     clickPostHeaderItem(postId, location, 'flagIcon');
 });
 
@@ -256,23 +380,6 @@ Cypress.Commands.add('clickPostCommentIcon', (postId, location = 'CENTER') => {
     clickPostHeaderItem(postId, location, 'commentIcon');
 });
 
-/**
- * Click comment icon by post ID or to most recent post (if post ID is not provided)
- * This open up the RHS
- * @param {String} postId - Post ID
- * @param {String} menuItem - e.g. "Pin to channel"
- * @param {String} location - as 'CENTER', 'SEARCH'
- */
-Cypress.Commands.add('getPostMenu', (postId, menuItem, location = 'CENTER') => {
-    cy.clickPostDotMenu(postId, location).then(() => {
-        cy.get(`#post_${postId}`).should('be.visible').within(() => {
-            cy.get('.dropdown-menu').should('be.visible').within(() => {
-                return cy.findByText(menuItem).scrollIntoView().should('be.visible');
-            });
-        });
-    });
-});
-
 // Close RHS by clicking close button
 Cypress.Commands.add('closeRHS', () => {
     cy.get('#rhsCloseButton').should('be.visible').click();
@@ -291,6 +398,20 @@ Cypress.Commands.add('createNewTeam', (teamName, teamURL) => {
 
 Cypress.Commands.add('getCurrentTeamId', () => {
     return cy.get('#headerTeamName').invoke('attr', 'data-teamid');
+});
+
+Cypress.Commands.add('getCurrentTeamURL', (siteURL) => {
+    let path;
+
+    // siteURL can be provided for cases where subpath is being tested
+    if (siteURL) {
+        path = window.location.href.substring(siteURL.length);
+    } else {
+        path = window.location.pathname;
+    }
+
+    const result = path.split('/', 2);
+    return `/${(result[0] ? result[0] : result[1])}`; // sometimes the first element is emply if path starts with '/'
 });
 
 Cypress.Commands.add('leaveTeam', () => {
@@ -390,6 +511,15 @@ Cypress.Commands.add('updateChannelHeader', (text) => {
         type(text).
         type('{enter}').
         wait(TIMEOUTS.HALF_SEC);
+});
+
+/**
+ * Archive the current channel.
+ */
+Cypress.Commands.add('uiArchiveChannel', () => {
+    cy.get('#channelHeaderDropdownIcon').click();
+    cy.get('#channelArchiveChannel').click();
+    cy.get('#deleteChannelModalDeleteButton').click();
 });
 
 /**

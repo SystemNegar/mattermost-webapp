@@ -28,7 +28,7 @@ type Props = {
     sendEmailNotifications: boolean;
     enableEmailBatching: boolean;
     actions: {
-        savePreferences: (currentUserId: string, emailIntervalPreference: Array<PreferenceType>) =>
+        savePreferences: (currentUserId: string, emailIntervalPreference: PreferenceType[]) =>
         Promise<{data: boolean}>;
     };
 };
@@ -109,7 +109,7 @@ export default class EmailNotificationSetting extends React.PureComponent<Props,
 
         this.setState({
             enableEmail,
-            newInterval
+            newInterval,
         });
 
         this.props.onChange(enableEmail);

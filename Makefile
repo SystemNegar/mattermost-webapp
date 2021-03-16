@@ -4,6 +4,7 @@ BUILD_SERVER_DIR = ../mattermost-server
 BUILD_WEBAPP_DIR = ../mattermost-webapp
 MM_UTILITIES_DIR = ../mattermost-utilities
 EMOJI_TOOLS_DIR = ./build/emoji
+export NODE_OPTIONS=--max-old-space-size=4096
 
 build-storybook: node_modules ## Build the storybook
 	@echo Building storybook
@@ -91,10 +92,7 @@ stop: ## Stops webpack
 ifeq ($(OS),Windows_NT)
 	wmic process where "Caption='node.exe' and CommandLine like '%webpack%'" call terminate
 else
-	@for PROCID in $$(ps -ef | grep "[n]ode.*[w]ebpack" | awk '{ print $$2 }'); do \
-		echo stopping webpack watch $$PROCID; \
-		kill $$PROCID; \
-	done
+	@pkill -f webpack || true
 endif
 
 restart: | stop run ## Restarts the app

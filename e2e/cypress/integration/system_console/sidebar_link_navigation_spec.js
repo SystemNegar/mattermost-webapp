@@ -12,7 +12,7 @@
 
 import * as TIMEOUTS from '../../fixtures/timeouts';
 
-describe('System Console', () => {
+describe('System Console - Non-Enterprise', () => {
     const testCases = [
         {
             header: 'Edition and License',
@@ -41,26 +41,6 @@ describe('System Console', () => {
             url: 'admin_console/user_management/users',
         },
         {
-            header: 'Web Server',
-            sidebar: 'Web Server',
-            url: 'admin_console/environment/web_server',
-        },
-        {
-            header: 'Database',
-            sidebar: 'Database',
-            url: 'admin_console/environment/database',
-        },
-        {
-            header: 'File Storage',
-            sidebar: 'File Storage',
-            url: 'admin_console/environment/file_storage',
-        },
-        {
-            header: 'Image Proxy',
-            sidebar: 'Image Proxy',
-            url: 'admin_console/environment/image_proxy',
-        },
-        {
             header: 'SMTP',
             sidebar: 'SMTP',
             url: 'admin_console/environment/smtp',
@@ -79,6 +59,11 @@ describe('System Console', () => {
             header: 'Logging',
             sidebar: 'Logging',
             url: 'admin_console/environment/logging',
+        },
+        {
+            header: 'Performance Monitoring',
+            sidebar: 'Performance Monitoring',
+            url: 'admin_console/environment/performance_monitoring',
         },
         {
             header: 'Session Lengths',
@@ -183,9 +168,6 @@ describe('System Console', () => {
     ];
 
     before(() => {
-        // * Check if server has license
-        cy.apiRequireLicense();
-
         const newSettings = {
             TeamSettings: {SiteName: 'Mattermost'},
         };
@@ -215,13 +197,13 @@ describe('System Console', () => {
     testCases.forEach((testCase) => {
         it(`can navigate to ${testCase.header}`, () => {
             // # Click the link on the sidebar
-            cy.get('.admin-sidebar').should('be.visible').within(() => {
+            cy.get('.admin-sidebar', {timeout: TIMEOUTS.ONE_MIN}).should('be.visible').within(() => {
                 cy.findByText(testCase.sidebar).scrollIntoView().should('be.visible').click();
             });
 
             // * Verify that it redirects to the URL and matches with the header
             cy.url().should('include', testCase.url);
-            cy.get('.admin-console').should('be.visible').within(() => {
+            cy.get('.admin-console', {timeout: TIMEOUTS.ONE_MIN}).should('be.visible').within(() => {
                 cy.get('.admin-console__header').should('be.visible').and(testCase.headerContains ? 'contain' : 'have.text', testCase.header);
             });
         });
@@ -232,7 +214,7 @@ describe('System Console', () => {
         cy.visit('/');
 
         // # Click on "Main Menu"
-        cy.get('#sidebarHeaderDropdownButton').should('be.visible').click();
+        cy.get('#sidebarHeaderDropdownButton', {timeout: TIMEOUTS.ONE_MIN}).should('be.visible').click();
 
         // # Click on "System Console"
         cy.get('.Menu__content').should('be.visible').within(() => {
@@ -241,7 +223,7 @@ describe('System Console', () => {
 
         // * Verify that it redirects to "Edition and License" system console page
         cy.url().should('include', '/admin_console/about/license');
-        cy.get('.admin-console').should('be.visible').within(() => {
+        cy.get('.admin-console', {timeout: TIMEOUTS.ONE_MIN}).should('be.visible').within(() => {
             cy.get('.admin-console__header').should('be.visible').and('have.text', 'Edition and License');
         });
     });

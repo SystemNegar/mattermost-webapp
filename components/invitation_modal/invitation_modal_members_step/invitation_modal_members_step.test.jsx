@@ -19,12 +19,13 @@ describe('components/invitation_modal/InvitationModalMembersStep', () => {
         userIsAdmin: true,
         userLimit: '0',
         currentUsers: 4,
-        isCloud: 'false',
-        analytics: {
-            TOTAL_USERS: 10,
+        isCloud: false,
+        subscriptionStats: {
+            remaining_seats: 6,
+            is_paid_tier: 'false',
         },
         actions: {
-            getStandardAnalytics: () => { },
+            getSubscriptionStats: () => {},
         },
     };
 

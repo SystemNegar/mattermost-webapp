@@ -143,8 +143,8 @@ describe('Image attachment', () => {
 
                 cy.get('@div').find('img').
                     and((img) => {
-                        expect(img.height()).to.be.closeTo(155, 2.0);
-                        expect(img.width()).to.be.closeTo(978, 2.0);
+                        expect(img.height()).to.be.closeTo(151, 2.0);
+                        expect(img.width()).to.be.closeTo(958, 2.0);
                     });
             });
         });
@@ -168,14 +168,14 @@ describe('Image attachment', () => {
 
                 cy.get('@div').find('img').
                     and((img) => {
-                        expect(img.height()).to.be.closeTo(155, 2.0);
-                        expect(img.width()).to.be.closeTo(978, 2.0);
+                        expect(img.height()).to.be.closeTo(151, 2.0);
+                        expect(img.width()).to.be.closeTo(958, 2.0);
                     }).
                     click();
             });
 
             // * Verify that the preview modal opens
-            cy.get('div.modal-image__content').should('be.visible');
+            cy.get('div.modal-image__content').should('be.visible').trigger('mouseover');
 
             // # Close the modal
             cy.get('div.modal-close').should('exist').click({force: true});

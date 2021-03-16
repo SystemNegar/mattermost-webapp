@@ -79,6 +79,14 @@ export default class PermissionsTree extends React.PureComponent {
                         ],
                     },
                     Permissions.DELETE_PUBLIC_CHANNEL,
+                    {
+                        id: 'convert_public_channel_to_private',
+                        combined: true,
+                        permissions: [
+                            Permissions.CONVERT_PUBLIC_CHANNEL_TO_PRIVATE,
+                            Permissions.CONVERT_PRIVATE_CHANNEL_TO_PUBLIC,
+                        ],
+                    },
                 ],
             },
             {
@@ -130,14 +138,20 @@ export default class PermissionsTree extends React.PureComponent {
                 permissions: [
                 ],
             },
+            {
+                id: 'manage_shared_channels',
+                permissions: [
+                ],
+            },
         ];
         this.updateGroups();
     }
 
     updateGroups = () => {
         const {config, scope, license} = this.props;
-        const integrationsGroup = this.groups[this.groups.length - 1];
-        const postsGroup = this.groups[this.groups.length - 2];
+        const sharedChannelsGroup = this.groups[this.groups.length - 1];
+        const integrationsGroup = this.groups[this.groups.length - 2];
+        const postsGroup = this.groups[this.groups.length - 3];
         const teamsGroup = this.groups[0];
         if (config.EnableIncomingWebhooks === 'true' && !integrationsGroup.permissions.includes(Permissions.MANAGE_INCOMING_WEBHOOKS)) {
             integrationsGroup.permissions.push(Permissions.MANAGE_INCOMING_WEBHOOKS);
@@ -170,6 +184,11 @@ export default class PermissionsTree extends React.PureComponent {
             postsGroup.permissions.push(Permissions.USE_GROUP_MENTIONS);
         }
         postsGroup.permissions.push(Permissions.CREATE_POST);
+
+        if (config.ExperimentalSharedChannels === 'true') {
+            sharedChannelsGroup.permissions.push(Permissions.MANAGE_SHARED_CHANNELS);
+            sharedChannelsGroup.permissions.push(Permissions.MANAGE_REMOTE_CLUSTERS);
+        }
     }
 
     openPostTimeLimitModal = () => {

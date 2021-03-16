@@ -152,9 +152,13 @@ class Post extends React.PureComponent {
         clearTimeout(this.highlightTimeout);
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps) {
         if (this.state.a11yActive) {
             this.postRef.current.dispatchEvent(new Event(A11yCustomEventTypes.UPDATE));
+        }
+        if (this.props.post.state === Posts.POST_DELETED && prevProps.post.state !== Posts.POST_DELETED) {
+            // ensure deleted message content does not remain in stale aria-label
+            this.updateAriaLabel();
         }
     }
 
@@ -229,10 +233,14 @@ class Post extends React.PureComponent {
         }
 
         let rootUser = '';
-        if (this.hasSameRoot(this.props) && !fromBot) {
+        if (this.hasSameRoot(this.props)) {
             rootUser = 'same--root';
         } else {
             rootUser = 'other--root';
+        }
+
+        if (fromBot) {
+            className += ' post--bot';
         }
 
         let currentUserCss = '';
@@ -315,6 +323,10 @@ class Post extends React.PureComponent {
     }
 
     handlePostFocus = () => {
+        this.updateAriaLabel();
+    }
+
+    updateAriaLabel = () => {
         this.setState({currentAriaLabel: this.props.createAriaLabel(this.props.intl)});
     }
 

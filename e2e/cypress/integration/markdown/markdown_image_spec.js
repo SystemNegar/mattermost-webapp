@@ -85,14 +85,14 @@ describe('Markdown', () => {
             cy.get(`#postMessageText_${postId}`).should('be.visible').within(() => {
                 cy.get('.markdown-inline-img').should('be.visible').
                     and((inlineImg) => {
-                        expect(inlineImg.height()).to.be.closeTo(153, 2);
-                        expect(inlineImg.width()).to.be.closeTo(971, 2);
+                        expect(inlineImg.height()).to.be.closeTo(151, 2);
+                        expect(inlineImg.width()).to.be.closeTo(951, 2);
                     }).
                     click();
             });
 
             // * Verify that the preview modal opens
-            cy.get('div.modal-image__content').should('be.visible');
+            cy.get('div.modal-image__content').should('be.visible').trigger('mouseover');
 
             // # Close the modal
             cy.get('div.modal-close').should('exist').click({force: true});
@@ -115,7 +115,7 @@ describe('Markdown', () => {
             });
 
             // * Verify that the preview modal opens
-            cy.get('div.file-details__container').should('be.visible');
+            cy.get('div.file-details__container').should('be.visible').trigger('mouseover');
 
             // # Close the modal
             cy.get('div.modal-close').should('exist').click({force: true});

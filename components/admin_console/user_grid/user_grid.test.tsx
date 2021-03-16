@@ -48,7 +48,7 @@ describe('components/admin_console/user_grid/UserGrid', () => {
         scope,
 
         loadPage: jest.fn(),
-        search: jest.fn(),
+        onSearch: jest.fn(),
         removeUser: jest.fn(),
         updateMembership: jest.fn(),
 
@@ -60,7 +60,7 @@ describe('components/admin_console/user_grid/UserGrid', () => {
             options: {},
             keys: [],
             onFilter: jest.fn(),
-        }
+        },
     };
 
     test('should match snapshot with 2 users', () => {

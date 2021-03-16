@@ -46,16 +46,19 @@ exports[`component/UserLimitModal should match snapshot without children 1`] = `
         <FormattedMessage
           defaultMessage="You've reached the user limit\\""
           id="upgrade.cloud_modal_title"
-          values={Object {}}
         />
       </div>
       <div
         className="description"
       >
         <FormattedMessage
-          defaultMessage="The free tier is limited to 10 users. Upgrade Mattermost Cloud for more users."
+          defaultMessage="The free tier is limited to {num} users. Upgrade Mattermost Cloud for more users."
           id="upgrade.cloud_modal_body"
-          values={Object {}}
+          values={
+            Object {
+              "num": "10",
+            }
+          }
         />
       </div>
       <div
@@ -73,24 +76,11 @@ exports[`component/UserLimitModal should match snapshot without children 1`] = `
           <FormattedMessage
             defaultMessage="Not right now"
             id="cloud.upgrade.notrightnow"
-            values={Object {}}
           />
         </Button>
-        <Button
-          active={false}
-          block={false}
-          bsClass="btn"
-          bsStyle="default"
+        <NotifyLink
           className="confirm-button"
-          disabled={false}
-          onClick={[Function]}
-        >
-          <FormattedMessage
-            defaultMessage="Upgrade Mattermost Cloud"
-            id="upgrade.cloud"
-            values={Object {}}
-          />
-        </Button>
+        />
       </div>
     </ModalBody>
   </Modal>

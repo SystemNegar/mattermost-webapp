@@ -9,7 +9,9 @@
 
 // Group: @mark_as_unread
 
-import {markAsUnreadByPostIdFromMenu, verifyPostNextToNewMessageSeparator} from './helpers';
+import * as TIMEOUTS from '../../fixtures/timeouts';
+
+import {verifyPostNextToNewMessageSeparator} from './helpers';
 
 describe('Mark as Unread', () => {
     let testUser;
@@ -45,9 +47,7 @@ describe('Mark as Unread', () => {
         const userGroupIds = [testUser.id, otherUser1.id, otherUser2.id];
 
         // # Create a group channel for 3 users
-        cy.apiCreateGroupChannel(userGroupIds).then((response) => {
-            const gmChannel = response.body;
-
+        cy.apiCreateGroupChannel(userGroupIds).then(({channel: gmChannel}) => {
             // # Visit the channel using the name using the channels route
             for (let index = 0; index < 8; index++) {
                 // # Post Message as otherUser1
@@ -62,7 +62,7 @@ describe('Mark as Unread', () => {
 
             // # Mark the post to be unread
             cy.getNthPostId(-2).then((postId) => {
-                markAsUnreadByPostIdFromMenu(postId);
+                cy.uiClickPostDropdownMenu(postId, 'Mark as Unread');
             });
 
             // * Verify the notification separator line exists and present before the unread message
@@ -78,7 +78,7 @@ describe('Mark as Unread', () => {
             cy.get(`#sidebarItem_${gmChannel.name}`).should('have.class', 'unread-title');
 
             // # Go to the group message channel
-            cy.get(`#sidebarItem_${gmChannel.name}`).click();
+            cy.get(`#sidebarItem_${gmChannel.name}`).click().wait(TIMEOUTS.ONE_SEC);
 
             // * Verify the group message in LHS is read
             cy.get(`#sidebarItem_${gmChannel.name}`).should('exist').should('not.have.class', 'unread-title');

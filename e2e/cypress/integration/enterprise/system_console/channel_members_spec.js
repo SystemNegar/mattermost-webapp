@@ -7,6 +7,9 @@
 // - Use element ID when selecting an element. Create one if none.
 // ***************************************************************
 
+// Stage: @prod
+// Group: @enterprise
+
 import * as TIMEOUTS from '../../../fixtures/timeouts';
 
 describe('Channel members test', () => {
@@ -46,10 +49,13 @@ describe('Channel members test', () => {
         cy.get('#channelMembers').scrollIntoView().should('be.visible');
 
         // # Click the sync group members switch
-        cy.findByTestId('syncGroupSwitch').scrollIntoView().click();
+        cy.findByTestId('syncGroupSwitch').
+            scrollIntoView().
+            findByRole('button').
+            click({force: true});
 
         // * Assert that the members block is no longer visible
-        cy.get('#channelMembers').should('not.be.visible');
+        cy.get('#channelMembers').should('not.exist');
     });
 
     it('MM-23938 - Channel Members block can search for users, remove users, add users and modify their roles', () => {
@@ -169,14 +175,14 @@ describe('Channel members test', () => {
         });
 
         // * Assert user1 is now back to being a regular member
-        cy.get('#channelMembers .DataGrid_rows').children(0).should('contain', user1.email).and('not.contain', 'New').and('contain', 'Channel Member');
+        cy.get('#channelMembers .DataGrid_rows').children(0).should('contain', user1.email).and('not.contain', 'New').and('contain', 'Member');
 
         // # Search user2 that we know is now in the team again
         searchFor(user2.email);
         cy.get('#channelMembers .DataGrid_loading').should('not.be.visible');
 
         // * Assert user2 is now saved as a regular member
-        cy.get('#channelMembers .DataGrid_rows').children(0).should('contain', user2.email).and('not.contain', 'New').and('contain', 'Channel Member');
+        cy.get('#channelMembers .DataGrid_rows').children(0).should('contain', user2.email).and('not.contain', 'New').and('contain', 'Member');
 
         // # Attempt to save
         saveConfig();

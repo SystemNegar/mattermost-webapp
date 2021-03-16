@@ -3,9 +3,9 @@
 
 import React from 'react';
 import {Modal} from 'react-bootstrap';
-import {FormattedMessage} from 'react-intl';
+import {FormattedMessage, WrappedComponentProps, injectIntl} from 'react-intl';
 
-import {setThemeDefaults} from 'mattermost-redux/utils/theme_utils';
+import {blendColors, setThemeDefaults} from 'mattermost-redux/utils/theme_utils';
 import {Theme} from 'mattermost-redux/types/preferences';
 
 import ModalStore from 'stores/modal_store.jsx';
@@ -15,18 +15,18 @@ const ActionTypes = Constants.ActionTypes;
 
 type State = {
     value: string;
-    inputError: any;
+    inputError: React.ReactNode | null;
     show: boolean;
-    callback: ((args: {}) => void) | null;
+    callback: ((args: Theme) => void) | null;
 }
 
-export default class ImportThemeModal extends React.PureComponent<{}, State> {
-    public constructor(props: {}) {
+class ImportThemeModal extends React.PureComponent<WrappedComponentProps, State> {
+    public constructor(props: WrappedComponentProps) {
         super(props);
 
         this.state = {
             value: '',
-            inputError: '',
+            inputError: null,
             show: false,
             callback: null,
         };
@@ -52,7 +52,7 @@ export default class ImportThemeModal extends React.PureComponent<{}, State> {
 
         const text = this.state.value;
 
-        if (!this.isInputValid(text)) {
+        if (!ImportThemeModal.isInputValid(text)) {
             this.setState({
                 inputError: (
                     <FormattedMessage
@@ -64,29 +64,64 @@ export default class ImportThemeModal extends React.PureComponent<{}, State> {
             return;
         }
 
-        const colors = text.split(',');
-        const theme = {type: 'custom'};
+        /*
+         * index mapping of slack theme format (index => slack-property name)
+         *
+         * |-------|-------------------------|-------------------------|
+         * | index | Slack theme-property    | MM theme-property       |
+         * |-------|-------------------------|-------------------------|
+         * |   0   | Column BG               | sidebarBg               |
+         * |   1   | ???                     | sidebarHeaderBg         |
+         * |   2   | Active Item BG          | sidebarTextActiveBorder |
+         * |   3   | Active Item Text        | sidebarTextActiveColor  |
+         * |   4   | Hover Item BG           | sidebarTextHoverBg      |
+         * |   5   | Text Color              | sidebarText             |
+         * |   6   | Active Presence         | onlineIndicator         |
+         * |   7   | Mention Badge           | mentionBg               |
+         * |   8   | TOP-NAV BG              | --- (desktop only)      |
+         * |   9   | TOP-NAV Text            | --- (desktop only)      |
+         * |-------|-------------------------|-------------------------|
+         *
+         * values at index 8 + 9 are only for the desktop app
+         */
 
-        (theme as Theme).sidebarBg = colors[0];
-        (theme as Theme).sidebarText = colors[5];
-        (theme as Theme).sidebarUnreadText = colors[5];
-        (theme as Theme).sidebarTextHoverBg = colors[4];
-        (theme as Theme).sidebarTextActiveBorder = colors[2];
-        (theme as Theme).sidebarTextActiveColor = colors[3];
-        (theme as Theme).sidebarHeaderBg = colors[1];
-        (theme as Theme).sidebarHeaderTextColor = colors[5];
-        (theme as Theme).onlineIndicator = colors[6];
-        (theme as Theme).mentionBg = colors[7];
+        const [
+            sidebarBg, // 0
+            sidebarHeaderBg, // 1
+            sidebarTextActiveBorder, // 2
+            sidebarTextActiveColor, // 3
+            sidebarTextHoverBg, // 4
+            sidebarText, // 5
+            onlineIndicator, // 6
+            mentionBg, // 7
+        ] = text.split(',');
+
+        const theme: Partial<Theme> = {
+            type: 'custom',
+            sidebarBg,
+            sidebarText,
+            sidebarUnreadText: sidebarText,
+            sidebarTextHoverBg,
+            sidebarTextActiveBorder,
+            sidebarTextActiveColor,
+            sidebarHeaderBg,
+            sidebarTeamBarBg: blendColors(sidebarHeaderBg, '#000000', 0.2, true),
+            sidebarHeaderTextColor: sidebarText,
+            onlineIndicator,
+            mentionBg,
+        };
+
         setThemeDefaults(theme as Theme);
 
-        this.state.callback!(theme);
+        this.state.callback?.(theme as Theme);
+
         this.setState({
             show: false,
             callback: null,
         });
     }
 
-    private isInputValid(text: string) {
+    private static isInputValid(text: string) {
         if (text.length === 0) {
             return false;
         }
@@ -102,7 +137,7 @@ export default class ImportThemeModal extends React.PureComponent<{}, State> {
         if (text.length > 0) {
             const colors = text.split(',');
 
-            if (colors.length !== 8) {
+            if (colors.length !== 10) {
                 return false;
             }
 
@@ -124,7 +159,7 @@ export default class ImportThemeModal extends React.PureComponent<{}, State> {
         const value = e.target.value;
         this.setState({value});
 
-        if (this.isInputValid(value)) {
+        if (ImportThemeModal.isInputValid(value)) {
             this.setState({inputError: null});
         } else {
             this.setState({
@@ -171,7 +206,7 @@ export default class ImportThemeModal extends React.PureComponent<{}, State> {
                             <p>
                                 <FormattedMessage
                                     id='user.settings.import_theme.importBody'
-                                    defaultMessage='To import a theme, go to a Slack team and look for "Preferences -> Sidebar Theme". Open the custom theme option, copy the theme color values and paste them here:'
+                                    defaultMessage='To import a theme, go to a Slack team and look for "Preferences -> Themes". Open the custom theme option, copy the theme color values and paste them here:'
                                 />
                             </p>
                             <div className='form-group less'>
@@ -219,3 +254,4 @@ export default class ImportThemeModal extends React.PureComponent<{}, State> {
         );
     }
 }
+export default injectIntl(ImportThemeModal);

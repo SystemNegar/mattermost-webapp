@@ -15,7 +15,6 @@ exports[`components/admin_console/group_settings/group_details/GroupDetails shou
       <FormattedMessage
         defaultMessage="Group Configuration"
         id="admin.group_settings.group_detail.group_configuration"
-        values={Object {}}
       />
     </div>
   </div>
@@ -34,7 +33,6 @@ exports[`components/admin_console/group_settings/group_details/GroupDetails shou
           <FormattedMessage
             defaultMessage="Configure default teams and channels and view users belonging to this group."
             id="admin.group_settings.group_detail.introBanner"
-            values={Object {}}
           />
         </div>
       </div>
@@ -57,11 +55,11 @@ exports[`components/admin_console/group_settings/group_details/GroupDetails shou
               <button
                 className="btn btn-primary"
                 id="add_team_or_channel"
+                type="button"
               >
                 <FormattedMessage
                   defaultMessage="Add Team or Channel"
                   id="admin.group_settings.group_details.add_team_or_channel"
-                  values={Object {}}
                 />
                 <i
                   className="fa fa-caret-down"
@@ -170,7 +168,6 @@ exports[`components/admin_console/group_settings/group_details/GroupDetails shou
       <FormattedMessage
         defaultMessage="Group Configuration"
         id="admin.group_settings.group_detail.group_configuration"
-        values={Object {}}
       />
     </div>
   </div>
@@ -189,7 +186,6 @@ exports[`components/admin_console/group_settings/group_details/GroupDetails shou
           <FormattedMessage
             defaultMessage="Configure default teams and channels and view users belonging to this group."
             id="admin.group_settings.group_detail.introBanner"
-            values={Object {}}
           />
         </div>
       </div>
@@ -212,11 +208,11 @@ exports[`components/admin_console/group_settings/group_details/GroupDetails shou
               <button
                 className="btn btn-primary"
                 id="add_team_or_channel"
+                type="button"
               >
                 <FormattedMessage
                   defaultMessage="Add Team or Channel"
                   id="admin.group_settings.group_details.add_team_or_channel"
-                  values={Object {}}
                 />
                 <i
                   className="fa fa-caret-down"
@@ -324,7 +320,6 @@ exports[`components/admin_console/group_settings/group_details/GroupDetails shou
       <FormattedMessage
         defaultMessage="Group Configuration"
         id="admin.group_settings.group_detail.group_configuration"
-        values={Object {}}
       />
     </div>
   </div>
@@ -343,7 +338,6 @@ exports[`components/admin_console/group_settings/group_details/GroupDetails shou
           <FormattedMessage
             defaultMessage="Configure default teams and channels and view users belonging to this group."
             id="admin.group_settings.group_detail.introBanner"
-            values={Object {}}
           />
         </div>
       </div>
@@ -366,11 +360,11 @@ exports[`components/admin_console/group_settings/group_details/GroupDetails shou
               <button
                 className="btn btn-primary"
                 id="add_team_or_channel"
+                type="button"
               >
                 <FormattedMessage
                   defaultMessage="Add Team or Channel"
                   id="admin.group_settings.group_details.add_team_or_channel"
-                  values={Object {}}
                 />
                 <i
                   className="fa fa-caret-down"
@@ -467,7 +461,6 @@ exports[`components/admin_console/group_settings/group_details/GroupDetails shou
       <FormattedMessage
         defaultMessage="Group Configuration"
         id="admin.group_settings.group_detail.group_configuration"
-        values={Object {}}
       />
     </div>
   </div>
@@ -486,7 +479,6 @@ exports[`components/admin_console/group_settings/group_details/GroupDetails shou
           <FormattedMessage
             defaultMessage="Configure default teams and channels and view users belonging to this group."
             id="admin.group_settings.group_detail.introBanner"
-            values={Object {}}
           />
         </div>
       </div>
@@ -509,11 +501,11 @@ exports[`components/admin_console/group_settings/group_details/GroupDetails shou
               <button
                 className="btn btn-primary"
                 id="add_team_or_channel"
+                type="button"
               >
                 <FormattedMessage
                   defaultMessage="Add Team or Channel"
                   id="admin.group_settings.group_details.add_team_or_channel"
-                  values={Object {}}
                 />
                 <i
                   className="fa fa-caret-down"

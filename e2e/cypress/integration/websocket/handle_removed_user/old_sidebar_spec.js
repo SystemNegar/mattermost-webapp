@@ -8,14 +8,14 @@
 // ***************************************************************
 
 // Stage: @prod
-// Group: @websocket
+// Group: @websocket @not_cloud
 
 import {getRandomId} from '../../../utils';
 
 import {
     createNewTeamAndMoveToOffTopic,
     removeMeFromCurrentChannel,
-    shouldRemoveFlaggedPostsInRHS,
+    shouldRemoveSavedPostsInRHS,
     shouldRemoveMentionsInRHS,
 } from './helpers';
 
@@ -23,6 +23,15 @@ describe('Handle removed user - old sidebar', () => {
     const sidebarItemClass = '.sidebar-item';
 
     before(() => {
+        cy.shouldNotRunOnCloudEdition();
+
+        // # Update config
+        cy.apiUpdateConfig({
+            ServiceSettings: {
+                EnableLegacySidebar: true,
+            },
+        });
+
         cy.apiInitSetup({loginAfter: true}).then(({team, channel}) => {
             cy.visit(`/${team.name}/channels/${channel.name}`);
         });
@@ -49,6 +58,6 @@ describe('Handle removed user - old sidebar', () => {
     it('should remove flagged posts from RHS', () => {
         const teamName = `team-${getRandomId()}`;
         createNewTeamAndMoveToOffTopic(teamName, sidebarItemClass);
-        shouldRemoveFlaggedPostsInRHS(teamName, sidebarItemClass);
+        shouldRemoveSavedPostsInRHS(teamName, sidebarItemClass);
     });
 });

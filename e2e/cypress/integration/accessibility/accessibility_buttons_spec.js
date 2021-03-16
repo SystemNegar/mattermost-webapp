@@ -56,10 +56,10 @@ describe('Verify Accessibility Support in different Buttons', () => {
         cy.get('#toggleFavorite').focus().tab({shift: true}).tab();
 
         // # Press tab until the focus is on the Pinned posts button
-        cy.focused().tab().tab().tab().tab();
+        cy.focused().tab().tab();
 
         // * Verify accessibility support in Pinned Posts button
-        cy.get('#channelHeaderPinButton').should('have.attr', 'aria-label', 'Pinned posts').and('have.class', 'a11y--active a11y--focused').tab();
+        cy.get('#channelHeaderPinButton').should('have.attr', 'aria-label', 'Pinned posts').and('have.class', 'a11y--active a11y--focused').tab().tab();
 
         // * Verify accessibility support in Search input
         cy.get('#searchBox').should('have.attr', 'aria-label', 'Search').and('have.class', 'a11y--active a11y--focused').tab();
@@ -67,7 +67,7 @@ describe('Verify Accessibility Support in different Buttons', () => {
         // * Verify accessibility support in Recent Mentions button
         cy.get('#channelHeaderMentionButton').should('have.attr', 'aria-label', 'Recent mentions').and('have.class', 'a11y--active a11y--focused').tab();
 
-        // * Verify accessibility support in Flagged Posts button
+        // * Verify accessibility support in Saved Posts button
         cy.get('#channelHeaderFlagButton').should('have.attr', 'aria-label', 'Saved posts').and('have.class', 'a11y--active a11y--focused');
     });
 });

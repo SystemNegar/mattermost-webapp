@@ -5,10 +5,14 @@ import React from 'react';
 import {shallow} from 'enzyme';
 
 import LoggedIn from 'components/logged_in/logged_in.jsx';
+import BrowserStore from 'stores/browser_store';
+import * as GlobalActions from 'actions/global_actions';
 
 jest.mock('actions/websocket_actions.jsx', () => ({
     initialize: jest.fn(),
 }));
+
+BrowserStore.signalLogin = jest.fn();
 
 describe('components/logged_in/LoggedIn', () => {
     const children = <span>{'Test'}</span>;
@@ -149,5 +153,31 @@ describe('components/logged_in/LoggedIn', () => {
 </span>
 `,
         );
+    });
+
+    it('should signal to other tabs when login is successful', () => {
+        const props = {
+            ...baseProps,
+            mfaRequired: false,
+            showTermsOfService: true,
+        };
+
+        shallow(<LoggedIn {...props}>{children}</LoggedIn>);
+
+        expect(BrowserStore.signalLogin).toBeCalledTimes(1);
+    });
+
+    it('should set state to unfocused if it starts in the background', () => {
+        document.hasFocus = jest.fn(() => false);
+        GlobalActions.emitBrowserFocus = jest.fn();
+
+        const props = {
+            ...baseProps,
+            mfaRequired: false,
+            showTermsOfService: true,
+        };
+
+        shallow(<LoggedIn {...props}>{children}</LoggedIn>);
+        expect(GlobalActions.emitBrowserFocus).toBeCalledTimes(1);
     });
 });

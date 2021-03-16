@@ -81,7 +81,7 @@ export default class PermissionSystemSchemeSettings extends React.PureComponent 
         }
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) { // eslint-disable-line camelcase
         if (!this.state.loaded && this.rolesNeeded.every((roleName) => nextProps.roles[roleName])) {
             this.loadRolesIntoState(nextProps);
         }
@@ -118,7 +118,20 @@ export default class PermissionSystemSchemeSettings extends React.PureComponent 
     }
 
     loadRolesIntoState(props) {
-        const {system_admin, team_admin, channel_admin, system_user, team_user, channel_user, system_guest, team_guest, channel_guest} = props.roles; // eslint-disable-line camelcase, @typescript-eslint/camelcase
+        /* eslint-disable camelcase */
+        const {
+            system_admin,
+            team_admin,
+            channel_admin,
+            system_user,
+            team_user,
+            channel_user,
+            system_guest,
+            team_guest,
+            channel_guest,
+        } = props.roles;
+        /* eslint-enable camelcase */
+
         this.setState({
             selectedPermission: null,
             loaded: true,

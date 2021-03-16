@@ -15,8 +15,8 @@ const PAGE_SIZE = 10;
 
 type Props = {
     userId: string;
-    headerLabels: Record<string, any>[];
-    data: Record<string, any>[];
+    headerLabels: Array<Record<string, any>>;
+    data: Array<Record<string, any>>;
     onPageChangedCallback?: (paging: Paging) => void;
     total: number;
     renderRow: (item: {[x: string]: string}) => JSX.Element;
@@ -71,12 +71,9 @@ export default class AbstractList extends React.PureComponent<Props, State> {
     }
 
     private performSearch = (): void => {
-        const newState = {...this.state};
         const userId = this.props.userId;
-        delete newState.page;
 
-        newState.loading = true;
-        this.setState(newState);
+        this.setState({loading: true});
 
         this.props.actions.getTeamsData(userId).then!(() => {
             if (this.props.onPageChangedCallback) {
@@ -161,6 +158,7 @@ export default class AbstractList extends React.PureComponent<Props, State> {
                             />
                         </div>
                         <button
+                            type='button'
                             className={'btn btn-link prev ' + (firstPage ? 'disabled' : '')}
                             onClick={firstPage ? () => null : this.previousPage}
                             disabled={firstPage}
@@ -168,6 +166,7 @@ export default class AbstractList extends React.PureComponent<Props, State> {
                             <PreviousIcon/>
                         </button>
                         <button
+                            type='button'
                             className={'btn btn-link next ' + (lastPage ? 'disabled' : '')}
                             onClick={lastPage ? () => null : this.nextPage}
                             disabled={lastPage}

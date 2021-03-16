@@ -1,6 +1,5 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-/* eslint-disable react/no-string-refs */
 
 import React from 'react';
 import {Overlay, Tooltip} from 'react-bootstrap';
@@ -29,8 +28,6 @@ export type BaseState = {
     errorTooltip: boolean;
 }
 
-type StateKeys = keyof BaseState;
-
 // Placeholder type until ClientError is exported from redux.
 // TODO: remove ClientErrorPlaceholder and change the return type of updateConfig
 type ClientErrorPlaceholder = {
@@ -39,6 +36,7 @@ type ClientErrorPlaceholder = {
 }
 
 export default abstract class AdminSettings <Props extends BaseProps, State extends BaseState> extends React.Component<Props, State> {
+    private errorMessageRef: React.RefObject<HTMLDivElement>;
     public constructor(props: Props) {
         super(props);
         const stateInit = {
@@ -52,11 +50,12 @@ export default abstract class AdminSettings <Props extends BaseProps, State exte
         } else {
             this.state = stateInit as Readonly<State>;
         }
+        this.errorMessageRef = React.createRef();
     }
 
     protected abstract getStateFromConfig(config: DeepPartial<AdminConfig>): Partial<State>;
 
-    protected abstract getConfigFromState(config: DeepPartial<AdminConfig>): object;
+    protected abstract getConfigFromState(config: DeepPartial<AdminConfig>): unknown;
 
     protected abstract renderTitle(): React.ReactElement;
 
@@ -96,7 +95,7 @@ export default abstract class AdminSettings <Props extends BaseProps, State exte
         this.doSubmit();
     }
 
-    private doSubmit = async (callback?: () => void) => {
+    protected doSubmit = async (callback?: () => void) => {
         this.setState({
             saving: true,
             serverError: null,
@@ -185,7 +184,7 @@ export default abstract class AdminSettings <Props extends BaseProps, State exte
         return n;
     };
 
-    private parseIntNonZero = (str: string, defaultValue?: number, minimumValue = 1) => {
+    protected parseIntNonZero = (str: string, defaultValue?: number, minimumValue = 1) => {
         const n = parseInt(str, 10);
 
         if (isNaN(n) || n < minimumValue) {
@@ -201,16 +200,20 @@ export default abstract class AdminSettings <Props extends BaseProps, State exte
     private getConfigValue(config: AdminConfig | EnvironmentConfig, path: string) {
         const pathParts = path.split('.');
 
-        return pathParts.reduce((obj: object|null, pathPart) => {
+        // eslint-disable-next-line @typescript-eslint/ban-types
+        return pathParts.reduce((obj: object | null, pathPart) => {
             if (!obj) {
                 return null;
             }
+            // eslint-disable-next-line @typescript-eslint/ban-types
             return obj[(pathPart as keyof object)];
         }, config);
     }
 
     private setConfigValue(config: AdminConfig, path: string, value: any) {
+        // eslint-disable-next-line @typescript-eslint/ban-types
         function setValue(obj: object, pathParts: string[]) {
+            // eslint-disable-next-line @typescript-eslint/ban-types
             const part = pathParts[0] as keyof object;
 
             if (pathParts.length === 1) {
@@ -252,7 +255,7 @@ export default abstract class AdminSettings <Props extends BaseProps, State exte
                         />
                         <div
                             className='error-message'
-                            ref='errorMessage'
+                            ref={this.errorMessageRef}
                             onMouseOver={this.openTooltip}
                             onMouseOut={this.closeTooltip}
                         >
@@ -261,7 +264,7 @@ export default abstract class AdminSettings <Props extends BaseProps, State exte
                         <Overlay
                             show={this.state.errorTooltip}
                             placement='top'
-                            target={this.refs.errorMessage}
+                            target={this.errorMessageRef.current as HTMLElement}
                         >
                             <Tooltip id='error-tooltip' >
                                 {this.state.serverError}
@@ -274,4 +277,3 @@ export default abstract class AdminSettings <Props extends BaseProps, State exte
     }
 }
 
-/* eslint-enable react/no-string-refs */

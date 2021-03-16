@@ -7,10 +7,14 @@
 // - Use element ID when selecting an element. Create one if none.
 // ***************************************************************
 
-// Stage:
-// Group: @system_console
+// Stage: @prod
+// Group: @not_cloud @system_console
 
 describe('Site URL', () => {
+    before(() => {
+        cy.shouldNotRunOnCloudEdition();
+    });
+
     it('MM-T3279 - Don\'t allow clearing site URL in System Console', () => {
         // # Navigate to System Console -> Environment -> Web Server
         cy.visit('/admin_console/environment/web_server');

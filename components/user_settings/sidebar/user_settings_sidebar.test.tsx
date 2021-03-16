@@ -1,10 +1,8 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import {shallow} from 'enzyme';
 import React from 'react';
-import PropTypes from 'prop-types';
-import configureStore from 'redux-mock-store';
-import {shallow, ShallowWrapper} from 'enzyme';
 
 import {UserProfile} from 'mattermost-redux/types/users';
 
@@ -21,9 +19,8 @@ describe('components/user_settings/sidebar/UserSettingsSidebar', () => {
         closeUnusedDirectMessages: 'after_seven_days',
         showUnusedOption: false,
         channelSwitcherOption: 'true',
-        channelSidebarOrganizationOption: 'false',
         showChannelOrganization: true,
-        showChannelSidebarOrganization: true,
+        enableLegacySidebar: true,
         sidebarPreference: {
             grouping: 'by_type',
             sorting: 'alpha',
@@ -40,14 +37,6 @@ describe('components/user_settings/sidebar/UserSettingsSidebar', () => {
             savePreferences: () => true,
         },
     };
-    const mockStore = configureStore();
-    const state = {
-        views: {
-            settings: {},
-        },
-    };
-
-    const store = mockStore(state);
 
     test('should match snapshot', () => {
         const wrapper = shallow(<UserSettingsSidebar {...defaultProps}/>);
@@ -57,7 +46,6 @@ describe('components/user_settings/sidebar/UserSettingsSidebar', () => {
         expect(wrapper.state('settings')).toEqual({
             close_unused_direct_messages: defaultProps.closeUnusedDirectMessages,
             channel_switcher_section: defaultProps.channelSwitcherOption,
-            channel_sidebar_organization: defaultProps.channelSidebarOrganizationOption,
             grouping: defaultProps.sidebarPreference.grouping,
             sorting: defaultProps.sidebarPreference.sorting,
             unreadsAtTop: defaultProps.unreadsAtTop,
@@ -69,13 +57,12 @@ describe('components/user_settings/sidebar/UserSettingsSidebar', () => {
         const newUpdateSection = jest.fn();
         const updateArg = 'unreadChannels';
         const props: UserSettingsSidebarProps = {...defaultProps, updateSection: newUpdateSection};
-        const wrapper: ShallowWrapper<{}, {}, UserSettingsSidebar> = shallow(<UserSettingsSidebar {...props}/>);
+        const wrapper = shallow<UserSettingsSidebar>(<UserSettingsSidebar {...props}/>);
 
         wrapper.setState({isSaving: true,
             settings: {
                 close_unused_direct_messages: 'junk',
                 channel_switcher_section: defaultProps.channelSwitcherOption,
-                channel_sidebar_organization: defaultProps.channelSidebarOrganizationOption,
                 grouping: defaultProps.sidebarPreference.grouping,
                 sorting: defaultProps.sidebarPreference.sorting,
                 unreadsAtTop: defaultProps.unreadsAtTop,
@@ -88,7 +75,6 @@ describe('components/user_settings/sidebar/UserSettingsSidebar', () => {
         expect(wrapper.state('settings')).toEqual({
             close_unused_direct_messages: defaultProps.closeUnusedDirectMessages,
             channel_switcher_section: defaultProps.channelSwitcherOption,
-            channel_sidebar_organization: defaultProps.channelSidebarOrganizationOption,
             grouping: defaultProps.sidebarPreference.grouping,
             sorting: defaultProps.sidebarPreference.sorting,
             unreadsAtTop: defaultProps.unreadsAtTop,
@@ -102,17 +88,12 @@ describe('components/user_settings/sidebar/UserSettingsSidebar', () => {
         const props = {...defaultProps, activeSection: 'groupChannels'};
         const wrapper = mountWithIntl(
             <UserSettingsSidebar {...props}/>,
-            {
-                context: {store},
-                childContextTypes: {store: PropTypes.object},
-            },
         );
 
         wrapper.find('#noneOption').simulate('change');
         expect(wrapper.state('settings')).toEqual({
             close_unused_direct_messages: defaultProps.closeUnusedDirectMessages,
             channel_switcher_section: defaultProps.channelSwitcherOption,
-            channel_sidebar_organization: defaultProps.channelSidebarOrganizationOption,
             grouping: 'none',
             sorting: defaultProps.sidebarPreference.sorting,
             unreadsAtTop: defaultProps.unreadsAtTop,
@@ -123,7 +104,6 @@ describe('components/user_settings/sidebar/UserSettingsSidebar', () => {
         expect(wrapper.state('settings')).toEqual({
             close_unused_direct_messages: defaultProps.closeUnusedDirectMessages,
             channel_switcher_section: defaultProps.channelSwitcherOption,
-            channel_sidebar_organization: defaultProps.channelSidebarOrganizationOption,
             grouping: 'by_type',
             sorting: defaultProps.sidebarPreference.sorting,
             unreadsAtTop: defaultProps.unreadsAtTop,
@@ -134,7 +114,6 @@ describe('components/user_settings/sidebar/UserSettingsSidebar', () => {
         expect(wrapper.state('settings')).toEqual({
             close_unused_direct_messages: defaultProps.closeUnusedDirectMessages,
             channel_switcher_section: defaultProps.channelSwitcherOption,
-            channel_sidebar_organization: defaultProps.channelSidebarOrganizationOption,
             grouping: 'by_type',
             sorting: defaultProps.sidebarPreference.sorting,
             unreadsAtTop: 'false',
@@ -145,7 +124,6 @@ describe('components/user_settings/sidebar/UserSettingsSidebar', () => {
         expect(wrapper.state('settings')).toEqual({
             close_unused_direct_messages: defaultProps.closeUnusedDirectMessages,
             channel_switcher_section: defaultProps.channelSwitcherOption,
-            channel_sidebar_organization: defaultProps.channelSidebarOrganizationOption,
             grouping: 'by_type',
             sorting: defaultProps.sidebarPreference.sorting,
             unreadsAtTop: 'true',
@@ -156,7 +134,6 @@ describe('components/user_settings/sidebar/UserSettingsSidebar', () => {
         expect(wrapper.state('settings')).toEqual({
             close_unused_direct_messages: defaultProps.closeUnusedDirectMessages,
             channel_switcher_section: defaultProps.channelSwitcherOption,
-            channel_sidebar_organization: defaultProps.channelSidebarOrganizationOption,
             grouping: 'by_type',
             sorting: defaultProps.sidebarPreference.sorting,
             unreadsAtTop: defaultProps.unreadsAtTop,
@@ -167,7 +144,6 @@ describe('components/user_settings/sidebar/UserSettingsSidebar', () => {
         expect(wrapper.state('settings')).toEqual({
             close_unused_direct_messages: defaultProps.closeUnusedDirectMessages,
             channel_switcher_section: defaultProps.channelSwitcherOption,
-            channel_sidebar_organization: defaultProps.channelSidebarOrganizationOption,
             grouping: 'by_type',
             sorting: defaultProps.sidebarPreference.sorting,
             unreadsAtTop: defaultProps.unreadsAtTop,
@@ -185,17 +161,12 @@ describe('components/user_settings/sidebar/UserSettingsSidebar', () => {
             }};
         const wrapper = mountWithIntl(
             <UserSettingsSidebar {...props}/>,
-            {
-                context: {store},
-                childContextTypes: {store: PropTypes.object},
-            },
         );
 
         wrapper.find('#recentSectionEnabled').simulate('change');
         expect(wrapper.state('settings')).toEqual({
             close_unused_direct_messages: defaultProps.closeUnusedDirectMessages,
             channel_switcher_section: defaultProps.channelSwitcherOption,
-            channel_sidebar_organization: defaultProps.channelSidebarOrganizationOption,
             grouping: 'none',
             sorting: 'recent',
             unreadsAtTop: defaultProps.unreadsAtTop,
@@ -206,7 +177,6 @@ describe('components/user_settings/sidebar/UserSettingsSidebar', () => {
         expect(wrapper.state('settings')).toEqual({
             close_unused_direct_messages: defaultProps.closeUnusedDirectMessages,
             channel_switcher_section: defaultProps.channelSwitcherOption,
-            channel_sidebar_organization: defaultProps.channelSidebarOrganizationOption,
             grouping: 'none',
             sorting: 'alpha',
             unreadsAtTop: defaultProps.unreadsAtTop,

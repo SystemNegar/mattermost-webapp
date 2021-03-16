@@ -31,7 +31,6 @@ exports[`admin_console/system_user_detail/team_list/AbstractList should match sn
       <FormattedMessage
         defaultMessage="No teams found"
         id="admin.team_settings.team_list.no_teams_found"
-        values={Object {}}
       />
     </div>
   </div>
@@ -247,6 +246,7 @@ exports[`admin_console/system_user_detail/team_list/AbstractList should match sn
       className="btn btn-link prev "
       disabled={false}
       onClick={[Function]}
+      type="button"
     >
       <PreviousIcon
         additionalClassName={null}
@@ -256,6 +256,7 @@ exports[`admin_console/system_user_detail/team_list/AbstractList should match sn
       className="btn btn-link next "
       disabled={false}
       onClick={[Function]}
+      type="button"
     >
       <NextIcon
         additionalClassName={null}
@@ -474,6 +475,7 @@ exports[`admin_console/system_user_detail/team_list/AbstractList should match sn
       className="btn btn-link prev disabled"
       disabled={true}
       onClick={[Function]}
+      type="button"
     >
       <PreviousIcon
         additionalClassName={null}
@@ -483,6 +485,7 @@ exports[`admin_console/system_user_detail/team_list/AbstractList should match sn
       className="btn btn-link next "
       disabled={false}
       onClick={[Function]}
+      type="button"
     >
       <NextIcon
         additionalClassName={null}
@@ -589,6 +592,7 @@ exports[`admin_console/system_user_detail/team_list/AbstractList should match sn
       className="btn btn-link prev disabled"
       disabled={true}
       onClick={[Function]}
+      type="button"
     >
       <PreviousIcon
         additionalClassName={null}
@@ -598,6 +602,7 @@ exports[`admin_console/system_user_detail/team_list/AbstractList should match sn
       className="btn btn-link next disabled"
       disabled={true}
       onClick={[Function]}
+      type="button"
     >
       <NextIcon
         additionalClassName={null}

@@ -19,7 +19,7 @@ type Props = {
     readOnly?: boolean;
 }
 
-export default class TeamRow extends React.PureComponent<Props, {}> {
+export default class TeamRow extends React.PureComponent<Props> {
     private renderTeamType = (team: {[x: string]: string}) => {
         if (team.group_constrained) {
             return (
@@ -82,7 +82,7 @@ export default class TeamRow extends React.PureComponent<Props, {}> {
                             <TeamIcon
                                 size='sm'
                                 url={teamIconUrl}
-                                name={team.display_name}
+                                content={team.display_name}
                             />
                         </div>
                         <div className='col-md-auto'>

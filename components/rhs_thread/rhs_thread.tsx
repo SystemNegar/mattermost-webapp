@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 /* eslint-disable react/no-string-refs */
 
 import $ from 'jquery';
@@ -68,12 +69,17 @@ type State = {
     isScrolling: boolean;
     topRhsPostId: string;
     openTime: number;
-    postsArray?: Record<string, any>[];
+    postsArray?: Array<Record<string, any>>;
     isBusy?: boolean;
+    postsContainerHeight: number;
+    userScrolledToBottom: boolean;
 }
 
 export default class RhsThread extends React.Component<Props, State> {
     private scrollStopAction: DelayedAction;
+    private rhspostlistRef: React.RefObject<HTMLDivElement>;
+    private containerRef: React.RefObject<HTMLDivElement>;
+    private postCreateContainerRef: React.RefObject<HTMLDivElement>;
 
     public static getDerivedStateFromProps(props: Props, state: State) {
         let updatedState: Partial<State> = {selected: props.selected};
@@ -96,11 +102,34 @@ export default class RhsThread extends React.Component<Props, State> {
             isScrolling: false,
             topRhsPostId: '',
             openTime,
+            postsContainerHeight: 0,
+            userScrolledToBottom: false,
         };
+
+        this.rhspostlistRef = React.createRef();
+        this.containerRef = React.createRef();
+        this.postCreateContainerRef = React.createRef();
+    }
+
+    private getLastPost() {
+        const childPosts = this.rhspostlistRef.current?.children;
+        return childPosts && childPosts[childPosts.length - 1];
+    }
+
+    private resizeRhsPostList() {
+        const containerHeight = this.containerRef.current?.getBoundingClientRect().height;
+        const createContainerHeight = this.postCreateContainerRef.current?.getBoundingClientRect().height;
+        const headerHeight = 56;
+        if (containerHeight && createContainerHeight) {
+            this.setState({
+                postsContainerHeight: containerHeight - (createContainerHeight + headerHeight),
+            });
+        }
     }
 
     public componentDidMount() {
         this.scrollToBottom();
+        this.resizeRhsPostList();
         window.addEventListener('resize', this.handleResize);
         if (this.props.posts.length < (Utils.getRootPost(this.props.posts).reply_count + 1)) {
             this.props.actions.getPostThread(this.props.selected.id, true);
@@ -125,7 +154,7 @@ export default class RhsThread extends React.Component<Props, State> {
 
         const curLastPost = curPostsArray[0];
 
-        if (curLastPost.user_id === this.props.currentUserId) {
+        if (curLastPost.user_id === this.props.currentUserId || this.state.userScrolledToBottom) {
             this.scrollToBottom();
         }
     }
@@ -167,6 +196,7 @@ export default class RhsThread extends React.Component<Props, State> {
         if (UserAgent.isMobile() && document!.activeElement!.id === 'reply_textbox') {
             this.scrollToBottom();
         }
+        this.resizeRhsPostList();
     }
 
     private handleCardClick = (post: Post) => {
@@ -183,10 +213,6 @@ export default class RhsThread extends React.Component<Props, State> {
         }
 
         this.props.actions.selectPostCard(post);
-    }
-
-    private onBusy = (isBusy: boolean) => {
-        this.setState({isBusy});
     }
 
     private filterPosts = (posts: Post[], selected: Post | FakePost, openTime: number): Post[] => {
@@ -219,8 +245,8 @@ export default class RhsThread extends React.Component<Props, State> {
         }
 
         if (this.props.posts) {
-            const childNodes = (this.refs.rhspostlist as HTMLElement).childNodes;
-            const viewPort = (this.refs.rhspostlist as HTMLElement).getBoundingClientRect();
+            const childNodes = (this.rhspostlistRef.current as HTMLElement).childNodes;
+            const viewPort = (this.rhspostlistRef.current as HTMLElement).getBoundingClientRect();
             let topRhsPostId = '';
             const offset = 100;
 
@@ -240,13 +266,23 @@ export default class RhsThread extends React.Component<Props, State> {
         }
     }
 
-    private handleScroll = (): void => {
+    private handleScroll = (event: React.UIEvent<any>): void => {
         this.updateFloatingTimestamp();
+        const typeCastedEventTarget = (event.target as HTMLDivElement);
+        const maxScroll = typeCastedEventTarget.scrollHeight - typeCastedEventTarget.getBoundingClientRect().height;
+        const scrollTop = typeCastedEventTarget.scrollTop;
+        const lastPost = this.getLastPost()?.getBoundingClientRect();
 
         if (!this.state.isScrolling) {
             this.setState({
                 isScrolling: true,
             });
+        }
+
+        if (lastPost) {
+            const userScrolledToBottom = scrollTop >= maxScroll - lastPost.height;
+
+            this.setState({userScrolledToBottom});
         }
 
         this.scrollStopAction.fireAfter(Constants.SCROLL_DELAY);
@@ -256,6 +292,11 @@ export default class RhsThread extends React.Component<Props, State> {
         this.setState({
             isScrolling: false,
         });
+    }
+
+    private handlePostCommentResize = (): void => {
+        this.resizeRhsPostList();
+        this.scrollToBottom();
     }
 
     public render(): JSX.Element {
@@ -337,8 +378,12 @@ export default class RhsThread extends React.Component<Props, State> {
                 );
             } else {
                 createComment = (
-                    <div className='post-create__container'>
+                    <div
+                        className='post-create__container'
+                        ref={this.postCreateContainerRef}
+                    >
                         <CreateComment
+                            onHeightChange={this.handlePostCommentResize}
                             channelId={selected.channel_id}
                             rootId={selected.id}
                             rootDeleted={(selected as Post).state === Posts.POST_DELETED}
@@ -369,6 +414,7 @@ export default class RhsThread extends React.Component<Props, State> {
             <div
                 id='rhsContainer'
                 className='sidebar-right__body'
+                ref={this.containerRef}
             >
                 <FloatingTimestamp
                     isScrolling={this.state.isScrolling}
@@ -387,6 +433,7 @@ export default class RhsThread extends React.Component<Props, State> {
                     autoHideDuration={500}
                     renderThumbHorizontal={renderThumbHorizontal}
                     renderThumbVertical={renderThumbVertical}
+                    autoHeightMax={this.state.postsContainerHeight}
                     renderView={renderView}
                     onScroll={this.handleScroll}
                 >
@@ -415,7 +462,7 @@ export default class RhsThread extends React.Component<Props, State> {
                             />
                             {isFakeDeletedPost && rootPostDay && <DateSeparator date={rootPostDay}/>}
                             <div
-                                ref='rhspostlist'
+                                ref={this.rhspostlistRef}
                                 className='post-right-comments-container'
                                 id='rhsPostList'
                             >

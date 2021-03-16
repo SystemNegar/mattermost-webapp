@@ -45,11 +45,11 @@ describe('Messaging', () => {
         });
     });
 
-    describe('MM-21342 Post time should render correct format and locale', () => {
+    describe('MM-T713 Post time should render correct format and locale', () => {
         const testCases = [
             {
                 name: 'in English',
-                publicChannel: 'PUBLIC CHANNELS',
+                publicChannel: 'CHANNELS',
                 locale: 'en',
                 manualTimezone: 'UTC',
                 localTimes: [
@@ -61,7 +61,7 @@ describe('Messaging', () => {
             },
             {
                 name: 'in Spanish',
-                publicChannel: 'CANALES PÚBLICOS',
+                publicChannel: 'CANALES',
                 locale: 'es',
                 manualTimezone: 'UTC',
                 localTimes: [
@@ -73,7 +73,7 @@ describe('Messaging', () => {
             },
             {
                 name: 'in react-intl unsupported timezone',
-                publicChannel: 'PUBLIC CHANNELS',
+                publicChannel: 'CHANNELS',
                 locale: 'en',
                 manualTimezone: 'NZ-CHAT',
                 localTimes: [

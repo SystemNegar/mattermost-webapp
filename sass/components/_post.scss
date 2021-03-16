@@ -4,19 +4,19 @@
     .custom-textarea {
         border-radius: 4px;
         background: transparent;
-        border: 1px solid v(center-channel-color-24);
+        border: none;
+        box-shadow: inset 0 0 0 1px rgba(v(center-channel-color-rgb), 0.24);
         height: 100%;
         line-height: 20px;
         min-height: 46px;
         overflow: hidden;
         resize: none;
+        transition: none;
         white-space: pre-wrap;
         word-wrap: break-word;
 
         &:focus {
-            border: 2px solid v(center-channel-color-32);
-            box-shadow: none;
-            padding: 11px 0 11px 14px;
+            box-shadow: inset 0 0 0 2px rgba(v(center-channel-color-rgb), 0.32);
         }
 
         &.bad-connection {
@@ -49,7 +49,7 @@
         z-index: 2;
 
         &:focus {
-            border-color: v(center-channel-color-40);
+            border-color: rgba(v(center-channel-color-rgb), 0.4);
         }
 
         p {
@@ -74,8 +74,8 @@
 }
 
 .help__format-text {
-    @include opacity(0);
     @include single-transition(all, .3s, ease-in, .3s);
+    opacity: 0;
     display: inline-block;
     font-size: .85em;
     vertical-align: bottom;
@@ -370,7 +370,7 @@
 .post-create__container {
     @include flex(0 0 auto);
     width: 100%;
-    z-index: 10;
+    z-index: 12;
 
     label {
         font-weight: normal;
@@ -389,7 +389,7 @@
     .custom-textarea {
         bottom: 0;
         max-height: calc(50vh - 40px);
-        padding: 12px 0 12px 15px;
+        padding: 13px 0 12px 16px;
         resize: none;
         cursor: auto;
 
@@ -511,10 +511,6 @@
                 }
             }
         }
-
-        textarea {
-            box-shadow: none;
-        }
     }
 
     .msg-typing {
@@ -561,19 +557,19 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        fill: v(center-channel-color-56);
-        color: v(center-channel-color-56);
+        fill: rgba(v(center-channel-color-rgb), 0.56);
+        color: rgba(v(center-channel-color-rgb), 0.56);
 
         &:hover {
-            background: v(center-channel-color-08);
-            fill: v(center-channel-color-72);
-            color: v(center-channel-color-72);
+            background: rgba(v(center-channel-color-rgb), 0.08);
+            fill: rgba(v(center-channel-color-rgb), 0.72);
+            color: rgba(v(center-channel-color-rgb), 0.72);
         }
 
         &:active,
         &--active,
         &--active:hover {
-            background: v(button-bg-08);
+            background: rgba(var(--button-bg-rgb), 0.08);
             fill: v(button-bg);
             color: v(button-bg);
         }
@@ -665,7 +661,7 @@
     word-wrap: break-word;
 
     &:hover {
-        background-color: v(center-channel-color-04);
+        background-color: rgba(v(center-channel-color-rgb), 0.04);
     }
 
     .browser--ie & {
@@ -1094,10 +1090,6 @@
                 .status-wrapper {
                     display: none;
                 }
-
-                img {
-                    display: none;
-                }
             }
 
             .post__header {
@@ -1126,8 +1118,42 @@
 
             &.same--user {
                 .post__img {
-                    img {
+                    .status-wrapper {
                         display: none;
+                    }
+                }
+
+                &.post--bot {
+                    .post__header {
+                        height: auto;
+                        float: none;
+                    }
+
+                    &.post--compact {
+                        .post__header {
+                            float: left;
+                        }
+                    }
+
+                    .col__name {
+                        display: flex;
+                    }
+
+                    .post__permalink {
+                        position: relative;
+                        top: auto;
+                        left: auto;
+                        width: auto;
+                    }
+
+                    .post__time {
+                        opacity: 0.6;
+                    }
+
+                    .post__img {
+                        .status-wrapper {
+                            display: inline;
+                        }
                     }
                 }
             }
@@ -1195,7 +1221,7 @@
 
             .post-pre-header__link-separator {
                 margin: 0px 5px;
-                color: var(--center-channel-color-32);
+                color: rgba(var(--center-channel-color-rgb), 0.32);
                 font-size: 4px;
                 vertical-align: top;
             }
@@ -1502,7 +1528,7 @@
 
     .post-add-reaction-emoji-picker-open {
         .Reaction {
-            background-color: v(button-bg-08);
+            background-color: rgba(var(--button-bg-rgb), 0.08);
             color: v(button-bg);
             fill: v(button-bg);
         }
@@ -1585,6 +1611,17 @@
 
         &:hover {
             text-decoration: underline;
+        }
+    }
+
+    .post_permalink_mobile_view {
+        color: inherit;
+        display: inline-block;
+
+        &:hover,
+        &:focus {
+            color: inherit;
+            text-decoration: none;
         }
     }
 
@@ -1742,7 +1779,7 @@
 }
 
 .post--pinned-or-flagged {
-    background-color: var(--mention-highlight-bg-12);
+    background-color: rgba(var(--mention-highlight-bg-rgb), 0.12);
 }
 
 .Badge {
@@ -1807,6 +1844,10 @@
     .post-collapse__show-more-button {
         @include single-transition(all, .15s, ease);
         @include border-radius(2px);
+        &:hover {
+            color: var(--center-channel-bg);
+        }
+        background: var(--center-channel-bg);
         border: 1px solid transparent;
         display: inline-block;
         flex-shrink: 0;
@@ -1897,6 +1938,14 @@
     }
 }
 
+.post-message__text {
+    text-align: left;
+}
+
+.post-message__text > ul, .post-code, .table-responsive {
+    direction: ltr;
+}
+
 .file-attachment-menu-item-input {
     @include opacity(0);
     cursor: pointer;
@@ -1956,7 +2005,7 @@
 @keyframes postPinnedOrFlaggedHighlight {
     100% {
       background: initial;
-      background-color: var(--mention-highlight-bg-12);
+      background-color: rgba(var(--mention-highlight-bg-rgb), 0.12);
     }
 }
 

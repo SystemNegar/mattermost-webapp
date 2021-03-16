@@ -1,5 +1,118 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`components/TextBox should match snapshot with additional, optional props 1`] = `
+<div
+  className="textarea-wrapper textarea-wrapper--preview"
+>
+  <SuggestionBox
+    channelId="channelId"
+    className="form-control custom-textarea custom-textarea--emoji-picker bad-connection custom-textarea--preview"
+    completeOnTab={true}
+    containerClass=""
+    contextId="channelId"
+    disabled={true}
+    forceSuggestionsWhenBlur={false}
+    id="someid"
+    inputComponent={[Function]}
+    isRHS={true}
+    listComponent={[Function]}
+    listStyle="style"
+    listenForMentionKeyClick={true}
+    onBlur={[Function]}
+    onChange={[Function]}
+    onComposition={[Function]}
+    onHeightChange={[Function]}
+    onKeyDown={[Function]}
+    onKeyPress={[Function]}
+    onKeyUp={[Function]}
+    onMouseUp={[Function]}
+    onSelect={[Function]}
+    openOnFocus={false}
+    openWhenEmpty={true}
+    placeholder="placeholder text"
+    providers={
+      Array [
+        AtMentionProvider {
+          "autocompleteGroups": Array [
+            Object {
+              "id": "gid1",
+            },
+            Object {
+              "id": "gid2",
+            },
+          ],
+          "autocompleteUsersInChannel": [Function],
+          "currentUserId": "currentUserId",
+          "data": null,
+          "disableDispatches": false,
+          "lastCompletedWord": "",
+          "lastPrefixWithNoResults": "",
+          "latestComplete": true,
+          "latestPrefix": "",
+          "priorityProfiles": undefined,
+          "profilesInChannel": Array [
+            Object {
+              "id": "id1",
+            },
+            Object {
+              "id": "id2",
+            },
+          ],
+          "requestStarted": false,
+          "searchAssociatedGroupsForReference": [Function],
+          "triggerCharacter": "@",
+          "useChannelMentions": true,
+        },
+        ChannelMentionProvider {
+          "autocompleteChannels": [MockFunction],
+          "disableDispatches": false,
+          "lastCompletedWord": "",
+          "lastPrefixTrimmed": "",
+          "lastPrefixWithNoResults": "",
+          "latestComplete": true,
+          "latestPrefix": "",
+          "requestStarted": false,
+          "triggerCharacter": "~",
+        },
+        EmoticonProvider {
+          "disableDispatches": false,
+          "latestComplete": true,
+          "latestPrefix": "",
+          "requestStarted": false,
+          "triggerCharacter": ":",
+        },
+      ]
+    }
+    renderDividers={true}
+    renderNoResults={false}
+    replaceAllInputOnSelect={false}
+    requiredCharacters={1}
+    spellCheck="true"
+    style={
+      Object {
+        "visibility": "hidden",
+      }
+    }
+    value="some test text"
+  />
+  <div
+    className="form-control custom-textarea textbox-preview-area"
+    onBlur={[Function]}
+    onKeyDown={[Function]}
+    onKeyPress={[Function]}
+    onSelect={[Function]}
+    tabIndex={0}
+  >
+    <Connect(PostMarkdown)
+      channelId="channelId"
+      isRHS={true}
+      mentionKeys={Array []}
+      message="some test text"
+    />
+  </div>
+</div>
+`;
+
 exports[`components/TextBox should match snapshot with required props 1`] = `
 <div
   className="textarea-wrapper"
@@ -24,6 +137,7 @@ exports[`components/TextBox should match snapshot with required props 1`] = `
     onKeyPress={[Function]}
     onKeyUp={[Function]}
     onMouseUp={[Function]}
+    onSelect={[Function]}
     openOnFocus={false}
     openWhenEmpty={false}
     placeholder="placeholder text"
@@ -46,6 +160,7 @@ exports[`components/TextBox should match snapshot with required props 1`] = `
           "lastPrefixWithNoResults": "",
           "latestComplete": true,
           "latestPrefix": "",
+          "priorityProfiles": undefined,
           "profilesInChannel": Array [
             Object {
               "id": "id1",
@@ -54,16 +169,9 @@ exports[`components/TextBox should match snapshot with required props 1`] = `
               "id": "id2",
             },
           ],
-          "profilesNotInChannel": Array [
-            Object {
-              "id": "id3",
-            },
-            Object {
-              "id": "id4",
-            },
-          ],
           "requestStarted": false,
           "searchAssociatedGroupsForReference": [Function],
+          "triggerCharacter": "@",
           "useChannelMentions": true,
         },
         ChannelMentionProvider {
@@ -75,12 +183,14 @@ exports[`components/TextBox should match snapshot with required props 1`] = `
           "latestComplete": true,
           "latestPrefix": "",
           "requestStarted": false,
+          "triggerCharacter": "~",
         },
         EmoticonProvider {
           "disableDispatches": false,
           "latestComplete": true,
           "latestPrefix": "",
           "requestStarted": false,
+          "triggerCharacter": ":",
         },
       ]
     }
@@ -123,6 +233,7 @@ exports[`components/TextBox should throw error when new property is too long 1`]
     onKeyPress={[Function]}
     onKeyUp={[Function]}
     onMouseUp={[Function]}
+    onSelect={[Function]}
     openOnFocus={false}
     openWhenEmpty={false}
     placeholder="placeholder text"
@@ -145,6 +256,7 @@ exports[`components/TextBox should throw error when new property is too long 1`]
           "lastPrefixWithNoResults": "",
           "latestComplete": true,
           "latestPrefix": "",
+          "priorityProfiles": undefined,
           "profilesInChannel": Array [
             Object {
               "id": "id1",
@@ -153,16 +265,9 @@ exports[`components/TextBox should throw error when new property is too long 1`]
               "id": "id2",
             },
           ],
-          "profilesNotInChannel": Array [
-            Object {
-              "id": "id3",
-            },
-            Object {
-              "id": "id4",
-            },
-          ],
           "requestStarted": false,
           "searchAssociatedGroupsForReference": [Function],
+          "triggerCharacter": "@",
           "useChannelMentions": true,
         },
         ChannelMentionProvider {
@@ -174,12 +279,14 @@ exports[`components/TextBox should throw error when new property is too long 1`]
           "latestComplete": true,
           "latestPrefix": "",
           "requestStarted": false,
+          "triggerCharacter": "~",
         },
         EmoticonProvider {
           "disableDispatches": false,
           "latestComplete": true,
           "latestPrefix": "",
           "requestStarted": false,
+          "triggerCharacter": ":",
         },
       ]
     }
@@ -222,6 +329,7 @@ exports[`components/TextBox should throw error when value is too long 1`] = `
     onKeyPress={[Function]}
     onKeyUp={[Function]}
     onMouseUp={[Function]}
+    onSelect={[Function]}
     openOnFocus={false}
     openWhenEmpty={false}
     placeholder="placeholder text"
@@ -244,6 +352,7 @@ exports[`components/TextBox should throw error when value is too long 1`] = `
           "lastPrefixWithNoResults": "",
           "latestComplete": true,
           "latestPrefix": "",
+          "priorityProfiles": undefined,
           "profilesInChannel": Array [
             Object {
               "id": "id1",
@@ -252,16 +361,9 @@ exports[`components/TextBox should throw error when value is too long 1`] = `
               "id": "id2",
             },
           ],
-          "profilesNotInChannel": Array [
-            Object {
-              "id": "id3",
-            },
-            Object {
-              "id": "id4",
-            },
-          ],
           "requestStarted": false,
           "searchAssociatedGroupsForReference": [Function],
+          "triggerCharacter": "@",
           "useChannelMentions": true,
         },
         ChannelMentionProvider {
@@ -273,12 +375,14 @@ exports[`components/TextBox should throw error when value is too long 1`] = `
           "latestComplete": true,
           "latestPrefix": "",
           "requestStarted": false,
+          "triggerCharacter": "~",
         },
         EmoticonProvider {
           "disableDispatches": false,
           "latestComplete": true,
           "latestPrefix": "",
           "requestStarted": false,
+          "triggerCharacter": ":",
         },
       ]
     }

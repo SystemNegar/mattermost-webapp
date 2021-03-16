@@ -8,7 +8,7 @@
 // ***************************************************************
 
 // Stage: @prod
-// Group: @channel @channel_settings
+// Group: @channel @channel_settings @not_cloud
 
 // Make sure that the current channel is Town Square and that the
 // channel identified by the passed name is no longer in the channel
@@ -27,6 +27,13 @@ describe('Close direct messages', () => {
     let testTeam;
 
     before(() => {
+        cy.shouldNotRunOnCloudEdition();
+        cy.apiUpdateConfig({
+            ServiceSettings: {
+                EnableLegacySidebar: true,
+            },
+        });
+
         cy.apiInitSetup().then(({team, user}) => {
             testUser = user;
             testTeam = team;
@@ -62,9 +69,7 @@ describe('Close direct messages', () => {
     });
 
     function createAndVisitDMChannel(userIds) {
-        return cy.apiCreateDirectChannel(userIds).then((res) => {
-            const channel = res.body;
-
+        return cy.apiCreateDirectChannel(userIds).then(({channel}) => {
             // # Visit the new channel
             cy.visit(`/${testTeam.name}/channels/${channel.name}`);
 
@@ -84,6 +89,13 @@ describe('Close group messages', () => {
 
     before(() => {
         cy.apiAdminLogin();
+        cy.shouldNotRunOnCloudEdition();
+        cy.apiUpdateConfig({
+            ServiceSettings: {
+                EnableLegacySidebar: true,
+            },
+        });
+
         cy.apiInitSetup().then(({team, user}) => {
             testUser = user;
             testTeam = team;
@@ -124,9 +136,7 @@ describe('Close group messages', () => {
 
     function createAndVisitGMChannel(users = []) {
         const userIds = users.map((user) => user.id);
-        return cy.apiCreateGroupChannel(userIds).then((res) => {
-            const channel = res.body;
-
+        return cy.apiCreateGroupChannel(userIds).then(({channel}) => {
             // # Visit the new channel
             cy.visit(`/${testTeam.name}/channels/${channel.name}`);
 

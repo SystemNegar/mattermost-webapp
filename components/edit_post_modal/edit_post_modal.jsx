@@ -69,6 +69,8 @@ class EditPostModal extends React.PureComponent {
             scrollbarWidth: 0,
             prevShowState: props.editingPost.show,
         };
+
+        this.editModalBody = React.createRef();
     }
 
     static getDerivedStateFromProps(props, state) {
@@ -95,7 +97,7 @@ class EditPostModal extends React.PureComponent {
     }
 
     getContainer = () => {
-        return this.refs.editModalBody;
+        return this.editModalBody.current;
     }
 
     toggleEmojiPicker = () => {
@@ -289,16 +291,42 @@ class EditPostModal extends React.PureComponent {
         });
     }
 
+    handleSelect = (e) => {
+        Utils.adjustSelection(this.editbox.getInputBox(), e);
+    }
+
     handleKeyDown = (e) => {
+        const {ctrlSend, codeBlockOnCtrlEnter} = this.props;
+
+        const ctrlOrMetaKeyPressed = e.ctrlKey || e.metaKey;
+        const ctrlKeyCombo = Utils.cmdOrCtrlPressed(e) && !e.altKey && !e.shiftKey;
+        const ctrlAltCombo = Utils.cmdOrCtrlPressed(e, true) && e.altKey;
+        const ctrlEnterKeyCombo = (ctrlSend || codeBlockOnCtrlEnter) && Utils.isKeyPressed(e, KeyCodes.ENTER) && ctrlOrMetaKeyPressed;
+        const markdownHotkey = Utils.isKeyPressed(e, KeyCodes.B) || Utils.isKeyPressed(e, KeyCodes.I);
+        const markdownLinkKey = Utils.isKeyPressed(e, KeyCodes.K);
+
         // listen for line break key combo and insert new line character
         if (Utils.isUnhandledLineBreakKeyCombo(e)) {
             e.stopPropagation(); // perhaps this should happen in all of these cases? or perhaps Modal should not be listening?
             this.setState({editText: Utils.insertLineBreakFromKeyEvent(e)});
-        } else if (this.props.ctrlSend && Utils.isKeyPressed(e, KeyCodes.ENTER) && e.ctrlKey === true) {
+        } else if (ctrlEnterKeyCombo) {
             this.handleEdit();
         } else if (Utils.isKeyPressed(e, KeyCodes.ESCAPE) && !this.state.showEmojiPicker) {
             this.handleHide();
+        } else if ((ctrlKeyCombo && markdownHotkey) || (ctrlAltCombo && markdownLinkKey)) {
+            this.applyHotkeyMarkdown(e);
         }
+    }
+
+    applyHotkeyMarkdown = (e) => {
+        const res = Utils.applyHotkeyMarkdown(e);
+
+        this.setState({
+            editText: res.message,
+        }, () => {
+            const textbox = this.editbox.getInputBox();
+            Utils.setSelectionRange(textbox, res.selectionStart, res.selectionEnd);
+        });
     }
 
     handleHide = (doRefocus = true) => {
@@ -419,6 +447,7 @@ class EditPostModal extends React.PureComponent {
                 dialogClassName='a11y__modal edit-modal'
                 show={this.props.editingPost.show}
                 onKeyDown={this.handleKeyDown}
+                onSelect={this.handleSelect}
                 onHide={this.handleCheckForChangesHide}
                 onEntered={this.handleEntered}
                 onExit={this.handleExit}
@@ -446,7 +475,7 @@ class EditPostModal extends React.PureComponent {
                 </Modal.Header>
                 <Modal.Body
                     bsClass={`modal-body edit-modal-body${this.state.showEmojiPicker ? ' edit-modal-body--add-reaction' : ''}`}
-                    ref='editModalBody'
+                    ref={this.editModalBody}
                 >
                     <div className='post-create__container'>
                         <div
@@ -458,6 +487,7 @@ class EditPostModal extends React.PureComponent {
                                 onChange={this.handleChange}
                                 onKeyPress={this.handleEditKeyPress}
                                 onKeyDown={this.handleKeyDown}
+                                onSelect={this.handleSelect}
                                 onMouseUp={this.handleMouseUpKeyUp}
                                 onKeyUp={this.handleMouseUpKeyUp}
                                 onHeightChange={this.handleHeightChange}

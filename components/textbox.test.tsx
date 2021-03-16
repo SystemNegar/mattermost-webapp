@@ -15,10 +15,6 @@ describe('components/TextBox', () => {
             {id: 'id1'},
             {id: 'id2'},
         ],
-        profilesNotInChannel: [
-            {id: 'id3'},
-            {id: 'id4'},
-        ],
         autocompleteGroups: [
             {id: 'gid1'},
             {id: 'gid2'},
@@ -44,6 +40,41 @@ describe('components/TextBox', () => {
                 createMessage='placeholder text'
                 supportsCommands={false}
                 {...baseProps}
+            />,
+        );
+        expect(wrapper).toMatchSnapshot();
+    });
+
+    test('should match snapshot with additional, optional props', () => {
+        function emptyFunction() {} //eslint-disable-line no-empty-function
+
+        const wrapper = shallow(
+            <Textbox
+                id='someid'
+                value='some test text'
+                onChange={emptyFunction}
+                onKeyPress={emptyFunction}
+                characterLimit={4000}
+                createMessage='placeholder text'
+                supportsCommands={false}
+                {...baseProps}
+                rootId='root_id'
+                onComposition={() => {}}
+                onHeightChange={() => {}}
+                onKeyDown={() => {}}
+                onSelect={() => {}}
+                onMouseUp={() => {}}
+                onKeyUp={() => {}}
+                onBlur={() => {}}
+                handlePostError={() => {}}
+                suggestionListStyle='style'
+                emojiEnabled={true}
+                isRHS={true}
+                disabled={true}
+                badConnection={true}
+                listenForMentionKeyClick={true}
+                preview={true}
+                openWhenEmpty={true}
             />,
         );
         expect(wrapper).toMatchSnapshot();

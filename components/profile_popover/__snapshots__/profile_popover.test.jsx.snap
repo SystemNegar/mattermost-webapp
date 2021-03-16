@@ -2,7 +2,9 @@
 
 exports[`components/ProfilePopover should hide add-to-channel option if not on team 1`] = `
 <Popover
+  customStatus={Object {}}
   id="user-profile-popover"
+  isCustomStatusEnabled={true}
   isInCurrentTeam={false}
   placement="right"
   popoverSize="sm"
@@ -19,7 +21,7 @@ exports[`components/ProfilePopover should hide add-to-channel option if not on t
     </span>
   }
 >
-  <Avatar
+  <Memo(Avatar)
     key="user-popover-image"
     size="xxl"
     url="src"
@@ -49,7 +51,6 @@ exports[`components/ProfilePopover should hide add-to-channel option if not on t
     >
       <LocalizedIcon
         className="fa fa-paper-plane"
-        component="i"
         title={
           Object {
             "defaultMessage": "Send Message Icon",
@@ -60,7 +61,6 @@ exports[`components/ProfilePopover should hide add-to-channel option if not on t
       <FormattedMessage
         defaultMessage="Send Message"
         id="user_profile.send.dm"
-        values={Object {}}
       />
     </a>
   </div>
@@ -81,7 +81,9 @@ exports[`components/ProfilePopover should hide add-to-channel option if not on t
 
 exports[`components/ProfilePopover should match snapshot 1`] = `
 <Popover
+  customStatus={Object {}}
   id="user-profile-popover"
+  isCustomStatusEnabled={true}
   isInCurrentTeam={true}
   placement="right"
   popoverSize="sm"
@@ -98,7 +100,7 @@ exports[`components/ProfilePopover should match snapshot 1`] = `
     </span>
   }
 >
-  <Avatar
+  <Memo(Avatar)
     key="user-popover-image"
     size="xxl"
     url="src"
@@ -128,7 +130,6 @@ exports[`components/ProfilePopover should match snapshot 1`] = `
     >
       <LocalizedIcon
         className="fa fa-paper-plane"
-        component="i"
         title={
           Object {
             "defaultMessage": "Send Message Icon",
@@ -139,7 +140,6 @@ exports[`components/ProfilePopover should match snapshot 1`] = `
       <FormattedMessage
         defaultMessage="Send Message"
         id="user_profile.send.dm"
-        values={Object {}}
       />
     </a>
   </div>
@@ -178,7 +178,6 @@ exports[`components/ProfilePopover should match snapshot 1`] = `
       >
         <LocalizedIcon
           className="fa fa-user-plus"
-          component="i"
           title={
             Object {
               "defaultMessage": "Add User to Channel Icon",

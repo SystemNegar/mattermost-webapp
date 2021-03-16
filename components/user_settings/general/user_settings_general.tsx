@@ -8,7 +8,7 @@ import {defineMessages, FormattedDate, FormattedMessage, injectIntl, IntlShape} 
 import {isEmail} from 'mattermost-redux/utils/helpers';
 import {UserProfile} from 'mattermost-redux/types/users';
 
-import {trackEvent} from 'actions/diagnostics_actions.jsx';
+import {trackEvent} from 'actions/telemetry_actions.jsx';
 import * as Utils from 'utils/utils.jsx';
 import {t} from 'utils/i18n';
 
@@ -16,7 +16,7 @@ import SettingItemMax from 'components/setting_item_max.jsx';
 import SettingItemMin from 'components/setting_item_min';
 import SettingPicture from 'components/setting_picture.jsx';
 import LoadingWrapper from 'components/widgets/loading/loading_wrapper';
-import {AnnouncementBarMessages, AnnouncementBarTypes, AcceptedProfileImageTypes, Constants} from 'utils/constants';
+import {AnnouncementBarMessages, AnnouncementBarTypes, AcceptedProfileImageTypes, Constants, ValidationErrors} from 'utils/constants';
 
 const holders = defineMessages({
     usernameReserved: {
@@ -85,7 +85,7 @@ const holders = defineMessages({
     },
 });
 
-type Props = {
+export type Props = {
     intl: IntlShape;
     user: UserProfile;
     updateSection: (section: string) => void;
@@ -112,7 +112,7 @@ type Props = {
             };
         }>;
         setDefaultProfileImage: (id: string) => void;
-        uploadProfileImage: (id: string, file: object) => Promise<{
+        uploadProfileImage: (id: string, file: File) => Promise<{
             data: boolean;
             error?: {
                 message: string;
@@ -141,7 +141,7 @@ type State = {
     email: string;
     confirmEmail: string;
     currentPassword: string;
-    pictureFile: {type: string; size: number} | null;
+    pictureFile: File | null;
     loadingPicture: boolean;
     sectionIsSaving: boolean;
     showSpinner: boolean;
@@ -204,11 +204,14 @@ export class UserSettingsGeneralTab extends React.Component<Props, State> {
 
         const {formatMessage} = this.props.intl;
         const usernameError = Utils.isValidUsername(username);
-        if (usernameError === 'Cannot use a reserved word as a username.') {
-            this.setState({clientError: formatMessage(holders.usernameReserved), serverError: ''});
-            return;
-        } else if (usernameError) {
-            this.setState({clientError: formatMessage(holders.usernameRestrictions, {min: Constants.MIN_USERNAME_LENGTH, max: Constants.MAX_USERNAME_LENGTH}), serverError: ''});
+        if (usernameError) {
+            let errObj;
+            if (usernameError.id === ValidationErrors.RESERVED_NAME) {
+                errObj = {clientError: formatMessage(holders.usernameReserved), serverError: ''};
+            } else {
+                errObj = {clientError: formatMessage(holders.usernameRestrictions, {min: Constants.MIN_USERNAME_LENGTH, max: Constants.MAX_USERNAME_LENGTH}), serverError: ''};
+            }
+            this.setState(errObj);
             return;
         }
 
@@ -626,6 +629,24 @@ export class UserSettingsGeneralTab extends React.Component<Props, State> {
                             <FormattedMessage
                                 id='user.settings.general.emailOffice365CantUpdate'
                                 defaultMessage='Login occurs through Office 365. Email cannot be updated. Email address used for notifications is {email}.'
+                                values={{
+                                    email: this.state.originalEmail,
+                                }}
+                            />
+                        </div>
+                        {helpText}
+                    </div>,
+                );
+            } else if (this.props.user.auth_service === Constants.OPENID_SERVICE) {
+                inputs.push(
+                    <div
+                        key='oauthEmailInfo'
+                        className='form-group'
+                    >
+                        <div className='setting-list__hint pb-3'>
+                            <FormattedMessage
+                                id='user.settings.general.emailOpenIdCantUpdate'
+                                defaultMessage='Login occurs through OpenID Connect. Email cannot be updated. Email address used for notifications is {email}.'
                                 values={{
                                     email: this.state.originalEmail,
                                 }}
@@ -1223,7 +1244,7 @@ export class UserSettingsGeneralTab extends React.Component<Props, State> {
             let helpText = null;
             let imgSrc = null;
 
-            if ((this.props.user.auth_service === Constants.LDAP_SERVICE && this.props.ldapPictureAttributeSet)) {
+            if ((this.props.user.auth_service === Constants.LDAP_SERVICE || this.props.user.auth_service === Constants.SAML_SERVICE) && this.props.ldapPictureAttributeSet) {
                 helpText = (
                     <span>
                         <FormattedMessage

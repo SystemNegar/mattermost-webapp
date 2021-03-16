@@ -45,7 +45,6 @@ exports[`components/MoreDirectChannels should exclude deleted users if there is 
       <FormattedMessage
         defaultMessage="Direct Messages"
         id="more_direct_channels.title"
-        values={Object {}}
       />
     </ModalTitle>
   </ModalHeader>
@@ -108,7 +107,13 @@ exports[`components/MoreDirectChannels should exclude deleted users if there is 
       }
       perPage={50}
       placeholderText="Search and add members"
+      saveButtonPosition="top"
       saving={false}
+      selectedItemRef={
+        Object {
+          "current": null,
+        }
+      }
       submitImmediatelyOn={[Function]}
       users={
         Array [
@@ -145,6 +150,7 @@ exports[`components/MoreDirectChannels should exclude deleted users if there is 
         ]
       }
       valueRenderer={[Function]}
+      valueWithImage={false}
       values={Array []}
     />
   </ModalBody>
@@ -161,7 +167,6 @@ exports[`components/MoreDirectChannels should exclude deleted users if there is 
       <FormattedMessage
         defaultMessage="Close"
         id="general_button.close"
-        values={Object {}}
       />
     </button>
   </ModalFooter>
@@ -206,6 +211,18 @@ exports[`components/MoreDirectChannels should match renderOption snapshot 1`] = 
       <GuestBadge
         className="badge-popoverlist"
         show={false}
+      />
+      <CustomStatusEmoji
+        emojiSize={15}
+        emojiStyle={
+          Object {
+            "marginLeft": 4,
+          }
+        }
+        showTooltip={true}
+        spanStyle={Object {}}
+        tooltipDirection="top"
+        userID="user_id_1"
       />
     </div>
     <div
@@ -269,7 +286,6 @@ exports[`components/MoreDirectChannels should match snapshot 1`] = `
       <FormattedMessage
         defaultMessage="Direct Messages"
         id="more_direct_channels.title"
-        values={Object {}}
       />
     </ModalTitle>
   </ModalHeader>
@@ -326,7 +342,13 @@ exports[`components/MoreDirectChannels should match snapshot 1`] = `
       }
       perPage={50}
       placeholderText="Search and add members"
+      saveButtonPosition="top"
       saving={false}
+      selectedItemRef={
+        Object {
+          "current": null,
+        }
+      }
       submitImmediatelyOn={[Function]}
       users={
         Array [
@@ -351,6 +373,7 @@ exports[`components/MoreDirectChannels should match snapshot 1`] = `
         ]
       }
       valueRenderer={[Function]}
+      valueWithImage={false}
       values={
         Array [
           Object {
@@ -380,7 +403,6 @@ exports[`components/MoreDirectChannels should match snapshot 1`] = `
       <FormattedMessage
         defaultMessage="Close"
         id="general_button.close"
-        values={Object {}}
       />
     </button>
   </ModalFooter>
@@ -402,5 +424,10 @@ exports[`components/MoreDirectChannels should render the group channel option 1`
   }
   isSelected={false}
   onAdd={[Function]}
+  selectedItemRef={
+    Object {
+      "current": null,
+    }
+  }
 />
 `;

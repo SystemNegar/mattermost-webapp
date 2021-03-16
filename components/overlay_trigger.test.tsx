@@ -50,12 +50,10 @@ describe('OverlayTrigger', () => {
             </IntlProvider>,
         );
 
-        const overlay = mount(wrapper.find(BaseOverlayTrigger).prop('overlay'));
-
-        expect(overlay.text()).toBe('Default value');
-
         // console.error will have been called by FormattedMessage because its intl context is missing
-        expect(console.error).toHaveBeenCalled();
+        expect(() => {
+            mount(wrapper.find(BaseOverlayTrigger).prop('overlay'));
+        }).toThrow('[React Intl] Could not find required `intl` object. <IntlProvider> needs to exist in the component ancestry.');
     });
 
     test('custom OverlayTrigger should pass intl to overlay', () => {
@@ -128,5 +126,38 @@ describe('OverlayTrigger', () => {
         expect(overlay.prop('className')).toContain('fade in');
         expect(overlay.prop('placement')).toBe('right');
         expect(overlay.prop('positionTop')).toBe(0);
+    });
+
+    test('disabled and style should both be supported', () => {
+        const props = {
+            ...baseProps,
+            overlay: (
+                <span
+                    style={{backgroundColor: 'red'}}
+                >
+                    {'test-overlay'}
+                </span>
+            ),
+            defaultOverlayShown: true, // Make sure the overlay is visible
+            disabled: true,
+        };
+
+        const wrapper = mount(
+            <IntlProvider {...intlProviderProps}>
+                <OverlayTrigger {...props}>
+                    <span/>
+                </OverlayTrigger>
+            </IntlProvider>,
+        );
+
+        // Dive into the react-bootstrap internals to find our overlay
+        const overlay = mount((wrapper.find(BaseOverlayTrigger).instance() as any)._overlay).find('span'); // eslint-disable-line no-underscore-dangle
+
+        // Confirm that we've found the right span
+        expect(overlay.exists()).toBe(true);
+        expect(overlay.text()).toBe('test-overlay');
+
+        // Confirm that our props are included
+        expect(overlay.prop('style')).toMatchObject({backgroundColor: 'red', visibility: 'hidden'});
     });
 });

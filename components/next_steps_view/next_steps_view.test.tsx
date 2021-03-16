@@ -15,26 +15,31 @@ describe('components/next_steps_view', () => {
                 roles: [],
                 title: 'Step_1',
                 component: jest.fn(),
+                visible: true,
             },
             {
                 id: 'step_2',
                 title: 'Step_2',
                 roles: [],
                 component: jest.fn(),
+                visible: true,
             },
             {
                 id: 'step_3',
                 title: 'Step_3',
                 roles: [],
                 component: jest.fn(),
+                visible: true,
             },
         ],
         currentUser: TestHelper.getUserMock(),
         preferences: [],
-        isAdmin: true,
+        isFirstAdmin: true,
         actions: {
             setShowNextStepsView: jest.fn(),
             savePreferences: jest.fn(),
+            closeRightHandSide: jest.fn(),
+            getProfiles: jest.fn(),
         },
     };
 
@@ -42,6 +47,7 @@ describe('components/next_steps_view', () => {
         const wrapper = shallow(
             <NextStepsView {...baseProps}/>,
         );
+        wrapper.setState({show: true});
 
         expect(wrapper).toMatchSnapshot();
     });

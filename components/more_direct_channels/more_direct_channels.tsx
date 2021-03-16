@@ -9,6 +9,7 @@ import {Client4} from 'mattermost-redux/client';
 import {Channel} from 'mattermost-redux/types/channels';
 import {RelationOneToOne} from 'mattermost-redux/types/utilities';
 import {UserProfile} from 'mattermost-redux/types/users';
+import {GenericAction} from 'mattermost-redux/types/actions';
 
 import {browserHistory} from 'utils/browser_history';
 import Constants from 'utils/constants';
@@ -19,13 +20,15 @@ import AddIcon from 'components/widgets/icons/fa_add_icon';
 import GuestBadge from 'components/widgets/badges/guest_badge';
 import BotBadge from 'components/widgets/badges/bot_badge';
 
+import CustomStatusEmoji from 'components/custom_status/custom_status_emoji';
+
 import GroupMessageOption from './group_message_option';
 
 const USERS_PER_PAGE = 50;
 const MAX_SELECTABLE_VALUES = Constants.MAX_USERS_IN_GM - 1;
 
 type UserProfileValue = (UserProfile & Value);
-type GroupChannelValue = (Channel & Value & {profiles: UserProfile[]});
+type GroupChannelValue = (Channel & Value & { profiles: UserProfile[] });
 
 type OptionType = UserProfileValue | GroupChannelValue;
 
@@ -35,7 +38,7 @@ type Props = {
     currentTeamName: string;
     searchTerm: string;
     users: UserProfile[];
-    groupChannels: Array<{profiles: UserProfile[]} & Channel>;
+    groupChannels: Array<{ profiles: UserProfile[] } & Channel>;
     myDirectChannels: Channel[];
     statuses: RelationOneToOne<UserProfile, string>;
     totalCount?: number;
@@ -70,9 +73,7 @@ type Props = {
         openGroupChannelToUserIds: (userIds: any) => Promise<any>;
         searchProfiles: (term: string, options?: any) => Promise<any>;
         searchGroupChannels: (term: string) => Promise<any>;
-        setModalSearchTerm: (term: any) => Promise<{
-            data: boolean;
-        }>;
+        setModalSearchTerm: (term: any) => GenericAction;
     };
 }
 
@@ -88,14 +89,15 @@ export default class MoreDirectChannels extends React.PureComponent<Props, State
     searchTimeoutId: any;
     exitToChannel?: string;
     multiselect: React.RefObject<MultiSelect<OptionType>>;
-
+    selectedItemRef: React.RefObject<HTMLDivElement>;
     constructor(props: Props) {
         super(props);
 
         this.searchTimeoutId = 0;
         this.multiselect = React.createRef();
+        this.selectedItemRef = React.createRef();
 
-        const values: (OptionType | UserProfile)[] = [];
+        const values: Array<OptionType | UserProfile> = [];
 
         if (props.currentChannelMembers) {
             for (let i = 0; i < props.currentChannelMembers.length; i++) {
@@ -311,6 +313,7 @@ export default class MoreDirectChannels extends React.PureComponent<Props, State
         if ((option as GroupChannelValue).type && (option as GroupChannelValue).type === 'G') {
             return (
                 <GroupMessageOption
+                    selectedItemRef={this.selectedItemRef}
                     key={option.id}
                     channel={(option as GroupChannelValue)}
                     isSelected={isSelected}
@@ -355,7 +358,7 @@ export default class MoreDirectChannels extends React.PureComponent<Props, State
         return (
             <div
                 key={option.id}
-                ref={isSelected ? 'selected' : option.id}
+                ref={isSelected ? this.selectedItemRef : option.id}
                 className={'more-modal__row clickable ' + rowSelected}
                 onClick={() => onAdd(option)}
                 onMouseMove={() => onMouseMove(option)}
@@ -378,6 +381,11 @@ export default class MoreDirectChannels extends React.PureComponent<Props, State
                             show={isGuest(option)}
                             className='badge-popoverlist'
                         />
+                        <CustomStatusEmoji
+                            userID={option.id}
+                            showTooltip={true}
+                            emojiSize={15}
+                        />
                     </div>
                     <div className='more-modal__description'>
                         {email}
@@ -392,7 +400,7 @@ export default class MoreDirectChannels extends React.PureComponent<Props, State
         );
     }
 
-    renderValue(props: {data: OptionType}) {
+    renderValue(props: { data: OptionType }) {
         return (props.data as UserProfileValue).username;
     }
 
@@ -474,6 +482,7 @@ export default class MoreDirectChannels extends React.PureComponent<Props, State
                 ref={this.multiselect}
                 options={options}
                 optionRenderer={this.renderOption}
+                selectedItemRef={this.selectedItemRef}
                 values={this.state.values}
                 valueRenderer={this.renderValue}
                 ariaLabelRenderer={this.renderAriaLabel}

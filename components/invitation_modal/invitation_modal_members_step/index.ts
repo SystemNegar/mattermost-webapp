@@ -1,15 +1,15 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import {connect} from 'react-redux';
+import {bindActionCreators, Dispatch} from 'redux';
 
 import {
     getConfig,
     getLicense,
+    getSubscriptionStats as selectSubscriptionStats,
 } from 'mattermost-redux/selectors/entities/general';
 import {getCurrentUser} from 'mattermost-redux/selectors/entities/users';
-import {getStandardAnalytics} from 'mattermost-redux/actions/admin';
-import {bindActionCreators, Dispatch} from 'redux';
-import {GenericAction} from 'mattermost-redux/types/actions';
+import {getSubscriptionStats} from 'mattermost-redux/actions/cloud';
 
 import {GlobalState} from 'types/store';
 
@@ -20,20 +20,15 @@ import InvitationModalMembersStep from './invitation_modal_members_step';
 function mapStateToProps(state: GlobalState) {
     return {
         userLimit: getConfig(state).ExperimentalCloudUserLimit,
-        analytics: state.entities.admin.analytics,
         userIsAdmin: isAdmin(getCurrentUser(state).roles),
-        isCloud: getLicense(state).Cloud,
+        isCloud: getLicense(state).Cloud === 'true',
+        subscriptionStats: selectSubscriptionStats(state),
     };
 }
 
-function mapDispatchToProps(dispatch: Dispatch<GenericAction>) {
+function mapDispatchToProps(dispatch: Dispatch) {
     return {
-        actions: bindActionCreators(
-            {
-                getStandardAnalytics,
-            },
-            dispatch
-        ),
+        actions: bindActionCreators({getSubscriptionStats}, dispatch),
     };
 }
 

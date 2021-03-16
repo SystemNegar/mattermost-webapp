@@ -2,6 +2,7 @@
 // See LICENSE.txt for license information.
 
 import React, {CSSProperties} from 'react';
+import classNames from 'classnames';
 
 import * as Utils from 'utils/utils.jsx';
 import {showMobileSubMenuModal} from 'actions/global_actions';
@@ -30,20 +31,22 @@ import Constants from 'utils/constants';
 // }
 // Submenus can contain Submenus as well
 
-type Props = {
+export type Props = {
     id?: string;
     postId?: string;
     text: React.ReactNode;
+    selectedValueText?: React.ReactNode;
     subMenu?: Props[];
     icon?: React.ReactNode;
-    action?: (id?: string) => {};
-    filter?: (id?: string) => {};
+    action?: (id?: string) => void;
+    filter?: (id?: string) => boolean;
     xOffset?: number;
     ariaLabel?: string;
     root?: boolean;
     show?: boolean;
     direction?: 'left' | 'right';
     openUp?: boolean;
+    styleSelectableItem?: boolean;
 }
 
 type State = {
@@ -93,13 +96,23 @@ export default class SubMenuItem extends React.PureComponent<Props, State> {
             } else if (action) { // leaf node in the tree handles action only
                 action(postId);
             }
-        } else if (path && // the first 2 elements in path match original event id
+        } else if (
+            path && // the first 2 elements in path match original event id
             path.slice(0, 2).find((e) => e.id === id) &&
-            action) {
+            action
+        ) {
             action(postId);
-        } else if (!path && !event.nativeEvent.composedPath && action) { //for tests only that don't contain `path` or `composedPath`
+        } else if (
+            !path &&
+            !event.nativeEvent.composedPath &&
+            action
+        ) { //for tests only that don't contain `path` or `composedPath`
             action(postId);
-        } else if (!path && (event.nativeEvent.composedPath() as HTMLElement[]).slice(0, 2).find((e) => e.id === id) && action) {
+        } else if (
+            !path &&
+            (event.nativeEvent.composedPath() as HTMLElement[]).slice(0, 2).find((e) => e.id === id) &&
+            action
+        ) {
             action(postId);
         }
     }
@@ -131,7 +144,7 @@ export default class SubMenuItem extends React.PureComponent<Props, State> {
     }
 
     public render() {
-        const {id, postId, text, subMenu, root, icon, filter, xOffset, ariaLabel, direction} = this.props;
+        const {id, postId, text, selectedValueText, subMenu, root, icon, filter, xOffset, ariaLabel, direction, styleSelectableItem} = this.props;
         const isMobile = Utils.isMobile();
 
         if (filter && !filter(id)) {
@@ -142,7 +155,7 @@ export default class SubMenuItem extends React.PureComponent<Props, State> {
         if (icon) {
             textProp = (
                 <React.Fragment>
-                    <span className='icon'>{icon}</span>
+                    <span className={classNames(['icon', {'sorting-menu-icon': styleSelectableItem}])}>{icon}</span>
                     {text}
                 </React.Fragment>
             );
@@ -169,25 +182,34 @@ export default class SubMenuItem extends React.PureComponent<Props, State> {
         if (!isMobile) {
             subMenuContent = (
                 <ul
-                    className={'a11y__popup Menu dropdown-menu SubMenu'}
+                    className={classNames(['a11y__popup Menu dropdown-menu SubMenu', {styleSelectableItem}])}
                     style={subMenuStyle}
                 >
                     {hasSubmenu ? subMenu!.map((s) => {
+                        const hasDivider = s.id === 'SidebarChannelMenu-moveToDivider';
                         return (
-                            <SubMenuItem
+                            <div
+                                className={classNames(['SubMenuItemContainer', {hasDivider}])}
                                 key={s.id}
-                                id={s.id}
-                                postId={postId}
-                                text={s.text}
-                                icon={s.icon}
-                                subMenu={s.subMenu}
-                                action={s.action}
-                                filter={s.filter}
-                                xOffset={parentWidth}
-                                ariaLabel={ariaLabel}
-                                root={false}
-                                direction={s.direction}
-                            />
+                            >
+                                <SubMenuItem
+                                    id={s.id}
+                                    postId={postId}
+                                    text={s.text}
+                                    selectedValueText={s.selectedValueText}
+                                    icon={s.icon}
+                                    subMenu={s.subMenu}
+                                    action={s.action}
+                                    filter={s.filter}
+                                    xOffset={parentWidth}
+                                    ariaLabel={ariaLabel}
+                                    root={false}
+                                    direction={s.direction}
+                                />
+                                {s.text === selectedValueText && <span className='sorting-menu-checkbox'>
+                                    <i className='icon-check'/>
+                                </span>}
+                            </div>
                         );
                     }) : ''}
                 </ul>
@@ -196,12 +218,13 @@ export default class SubMenuItem extends React.PureComponent<Props, State> {
 
         return (
             <li
-                className={'SubMenuItem MenuItem'}
+                className={classNames(['SubMenuItem MenuItem', {styleSelectableItem}])}
                 role='menuitem'
                 id={id + '_menuitem'}
                 ref={this.node}
             >
                 <div
+                    className={classNames([{styleSelectableItemDiv: styleSelectableItem}])}
                     id={id}
                     aria-label={ariaLabel}
                     onMouseEnter={this.show}
@@ -210,17 +233,20 @@ export default class SubMenuItem extends React.PureComponent<Props, State> {
                     tabIndex={0}
                     onKeyDown={this.handleKeyDown}
                 >
-                    <span
-                        id={'channelHeaderDropdownIconLeft_' + id}
-                        className={'fa fa-angle-left SubMenu__icon-left' + (hasSubmenu && !isMobile && (direction === 'left') ? '' : '-empty' + (isMobile ? ' mobile' : ''))}
-                        aria-label={Utils.localizeMessage('post_info.submenu.icon', 'submenu icon').toLowerCase()}
-                    />
+                    {id !== 'SidebarChannelMenu-moveToDivider' &&
+                        <span
+                            id={'channelHeaderDropdownIconLeft_' + id}
+                            className={classNames([`fa fa-angle-left SubMenu__icon-left${hasSubmenu && direction === 'left' ? '' : '-empty'}`, {mobile: isMobile}])}
+                            aria-label={Utils.localizeMessage('post_info.submenu.icon', 'submenu icon').toLowerCase()}
+                        />}
                     {textProp}
-                    <span
-                        id={'channelHeaderDropdownIconRight_' + id}
-                        className={'fa fa-angle-right SubMenu__icon-right' + (hasSubmenu && (isMobile || direction === 'right') ? '' : '-empty')}
-                        aria-label={Utils.localizeMessage('post_info.submenu.icon', 'submenu icon').toLowerCase()}
-                    />
+                    {selectedValueText && <span className='selected'>{selectedValueText}</span>}
+                    {id !== 'SidebarChannelMenu-moveToDivider' &&
+                        <span
+                            id={'channelHeaderDropdownIconRight_' + id}
+                            className={classNames([`fa fa-angle-right SubMenu__icon-right${hasSubmenu && direction === 'right' ? '' : '-empty'}`, {mobile: isMobile}])}
+                            aria-label={Utils.localizeMessage('post_info.submenu.icon', 'submenu icon').toLowerCase()}
+                        />}
                     {subMenuContent}
                 </div>
             </li>

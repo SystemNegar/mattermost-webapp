@@ -1,29 +1,68 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Modal, Button} from 'react-bootstrap';
 import {FormattedMessage} from 'react-intl';
+
+import {trackEvent, pageVisited} from 'actions/telemetry_actions';
+
+import {ModalIdentifiers, TELEMETRY_CATEGORIES} from 'utils/constants';
+import PurchaseModal from 'components/purchase_modal';
+import NotifyLink from 'components/widgets/links/notify_link';
 
 import UpgradeUserLimitModalSvg from './user_limit_upgrade_svg';
 import './user_limit_modal.scss';
 
 type Props = {
+    userIsAdmin: boolean;
     show: boolean;
+    cloudUserLimit: string;
     actions: {
         closeModal: () => void;
+        openModal: (modalData: {modalId: string; dialogType: any; dialogProps?: any}) => void;
     };
 };
 
 export default function UserLimitModal(props: Props) {
+    useEffect(() => {
+        pageVisited(
+            TELEMETRY_CATEGORIES.CLOUD_PURCHASING,
+            'pageview_modal_user_limit_reached',
+        );
+    }, []);
+
     const onSubmit = () => {
-        // This does nothing until implementation of the upgrade tier page is complete
-        // Eventually, we will dispatch props.actions.openModal here
+        trackEvent(
+            TELEMETRY_CATEGORIES.CLOUD_PURCHASING,
+            'click_modal_user_limit_upgrade',
+        );
+        props.actions.closeModal();
+        props.actions.openModal({
+            modalId: ModalIdentifiers.CLOUD_PURCHASE,
+            dialogType: PurchaseModal,
+        });
     };
 
     const close = () => {
+        trackEvent(
+            TELEMETRY_CATEGORIES.CLOUD_PURCHASING,
+            'click_modal_user_limit_not_now',
+        );
         props.actions.closeModal();
     };
+
+    const confirmBtn = props.userIsAdmin ? (
+        <Button
+            className='confirm-button'
+            onClick={onSubmit}
+        >
+            <FormattedMessage
+                id={'upgrade.cloud'}
+                defaultMessage={'Upgrade Mattermost Cloud'}
+            />
+        </Button>
+    ) : (<NotifyLink className='confirm-button'/>);
 
     return (
         <>
@@ -48,8 +87,11 @@ export default function UserLimitModal(props: Props) {
                             <FormattedMessage
                                 id={'upgrade.cloud_modal_body'}
                                 defaultMessage={
-                                    'The free tier is limited to 10 users. Upgrade Mattermost Cloud for more users.'
+                                    'The free tier is limited to {num} users. Upgrade Mattermost Cloud for more users.'
                                 }
+                                values={{
+                                    num: props.cloudUserLimit,
+                                }}
                             />
                         </div>
                         <div className='buttons'>
@@ -62,15 +104,7 @@ export default function UserLimitModal(props: Props) {
                                     defaultMessage={'Not right now'}
                                 />
                             </Button>
-                            <Button
-                                className='confirm-button'
-                                onClick={onSubmit}
-                            >
-                                <FormattedMessage
-                                    id={'upgrade.cloud'}
-                                    defaultMessage={'Upgrade Mattermost Cloud'}
-                                />
-                            </Button>
+                            {confirmBtn}
                         </div>
                     </Modal.Body>
                 </Modal>

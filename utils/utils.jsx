@@ -1,27 +1,34 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+/* eslint-disable max-lines */
 
-import $ from 'jquery';
 import React from 'react';
 import {FormattedMessage} from 'react-intl';
 
+import {getChannel as getChannelAction, getChannelByNameAndTeamName, getChannelMember, joinChannel} from 'mattermost-redux/actions/channels';
+import {getPost as getPostAction} from 'mattermost-redux/actions/posts';
+import {getTeamByName as getTeamByNameAction} from 'mattermost-redux/actions/teams';
 import {Client4} from 'mattermost-redux/client';
 import {Posts} from 'mattermost-redux/constants';
-import {getChannel, getRedirectChannelNameForTeam} from 'mattermost-redux/selectors/entities/channels';
+import {getChannel, getChannelsNameMapInTeam, getMyChannelMemberships, getRedirectChannelNameForTeam} from 'mattermost-redux/selectors/entities/channels';
 import {getConfig} from 'mattermost-redux/selectors/entities/general';
+import {getPost} from 'mattermost-redux/selectors/entities/posts';
 import {getTeammateNameDisplaySetting, getBool} from 'mattermost-redux/selectors/entities/preferences';
-import {getCurrentUserId, getUser} from 'mattermost-redux/selectors/entities/users';
+import {getCurrentUser, getCurrentUserId, getUser} from 'mattermost-redux/selectors/entities/users';
 import {
     blendColors,
     changeOpacity,
 } from 'mattermost-redux/utils/theme_utils';
 import {displayUsername} from 'mattermost-redux/utils/user_utils';
-import {getCurrentTeamId, getCurrentRelativeTeamUrl, getTeam} from 'mattermost-redux/selectors/entities/teams';
+import {getCurrentTeamId, getCurrentRelativeTeamUrl, getTeam, getTeamByName, getTeamMemberships} from 'mattermost-redux/selectors/entities/teams';
 import cssVars from 'css-vars-ponyfill';
 
-import {browserHistory} from 'utils/browser_history';
+import moment from 'moment';
+
+import {addUserToTeam} from 'actions/team_actions';
 import {searchForTerm} from 'actions/post_actions';
-import Constants, {FileTypes, UserStatuses} from 'utils/constants.jsx';
+import {browserHistory} from 'utils/browser_history';
+import Constants, {FileTypes, UserStatuses, ValidationErrors} from 'utils/constants.jsx';
 import * as UserAgent from 'utils/user_agent';
 import * as Utils from 'utils/utils';
 import bing from 'sounds/bing.mp3';
@@ -32,7 +39,10 @@ import ripple from 'sounds/ripple.mp3';
 import upstairs from 'sounds/upstairs.mp3';
 import {t} from 'utils/i18n';
 import store from 'stores/redux_store.jsx';
+
 import {getCurrentLocale, getTranslations} from 'selectors/i18n';
+
+import {joinPrivateChannelPrompt} from './channel_utils';
 
 export function isMac() {
     return navigator.platform.toUpperCase().indexOf('MAC') >= 0;
@@ -44,7 +54,7 @@ export function isLinux() {
 
 export function createSafeId(prop) {
     if (prop === null) {
-        return null;
+        return undefined;
     }
 
     var str = '';
@@ -501,53 +511,30 @@ export function applyTheme(theme) {
     if (theme.sidebarBg) {
         changeCss('.app__body .sidebar--left .sidebar__switcher, .sidebar--left, .app__body .modal .settings-modal .settings-table .settings-links, .app__body .sidebar--menu', 'background:' + theme.sidebarBg);
         changeCss('body.app__body', 'scrollbar-face-color:' + theme.sidebarBg);
-        changeCss('@media(max-width: 768px){.app__body .modal .settings-modal:not(.settings-modal--tabless):not(.display--content) .modal-content', 'background:' + theme.sidebarBg);
-        changeCss('.app__body .modal-tabs .nav-tabs > li.active', `border-bottom-color:${theme.sidebarBg}`);
     }
 
     if (theme.sidebarText) {
         changeCss('.app__body .team-sidebar .a11y--focused, .app__body .sidebar--left .a11y--focused', 'box-shadow: inset 0 0 1px 3px ' + changeOpacity(theme.sidebarText, 0.5) + ', inset 0 0 0 1px ' + theme.sidebarText);
-        changeCss('.multi-select__focused > div', 'box-shadow: inset 0 0 1px 3px ' + changeOpacity(theme.sidebarText, 0.5) + ', inset 0 0 0 1px ' + theme.sidebarText);
-        changeCss('.app__body .ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y', 'background:' + theme.sidebarText);
-        changeCss('.app__body .ps-container:hover .ps-scrollbar-y-rail:hover, .app__body .sidebar__switcher button:hover', 'background:' + changeOpacity(theme.sidebarText, 0.15));
-        changeCss('.app__body .modal .settings-modal .nav-pills>li button', 'color:' + changeOpacity(theme.sidebarText, 0.6));
         changeCss('@media(max-width: 768px){.app__body .modal .settings-modal .settings-table .nav>li>a, .app__body .sidebar--menu', 'color:' + changeOpacity(theme.sidebarText, 0.8));
         changeCss('.sidebar--left .status .offline--icon, .app__body .sidebar--menu svg, .app__body .sidebar-item .icon', 'fill:' + theme.sidebarText);
-        changeCss('.sidebar--left .status.status--group', 'background:' + changeOpacity(theme.sidebarText, 0.3));
         changeCss('@media(max-width: 768px){.app__body .modal .settings-modal .settings-table .nav>li>button, .app__body #sidebarDropdownMenu .menu-divider', 'border-color:' + changeOpacity(theme.sidebarText, 0.2));
         changeCss('@media(max-width: 768px){.app__body .modal .settings-modal .settings-table .nav>li>button, .app__body .modal .settings-modal .settings-table .nav>li.active>button', 'color:' + theme.sidebarText);
-        changeCss('.app__body .sidebar--left .sidebar__switcher', 'border-color:' + changeOpacity(theme.sidebarText, 0.2));
-        changeCss('.app__body .team-sidebar .team-btn .badge', 'border-color:' + changeOpacity(theme.sidebarText, 0.5));
         changeCss('@media(max-width: 768px){.sidebar--left .add-channel-btn:hover, .sidebar--left .add-channel-btn:focus', 'color:' + changeOpacity(theme.sidebarText, 0.6));
-        changeCss('.app__body .sidebar--left .sidebar__switcher span', 'color:' + theme.sidebarText);
-        changeCss('.app__body .sidebar--left .sidebar__switcher button svg', 'fill:' + theme.sidebarText);
         changeCss('.channel-header .channel-header_plugin-dropdown a, .app__body .sidebar__switcher button', 'background:' + changeOpacity(theme.sidebarText, 0.08));
-        changeCss('.app__body .icon__bot', 'fill:' + theme.sidebarText);
     }
 
     if (theme.sidebarTextHoverBg) {
         changeCss('.sidebar--left .nav-pills__container li .sidebar-item:hover, .sidebar--left .nav-pills__container li > .nav-more:hover, .app__body .modal .settings-modal .nav-pills>li:hover button', 'background:' + theme.sidebarTextHoverBg);
     }
 
-    if (theme.sidebarTextActiveBorder) {
-        changeCss('.multi-teams .team-sidebar .team-wrapper .team-container:before', 'background:' + theme.sidebarTextActiveBorder);
-        changeCss('.multi-teams .team-sidebar .team-wrapper .team-container.active:before', 'background:' + theme.sidebarTextActiveBorder);
-        changeCss('.multi-teams .team-sidebar .team-wrapper .team-container.unread:before', 'background:' + theme.sidebarTextActiveBorder);
-    }
-
     if (theme.sidebarTextActiveColor) {
         changeCss('.sidebar--left .nav-pills__container li.active .sidebar-item, .sidebar--left .nav-pills__container li.active .sidebar-item:hover, .sidebar--left .nav-pills__container li.active .sidebar-item:focus, .app__body .modal .settings-modal .nav-pills>li.active button, .app__body .modal .settings-modal .nav-pills>li.active button:hover, .app__body .modal .settings-modal .nav-pills>li.active button:active', 'color:' + theme.sidebarTextActiveColor);
         changeCss('.sidebar--left .nav li.active .sidebar-item, .sidebar--left .nav li.active .sidebar-item:hover, .sidebar--left .nav li.active .sidebar-item:focus', 'background:' + changeOpacity(theme.sidebarTextActiveColor, 0.1));
-        changeCss('@media(max-width: 768px){.app__body .modal .settings-modal .nav-pills > li.active button', 'color:' + changeOpacity(theme.sidebarText, 0.8));
     }
 
     if (theme.sidebarHeaderBg) {
         changeCss('.app__body .MenuWrapper .status-wrapper .status, .app__body #status-dropdown .status-wrapper .status-edit, .sidebar--left .team__header, .app__body .sidebar--menu .team__header, .app__body .post-list__timestamp > div', 'background:' + theme.sidebarHeaderBg);
-        changeCss('.app__body .modal .modal-header', 'background:' + theme.sidebarHeaderBg);
         changeCss('.app__body .multi-teams .team-sidebar, .app__body #navbar_wrapper .navbar-default', 'background:' + theme.sidebarHeaderBg);
-        changeCss('@media(max-width: 768px){.app__body .search-bar__container', 'background:' + theme.sidebarHeaderBg);
-        changeCss('.app__body .attachment .attachment__container', 'border-left-color:' + theme.sidebarHeaderBg);
-        changeCss('.emoji-picker .emoji-picker__header', 'background:' + theme.sidebarHeaderBg);
     }
 
     if (theme.sidebarHeaderTextColor) {
@@ -556,25 +543,9 @@ export function applyTheme(theme) {
         changeCss('.sidebar--left .team__header .user__name, .app__body .sidebar--menu .team__header .user__name', 'color:' + changeOpacity(theme.sidebarHeaderTextColor, 0.8));
         changeCss('.sidebar--left .team__header:hover .user__name, .app__body .sidebar--menu .team__header:hover .user__name', 'color:' + theme.sidebarHeaderTextColor);
         changeCss('.app__body .modal .modal-header .modal-title, .app__body .modal .modal-header .modal-title .name', 'color:' + theme.sidebarHeaderTextColor);
-        changeCss('.app__body #navbar_wrapper .navbar-default .navbar-brand', 'color:' + theme.sidebarHeaderTextColor);
-        changeCss('.app__body #navbar_wrapper .navbar-default .navbar-toggle .icon-bar', 'background:' + theme.sidebarHeaderTextColor);
         changeCss('.app__body .post-list__timestamp > div, .app__body .multi-teams .team-sidebar .team-wrapper .team-container a:hover .team-btn__content, .app__body .multi-teams .team-sidebar .team-wrapper .team-container.active .team-btn__content', 'border-color:' + changeOpacity(theme.sidebarHeaderTextColor, 0.5));
-        changeCss('.app__body .team-btn', 'border-color:' + changeOpacity(theme.sidebarHeaderTextColor, 0.3));
-        changeCss('@media(max-width: 768px){.app__body .search-bar__container', 'color:' + theme.sidebarHeaderTextColor);
-        changeCss('.app__body .navbar-right__icon', 'background:' + changeOpacity(theme.sidebarHeaderTextColor, 0.2));
         changeCss('.app__body .navbar-right__icon:hover, .app__body .navbar-right__icon:focus', 'background:' + changeOpacity(theme.sidebarHeaderTextColor, 0.3));
-        changeCss('.team-sidebar .fa', 'color:' + theme.sidebarHeaderTextColor);
         changeCss('.emoji-picker .emoji-picker__header, .emoji-picker .emoji-picker__header .emoji-picker__header-close-button', 'color:' + theme.sidebarHeaderTextColor);
-    }
-
-    if (theme.onlineIndicator) {
-        changeCss('.app__body .status.status--online', 'color:' + theme.onlineIndicator);
-        changeCss('.app__body .status .online--icon', 'fill:' + theme.onlineIndicator);
-    }
-
-    if (theme.awayIndicator) {
-        changeCss('.app__body .status.status--away', 'color:' + theme.awayIndicator);
-        changeCss('.app__body .status .away--icon', 'fill:' + theme.awayIndicator);
     }
 
     let dndIndicator;
@@ -602,41 +573,27 @@ export function applyTheme(theme) {
     // Including 'mentionBj' for backwards compatability (old typo)
     const mentionBg = theme.mentionBg || theme.mentionBj;
     if (mentionBg) {
-        changeCss('.sidebar--left .nav-pills__unread-indicator', 'background:' + mentionBg);
         changeCss('.app__body .sidebar--left .badge, .app__body .list-group-item.active > .badge, .nav-pills > .active > a > .badge', 'background:' + mentionBg);
         changeCss('.multi-teams .team-sidebar .badge, .app__body .list-group-item.active > .badge, .nav-pills > .active > a > .badge', 'background:' + mentionBg);
     }
 
     if (theme.mentionColor) {
-        changeCss('.sidebar--left .nav-pills__unread-indicator svg', 'fill:' + theme.mentionColor);
-        changeCss('.app__body .sidebar--left .nav-pills__unread-indicator', 'color:' + theme.mentionColor);
         changeCss('.app__body .sidebar--left .badge, .app__body .list-group-item.active > .badge, .nav-pills > .active > a > .badge', 'color:' + theme.mentionColor);
         changeCss('.app__body .multi-teams .team-sidebar .badge, .app__body .list-group-item.active > .badge, .nav-pills > .active > a > .badge', 'color:' + theme.mentionColor);
     }
 
     if (theme.centerChannelBg) {
-        changeCss('.app__body #channel_view.channel-view', `background: ${theme.centerChannelBg}`);
-        changeCss('@media(max-width: 768px){.app__body .post .MenuWrapper .dropdown-menu button', 'background:' + theme.centerChannelBg);
-        changeCss('@media(max-width: 320px){.tutorial-steps__container', 'background:' + theme.centerChannelBg);
         changeCss('.app__body .post-card--info, .app__body .bg--white, .app__body .system-notice, .app__body .channel-header__info .channel-header__description:before, .app__body .app__content, .app__body .markdown__table, .app__body .markdown__table tbody tr, .app__body .modal .modal-footer, .app__body .status-wrapper .status, .app__body .alert.alert-transparent', 'background:' + theme.centerChannelBg);
         changeCss('#post-list .post-list-holder-by-time, .app__body .post .dropdown-menu a, .app__body .post .Menu .MenuItem', 'background:' + theme.centerChannelBg);
         changeCss('#post-create, .app__body .emoji-picker__preview', 'background:' + theme.centerChannelBg);
         changeCss('.app__body .date-separator .separator__text, .app__body .new-separator .separator__text', 'background:' + theme.centerChannelBg);
-        changeCss('.app__body .search-help-popover .search-autocomplete__divider span', 'background:' + theme.centerChannelBg);
         changeCss('.app__body .dropdown-menu, .app__body .popover, .app__body .tip-overlay', 'background:' + theme.centerChannelBg);
-        changeCss('.app__body .popover.bottom>.arrow:after', 'border-bottom-color:' + theme.centerChannelBg);
         changeCss('.app__body .popover.right>.arrow:after, .app__body .tip-overlay.tip-overlay--sidebar .arrow, .app__body .tip-overlay.tip-overlay--header .arrow', 'border-right-color:' + theme.centerChannelBg);
-        changeCss('.app__body .popover.left>.arrow:after', 'border-left-color:' + theme.centerChannelBg);
         changeCss('.app__body .popover.top>.arrow:after, .app__body .tip-overlay.tip-overlay--chat .arrow', 'border-top-color:' + theme.centerChannelBg);
-        changeCss('@media(min-width: 768px){.app__body .form-control', 'background:' + theme.centerChannelBg);
         changeCss('.app__body .attachment__content, .app__body .attachment-actions button', 'background:' + theme.centerChannelBg);
-        changeCss('body.app__body', 'scrollbar-face-color:' + theme.centerChannelBg);
-        changeCss('body.app__body', 'scrollbar-track-color:' + theme.centerChannelBg);
         changeCss('.app__body .shortcut-key, .app__body .post-list__new-messages-below', 'color:' + theme.centerChannelBg);
         changeCss('.app__body .emoji-picker, .app__body .emoji-picker__search', 'background:' + theme.centerChannelBg);
         changeCss('.app__body .nav-tabs, .app__body .nav-tabs > li.active > a', 'background:' + theme.centerChannelBg);
-        changeCss('.app__body .modal-tabs .nav-tabs > li', `background:${theme.centerChannelBg}`);
-        changeCss('.app__body .modal-tabs .nav-tabs > li > a', `background:${theme.centerChannelBg}`);
 
         // Fade out effect for collapsed posts (not hovered, not from current user)
         changeCss(
@@ -662,9 +619,6 @@ export function applyTheme(theme) {
             '.app__body .sidebar-right__body .post-attachment-collapse__show-more',
             `background-color:${theme.centerChannelBg}`,
         );
-
-        changeCss('.app__body .post-collapse__show-more-button:hover', `color:${theme.centerChannelBg}`);
-        changeCss('.app__body .post-collapse__show-more-button', `background:${theme.centerChannelBg}`);
     }
 
     if (theme.centerChannelColor) {
@@ -821,7 +775,6 @@ export function applyTheme(theme) {
 
     if (theme.linkColor) {
         changeCss('.app__body .more-modal__list .a11y--focused, .app__body .post.a11y--focused, .app__body .channel-header.a11y--focused, .app__body .post-create.a11y--focused, .app__body .user-popover.a11y--focused, .app__body .post-message__text.a11y--focused, #archive-link-home>a.a11y--focused', 'box-shadow: inset 0 0 1px 3px ' + changeOpacity(theme.linkColor, 0.5) + ', inset 0 0 0 1px ' + theme.linkColor);
-        changeCss('.multi-select__focused > div', 'box-shadow: 0 0 1px 3px ' + changeOpacity(theme.linkColor, 0.5) + ', 0 0 0 1px ' + theme.linkColor);
         changeCss('.app__body .a11y--focused', 'box-shadow: 0 0 1px 3px ' + changeOpacity(theme.linkColor, 0.5) + ', 0 0 0 1px ' + theme.linkColor);
         changeCss('.app__body .DayPicker-Day--today, .app__body .channel-header .channel-header__favorites.inactive:hover, .app__body .channel-header__links > a.active, .app__body a, .app__body a:focus, .app__body a:hover, .app__body .channel-header__links > .color--link.active, .app__body .color--link, .app__body a:focus, .app__body .color--link:hover, .app__body .btn, .app__body .btn:focus, .app__body .btn:hover', 'color:' + theme.linkColor);
         changeCss('.app__body .attachment .attachment__container', 'border-left-color:' + changeOpacity(theme.linkColor, 0.5));
@@ -895,6 +848,7 @@ export function applyTheme(theme) {
             'online-indicator-rgb': toRgbValues(theme.onlineIndicator),
             'sidebar-bg-rgb': toRgbValues(theme.sidebarBg),
             'sidebar-header-bg-rgb': toRgbValues(theme.sidebarHeaderBg),
+            'sidebar-teambar-bg-rgb': toRgbValues(theme.sidebarTeamBarBg),
             'sidebar-header-text-color-rgb': toRgbValues(theme.sidebarHeaderTextColor),
             'sidebar-text-rgb': toRgbValues(theme.sidebarText),
             'sidebar-text-active-border-rgb': toRgbValues(theme.sidebarTextActiveBorder),
@@ -919,6 +873,7 @@ export function applyTheme(theme) {
             'sidebar-text-active-border': theme.sidebarTextActiveBorder,
             'sidebar-text-active-color': theme.sidebarTextActiveColor,
             'sidebar-header-bg': theme.sidebarHeaderBg,
+            'sidebar-teambar-bg': theme.sidebarTeamBarBg,
             'sidebar-header-text-color': theme.sidebarHeaderTextColor,
             'sidebar-header-text-color-80': changeOpacity(theme.sidebarHeaderTextColor, 0.8),
             'online-indicator': theme.onlineIndicator,
@@ -984,7 +939,6 @@ export function applyTheme(theme) {
             'error-text-12': changeOpacity(theme.errorTextColor, 0.12),
             'mention-highlight-bg': theme.mentionHighlightBg,
             'mention-highlight-link': theme.mentionHighlightLink,
-            'mention-highlight-bg-12': changeOpacity(theme.mentionHighlightBg, 0.12),
         },
     });
 }
@@ -1039,21 +993,26 @@ export function updateCodeTheme(userTheme) {
             });
         }
     });
-    const $link = $('link.code_theme');
-    if (cssPath !== $link.attr('href')) { // eslint-disable-line jquery/no-attr
+
+    const link = document.querySelector('link.code_theme');
+    if (link && cssPath !== link.attributes.href) {
         changeCss('code.hljs', 'visibility: hidden');
-        var xmlHTTP = new XMLHttpRequest();
+
+        const xmlHTTP = new XMLHttpRequest();
+
         xmlHTTP.open('GET', cssPath, true);
         xmlHTTP.onload = function onLoad() {
-            $link.attr('href', cssPath); // eslint-disable-line jquery/no-attr
+            link.href = cssPath;
+
             if (UserAgent.isFirefox()) {
-                $link.one('load', () => {
+                link.addEventListener('load', () => {
                     changeCss('code.hljs', 'visibility: visible');
-                });
+                }, {once: true});
             } else {
                 changeCss('code.hljs', 'visibility: visible');
             }
         };
+
         xmlHTTP.send();
     }
 }
@@ -1085,6 +1044,171 @@ export function getCaretPosition(el) {
     return 0;
 }
 
+export function createHtmlElement(el) {
+    return document.createElement(el);
+}
+
+export function getElementComputedStyle(el) {
+    return getComputedStyle(el);
+}
+
+export function addElementToDocument(el) {
+    document.body.appendChild(el);
+}
+
+export function copyTextAreaToDiv(textArea) {
+    if (!textArea) {
+        return null;
+    }
+    const copy = createHtmlElement('div');
+    copy.textContent = textArea.value;
+    const style = getElementComputedStyle(textArea);
+    [
+        'fontFamily',
+        'fontSize',
+        'fontWeight',
+        'wordWrap',
+        'whiteSpace',
+        'borderLeftWidth',
+        'borderTopWidth',
+        'borderRightWidth',
+        'borderBottomWidth',
+        'paddingRight',
+        'paddingLeft',
+        'paddingTop',
+    ].forEach((key) => {
+        copy.style[key] = style[key];
+    });
+    copy.style.overflow = 'auto';
+    copy.style.width = textArea.offsetWidth + 'px';
+    copy.style.height = textArea.offsetHeight + 'px';
+    copy.style.position = 'absolute';
+    copy.style.left = textArea.offsetLeft + 'px';
+    copy.style.top = textArea.offsetTop + 'px';
+    addElementToDocument(copy);
+    return copy;
+}
+
+export function convertEmToPixels(el, remNum) {
+    if (isNaN(remNum)) {
+        return 0;
+    }
+    const styles = getElementComputedStyle(el);
+    return remNum * parseFloat(styles.fontSize);
+}
+
+export function getCaretXYCoordinate(textArea) {
+    if (!textArea) {
+        return {x: 0, y: 0};
+    }
+    const start = textArea.selectionStart;
+    const end = textArea.selectionEnd;
+    const copy = copyTextAreaToDiv(textArea);
+    const range = document.createRange();
+    range.setStart(copy.firstChild, start);
+    range.setEnd(copy.firstChild, end);
+    const selection = document.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+    const rect = range.getClientRects();
+    document.body.removeChild(copy);
+    textArea.selectionStart = start;
+    textArea.selectionEnd = end;
+    textArea.focus();
+    return {
+        x: Math.floor(rect[0].left - textArea.scrollLeft),
+        y: Math.floor(rect[0].top - textArea.scrollTop),
+    };
+}
+
+export function getViewportSize(win) {
+    const w = win || window;
+    if (w.innerWidth != null) {
+        return {w: w.innerWidth, h: w.innerHeight};
+    }
+    const {clientWidth, clientHeight} = w.document.body;
+    return {w: clientWidth, h: clientHeight};
+}
+
+export function offsetTopLeft(el) {
+    if (!(el instanceof HTMLElement)) {
+        return {top: 0, left: 0};
+    }
+    const rect = el.getBoundingClientRect();
+    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    return {top: rect.top + scrollTop, left: rect.left + scrollLeft};
+}
+
+export function getSuggestionBoxAlgn(textArea, pxToSubstract = 0, boxLocation = 'top') {
+    if (!textArea || !(textArea instanceof HTMLElement)) {
+        return {
+            pixelsToMoveX: 0,
+            pixelsToMoveY: 0,
+        };
+    }
+    const caretCoordinatesInTxtArea = getCaretXYCoordinate(textArea);
+    const caretXCoordinateInTxtArea = caretCoordinatesInTxtArea.x;
+    let caretYCoordinateInTxtArea = caretCoordinatesInTxtArea.y;
+    const viewportWidth = getViewportSize().w;
+
+    const suggestionBoxWidth = getSuggestionBoxWidth(textArea);
+
+    // value in pixels for the offsetLeft for the textArea
+    const txtAreaOffsetLft = offsetTopLeft(textArea).left;
+
+    // how many pixels to the right should be moved the suggestion box
+    let pxToTheRight = (caretXCoordinateInTxtArea) - (pxToSubstract);
+
+    // the x coordinate in the viewport of the suggestion box border-right
+    const xBoxRightCoordinate = caretXCoordinateInTxtArea + txtAreaOffsetLft + suggestionBoxWidth;
+
+    // if the right-border edge of the suggestion box will overflow the x-axis viewport
+    if (xBoxRightCoordinate > viewportWidth) {
+        // stick the suggestion list to the very right of the TextArea
+        pxToTheRight = textArea.offsetWidth - suggestionBoxWidth;
+    }
+    const txtAreaLineHeight = Number(getComputedStyle(textArea)?.lineHeight.replace('px', ''));
+    if (boxLocation === 'bottom') {
+        // Add the line height and 4 extra px so it looks less tight
+        caretYCoordinateInTxtArea += txtAreaLineHeight + 4;
+    }
+    return {
+        pixelsToMoveX: Math.max(0, Math.round(pxToTheRight)),
+
+        // if the suggestion box was invoked from the first line in the post box, stick to the top of the post box
+        pixelsToMoveY: Math.round(caretYCoordinateInTxtArea > txtAreaLineHeight ? caretYCoordinateInTxtArea : 0),
+    };
+}
+
+export function getSuggestionBoxWidth(textArea) {
+    if (textArea.id === 'edit_textbox') {
+        // when the sugeestion box is in the edit mode it will inhering the class .modal suggestion-list which has width: 100%
+        return textArea.offsetWidth;
+    }
+
+    // 496 - value in pixels used in suggestion-list__content class line 72 file _suggestion-list.scss
+
+    return Constants.SUGGESTION_LIST_MODAL_WIDTH;
+}
+
+export function getPxToSubstract(char = '@') {
+    // depending on the triggering character different values must be substracted
+    if (char === '@') {
+    // mention name padding-left 2.4rem as stated in suggestion-list__content .mentions__name
+        const mentionNamePaddingLft = convertEmToPixels(document.documentElement, Constants.MENTION_NAME_PADDING_LEFT);
+
+        // half of width of avatar stated in .Avatar.Avatar-sm (24px)
+        const avatarWidth = Constants.AVATAR_WIDTH * 0.5;
+        return 5 + avatarWidth + mentionNamePaddingLft;
+    } else if (char === '~') {
+        return 39;
+    } else if (char === ':') {
+        return 32;
+    }
+    return 0;
+}
+
 export function setSelectionRange(input, selectionStart, selectionEnd) {
     if (input.setSelectionRange) {
         input.focus();
@@ -1107,19 +1231,29 @@ export function scrollbarWidth(el) {
 }
 
 export function isValidUsername(name) {
-    var error = '';
+    let error;
     if (!name) {
-        error = 'This field is required';
+        error = {
+            id: ValidationErrors.USERNAME_REQUIRED,
+        };
     } else if (name.length < Constants.MIN_USERNAME_LENGTH || name.length > Constants.MAX_USERNAME_LENGTH) {
-        error = 'Must be between ' + Constants.MIN_USERNAME_LENGTH + ' and ' + Constants.MAX_USERNAME_LENGTH + ' characters';
+        error = {
+            id: ValidationErrors.INVALID_LENGTH,
+        };
     } else if (!(/^[a-z0-9.\-_]+$/).test(name)) {
-        error = "Username must contain only letters, numbers, and the symbols '.', '-', and '_'.";
+        error = {
+            id: ValidationErrors.INVALID_CHARACTERS,
+        };
     } else if (!(/[a-z]/).test(name.charAt(0))) { //eslint-disable-line no-negated-condition
-        error = 'First character must be a letter.';
+        error = {
+            id: ValidationErrors.INVALID_FIRST_CHARACTER,
+        };
     } else {
-        for (var i = 0; i < Constants.RESERVED_USERNAMES.length; i++) {
-            if (name === Constants.RESERVED_USERNAMES[i]) {
-                error = 'Cannot use a reserved word as a username.';
+        for (const reserved of Constants.RESERVED_USERNAMES) {
+            if (name === reserved) {
+                error = {
+                    id: ValidationErrors.RESERVED_NAME,
+                };
                 break;
             }
         }
@@ -1135,7 +1269,9 @@ export function isValidBotUsername(name) {
     }
 
     if (name.endsWith('.')) {
-        error = "Username must not end with '.' symbol.";
+        error = {
+            id: ValidationErrors.INVALID_LAST_CHARACTER,
+        };
     }
 
     return error;
@@ -1399,16 +1535,25 @@ export function imageURLForTeam(team) {
 // Converts a file size in bytes into a human-readable string of the form '123MB'.
 export function fileSizeToString(bytes) {
     // it's unlikely that we'll have files bigger than this
-    if (bytes > 1024 * 1024 * 1024 * 1024) {
-        return Math.floor(bytes / (1024 * 1024 * 1024 * 1024)) + 'TB';
-    } else if (bytes > 1024 * 1024 * 1024) {
-        return Math.floor(bytes / (1024 * 1024 * 1024)) + 'GB';
-    } else if (bytes > 1024 * 1024) {
-        return Math.floor(bytes / (1024 * 1024)) + 'MB';
+    if (bytes > 1024 ** 4) {
+        // check if file is smaller than 10 to display fractions
+        if (bytes < (1024 ** 4) * 10) {
+            return (Math.round((bytes / (1024 ** 4)) * 10) / 10) + 'TB';
+        }
+        return Math.round(bytes / (1024 ** 4)) + 'TB';
+    } else if (bytes > 1024 ** 3) {
+        if (bytes < (1024 ** 3) * 10) {
+            return (Math.round((bytes / (1024 ** 3)) * 10) / 10) + 'GB';
+        }
+        return Math.round(bytes / (1024 ** 3)) + 'GB';
+    } else if (bytes > 1024 ** 2) {
+        if (bytes < (1024 ** 2) * 10) {
+            return (Math.round((bytes / (1024 ** 2)) * 10) / 10) + 'MB';
+        }
+        return Math.round(bytes / (1024 ** 2)) + 'MB';
     } else if (bytes > 1024) {
-        return Math.floor(bytes / 1024) + 'KB';
+        return Math.round(bytes / 1024) + 'KB';
     }
-
     return bytes + 'B';
 }
 
@@ -1468,11 +1613,11 @@ export function importSlack(teamId, file, success, error) {
 }
 
 export function windowWidth() {
-    return $(window).width();
+    return window.innerWidth;
 }
 
 export function windowHeight() {
-    return $(window).height();
+    return window.innerHeight;
 }
 
 // Should be refactored, seems to make most sense to wrap TextboxLinks in a connect(). To discuss
@@ -1623,7 +1768,27 @@ export function isValidPassword(password, passwordConfig) {
     return {valid, error};
 }
 
-export function handleFormattedTextClick(e, currentRelativeTeamUrl) {
+export function isChannelOrPermalink(link) {
+    let match = (/\/([^/]+)\/channels\/(\S+)/).exec(link);
+    if (match) {
+        return {
+            type: 'channel',
+            teamName: match[1],
+            channelName: match[2],
+        };
+    }
+    match = (/\/([^/]+)\/pl\/(\w+)/).exec(link);
+    if (match) {
+        return {
+            type: 'permalink',
+            teamName: match[1],
+            postId: match[2],
+        };
+    }
+    return match;
+}
+
+export async function handleFormattedTextClick(e, currentRelativeTeamUrl) {
     const hashtagAttribute = e.target.getAttributeNode('data-hashtag');
     const linkAttribute = e.target.getAttributeNode('data-link');
     const channelMentionAttribute = e.target.getAttributeNode('data-channel-mention');
@@ -1637,6 +1802,72 @@ export function handleFormattedTextClick(e, currentRelativeTeamUrl) {
 
         if (!(e.button === MIDDLE_MOUSE_BUTTON || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey)) {
             e.preventDefault();
+
+            const state = store.getState();
+            const user = getCurrentUser(state);
+            if (isSystemAdmin(user.roles)) {
+                const match = isChannelOrPermalink(linkAttribute.value);
+                if (match) {
+                    // Get team by name
+                    const {teamName} = match;
+                    let team = getTeamByName(state, teamName);
+                    if (!team) {
+                        const {data: teamData} = await store.dispatch(getTeamByNameAction(teamName));
+                        team = teamData;
+                    }
+                    if (team && team.delete_at === 0) {
+                        let channel;
+
+                        // Handle channel url - Get channel data from channel name
+                        if (match.type === 'channel') {
+                            const {channelName} = match;
+                            channel = getChannelsNameMapInTeam(state, team.id)[channelName];
+                            if (!channel) {
+                                const {data: channelData} = await store.dispatch(getChannelByNameAndTeamName(teamName, channelName, true));
+                                channel = channelData;
+                            }
+                        } else { // Handle permalink - Get channel data from post
+                            const {postId} = match;
+                            let post = getPost(state, postId);
+                            if (!post) {
+                                const {data: postData} = await store.dispatch(getPostAction(match.postId));
+                                post = postData;
+                            }
+                            if (post) {
+                                channel = getChannel(state, post.channel_id);
+                                if (!channel) {
+                                    const {data: channelData} = await store.dispatch(getChannelAction(post.channel_id));
+                                    channel = channelData;
+                                }
+                            }
+                        }
+                        if (channel && channel.type === Constants.PRIVATE_CHANNEL) {
+                            let member = getMyChannelMemberships(state)[channel.id];
+                            if (!member) {
+                                const membership = await store.dispatch(getChannelMember(channel.id, getCurrentUserId(state)));
+                                if ('data' in membership) {
+                                    member = membership.data;
+                                }
+                            }
+                            if (!member) {
+                                const {data} = await store.dispatch(joinPrivateChannelPrompt(team, channel, false));
+                                if (data.join) {
+                                    let error = false;
+                                    if (!getTeamMemberships(state)[team.id]) {
+                                        const joinTeamResult = await store.dispatch(addUserToTeam(team.id, user.id));
+                                        error = joinTeamResult.error;
+                                    }
+                                    if (!error) {
+                                        await store.dispatch(joinChannel(user.id, team.id, channel.id, channel.name));
+                                    }
+                                } else {
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
             browserHistory.push(linkAttribute.value);
         }
@@ -1672,9 +1903,16 @@ export function removePrefixFromLocalStorage(prefix) {
 }
 
 export function copyToClipboard(data) {
+    // Attempt to use the newer clipboard API when possible
+    const clipboard = navigator.clipboard;
+    if (clipboard) {
+        clipboard.writeText(data);
+        return;
+    }
+
     // creates a tiny temporary text area to copy text out of
     // see https://stackoverflow.com/a/30810322/591374 for details
-    var textArea = document.createElement('textarea');
+    const textArea = document.createElement('textarea');
     textArea.style.position = 'fixed';
     textArea.style.top = 0;
     textArea.style.left = 0;
@@ -1807,4 +2045,206 @@ export function getSortedUsers(reactions, currentUserId, profiles, teammateNameD
     }
 
     return {currentUserReacted, users};
+}
+
+const BOLD_MD = '**';
+const ITALIC_MD = '*';
+
+/**
+ * Applies bold/italic/link markdown on textbox associated with event and returns
+ * modified text alongwith modified selection positions.
+ */
+export function applyHotkeyMarkdown(e) {
+    e.preventDefault();
+
+    if (e.keyCode === Constants.KeyCodes.B[1] || e.keyCode === Constants.KeyCodes.I[1]) {
+        return applyBoldItalicMarkdown(e);
+    } else if (e.keyCode === Constants.KeyCodes.K[1]) {
+        return applyLinkMarkdown(e);
+    }
+
+    throw Error('Unsupported key code: ' + e.keyCode);
+}
+
+function applyBoldItalicMarkdown(e) {
+    const el = e.target;
+    const {selectionEnd, selectionStart, value} = el;
+
+    // <prefix> <selection> <suffix>
+    const prefix = value.substring(0, selectionStart);
+    const selection = value.substring(selectionStart, selectionEnd);
+    const suffix = value.substring(selectionEnd);
+
+    // Is it italic hot key on existing bold markdown? i.e. italic on **haha**
+    let isItalicFollowedByBold = false;
+    let delimiter = '';
+
+    if (e.keyCode === Constants.KeyCodes.B[1]) {
+        delimiter = BOLD_MD;
+    } else if (e.keyCode === Constants.KeyCodes.I[1]) {
+        delimiter = ITALIC_MD;
+        isItalicFollowedByBold = prefix.endsWith(BOLD_MD) && suffix.startsWith(BOLD_MD);
+    }
+
+    // Does the selection have current hotkey's markdown?
+    const hasCurrentMarkdown = prefix.endsWith(delimiter) && suffix.startsWith(delimiter);
+
+    // Does current selection have both of the markdown around it? i.e. ***haha***
+    const hasItalicAndBold = prefix.endsWith(BOLD_MD + ITALIC_MD) && suffix.startsWith(BOLD_MD + ITALIC_MD);
+
+    let newValue = '';
+    let newStart = 0;
+    let newEnd = 0;
+    if (hasItalicAndBold || (hasCurrentMarkdown && !isItalicFollowedByBold)) {
+        // message already has the markdown; remove it
+        newValue = prefix.substring(0, prefix.length - delimiter.length) + selection + suffix.substring(delimiter.length);
+        newStart = selectionStart - delimiter.length;
+        newEnd = selectionEnd - delimiter.length;
+    } else {
+        // Add italic or bold markdown
+        newValue = prefix + delimiter + selection + delimiter + suffix;
+        newStart = selectionStart + delimiter.length;
+        newEnd = selectionEnd + delimiter.length;
+    }
+
+    return {
+        message: newValue,
+        selectionStart: newStart,
+        selectionEnd: newEnd,
+    };
+}
+
+function applyLinkMarkdown(e) {
+    const el = e.target;
+    const {selectionEnd, selectionStart, value} = el;
+
+    // <prefix> <selection> <suffix>
+    const prefix = value.substring(0, selectionStart);
+    const selection = value.substring(selectionStart, selectionEnd);
+    const suffix = value.substring(selectionEnd);
+
+    const delimiterStart = '[';
+    const delimiterEnd = '](url)';
+
+    // Does the selection have link markdown?
+    const hasMarkdown = prefix.endsWith(delimiterStart) && suffix.startsWith(delimiterEnd);
+
+    let newValue = '';
+    let newStart = 0;
+    let newEnd = 0;
+
+    // When url is to be selected in [...](url), selection cursors need to shift by this much.
+    const urlShift = delimiterStart.length + 2; // ']'.length + ']('.length
+    if (hasMarkdown) {
+        // message already has the markdown; remove it
+        newValue = prefix.substring(0, prefix.length - delimiterStart.length) + selection + suffix.substring(delimiterEnd.length);
+        newStart = selectionStart - delimiterStart.length;
+        newEnd = selectionEnd - delimiterStart.length;
+    } else if (value.length === 0) {
+        // no input; Add [|](url)
+        newValue = delimiterStart + delimiterEnd;
+        newStart = delimiterStart.length;
+        newEnd = delimiterStart.length;
+    } else if (selectionStart < selectionEnd) {
+        // there is something selected; put markdown around it and preserve selection
+        newValue = prefix + delimiterStart + selection + delimiterEnd + suffix;
+        newStart = selectionEnd + urlShift;
+        newEnd = newStart + urlShift;
+    } else {
+        // nothing is selected
+        const spaceBefore = prefix.charAt(prefix.length - 1) === ' ';
+        const spaceAfter = suffix.charAt(0) === ' ';
+        const cursorBeforeWord = ((selectionStart !== 0 && spaceBefore && !spaceAfter) ||
+                                  (selectionStart === 0 && !spaceAfter));
+        const cursorAfterWord = ((selectionEnd !== value.length && spaceAfter && !spaceBefore) ||
+                                 (selectionEnd === value.length && !spaceBefore));
+
+        if (cursorBeforeWord) {
+            // cursor before a word
+            const word = value.substring(selectionStart, findWordEnd(value, selectionStart));
+
+            newValue = prefix + delimiterStart + word + delimiterEnd + suffix.substring(word.length);
+            newStart = selectionStart + word.length + urlShift;
+            newEnd = newStart + urlShift;
+        } else if (cursorAfterWord) {
+            // cursor after a word
+            const cursorAtEndOfLine = (selectionStart === selectionEnd && selectionEnd === value.length);
+            if (cursorAtEndOfLine) {
+                // cursor at end of line
+                newValue = value + ' ' + delimiterStart + delimiterEnd;
+                newStart = selectionEnd + 1 + delimiterStart.length;
+                newEnd = newStart;
+            } else {
+                // cursor not at end of line
+                const word = value.substring(findWordStart(value, selectionStart), selectionStart);
+
+                newValue = prefix.substring(0, prefix.length - word.length) + delimiterStart + word + delimiterEnd + suffix;
+                newStart = selectionStart + urlShift;
+                newEnd = newStart + urlShift;
+            }
+        } else {
+            // cursor is in between a word
+            const wordStart = findWordStart(value, selectionStart);
+            const wordEnd = findWordEnd(value, selectionStart);
+            const word = value.substring(wordStart, wordEnd);
+
+            newValue = prefix.substring(0, wordStart) + delimiterStart + word + delimiterEnd + value.substring(wordEnd);
+            newStart = wordEnd + urlShift;
+            newEnd = newStart + urlShift;
+        }
+    }
+
+    return {
+        message: newValue,
+        selectionStart: newStart,
+        selectionEnd: newEnd,
+    };
+}
+
+function findWordEnd(text, start) {
+    const wordEnd = text.indexOf(' ', start);
+    return wordEnd === -1 ? text.length : wordEnd;
+}
+
+function findWordStart(text, start) {
+    const wordStart = text.lastIndexOf(' ', start - 1) + 1;
+    return wordStart === -1 ? 0 : wordStart;
+}
+
+/**
+ * Adjust selection to correct text when there is Italic markdown (_) around selected text.
+ */
+export function adjustSelection(inputBox, e) {
+    const el = e.target;
+    const {selectionEnd, selectionStart, value} = el;
+
+    if (selectionStart === selectionEnd) {
+        // nothing selected.
+        return;
+    }
+
+    e.preventDefault();
+
+    const firstUnderscore = value.charAt(selectionStart) === '_';
+    const lastUnderscore = value.charAt(selectionEnd - 1) === '_';
+
+    const spaceBefore = value.charAt(selectionStart - 1) === ' ';
+    const spaceAfter = value.charAt(selectionEnd) === ' ';
+
+    if (firstUnderscore && lastUnderscore && (spaceBefore || spaceAfter)) {
+        setSelectionRange(inputBox, selectionStart + 1, selectionEnd - 1);
+    }
+}
+
+export function getNextBillingDate() {
+    const nextBillingDate = moment().add(1, 'months').startOf('month');
+    return nextBillingDate.format('MMM D, YYYY');
+}
+
+export function stringToNumber(s) {
+    if (!s) {
+        return 0;
+    }
+
+    return parseInt(s, 10);
 }

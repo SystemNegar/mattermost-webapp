@@ -16,7 +16,7 @@ type Props = {
     idMessage: string;
 };
 
-export default class CopyText extends React.PureComponent<Props, {}> {
+export default class CopyText extends React.PureComponent<Props> {
     public static defaultProps = {
         defaultMessage: 'Copy',
         idMessage: 'integrations.copy',
@@ -49,6 +49,7 @@ export default class CopyText extends React.PureComponent<Props, {}> {
             >
                 <a
                     href='#'
+                    data-testid='copyText'
                     className='fa fa-copy ml-2'
                     onClick={this.copyText}
                 />

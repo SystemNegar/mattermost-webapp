@@ -4,9 +4,10 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {FormattedMessage, FormattedHTMLMessage, injectIntl} from 'react-intl';
+import {FormattedMessage, injectIntl} from 'react-intl';
 import {Overlay, Tooltip} from 'react-bootstrap';
 
+import FormattedMarkdownMessage from 'components/formatted_markdown_message';
 import {generateId} from 'utils/utils.jsx';
 import {intlShape} from 'utils/react_intl';
 import Constants from 'utils/constants';
@@ -28,6 +29,8 @@ export class PermissionDescription extends React.PureComponent {
         this.state = {
             open: false,
         };
+
+        this.contentRef = React.createRef();
     }
 
     closeTooltip = () => {
@@ -57,7 +60,7 @@ export class PermissionDescription extends React.PureComponent {
         if (inherited) {
             content = (
                 <span className='inherit-link-wrapper'>
-                    <FormattedHTMLMessage
+                    <FormattedMarkdownMessage
                         id='admin.permissions.inherited_from'
                         values={{
                             name: this.props.intl.formatMessage({
@@ -81,7 +84,7 @@ export class PermissionDescription extends React.PureComponent {
                 show={this.state.open}
                 delayShow={Constants.OVERLAY_TIME_DELAY}
                 placement='top'
-                target={this.refs.content}
+                target={this.contentRef.current}
             >
                 <Tooltip id={this.id}>
                     {content}
@@ -95,7 +98,7 @@ export class PermissionDescription extends React.PureComponent {
             <span
                 className='permission-description'
                 onClick={this.parentPermissionClicked}
-                ref='content'
+                ref={this.contentRef}
                 onMouseOver={this.openTooltip}
                 onMouseOut={this.closeTooltip}
             >

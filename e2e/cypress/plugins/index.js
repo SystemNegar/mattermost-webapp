@@ -9,14 +9,17 @@ const {
     dbGetUserSession,
     dbUpdateUserSession,
 } = require('./db_request');
+const clientRequest = require('./client_request');
 const externalRequest = require('./external_request');
 const fileExist = require('./file_exist');
 const getRecentEmail = require('./get_recent_email');
+const keycloakRequest = require('./keycloak_request');
 const oktaRequest = require('./okta_request');
 const postBotMessage = require('./post_bot_message');
 const postIncomingWebhook = require('./post_incoming_webhook');
 const postMessageAs = require('./post_message_as');
 const urlHealthCheck = require('./url_health_check');
+const reactToMessageAs = require('./react_to_message_as');
 
 const log = (message) => {
     console.log(message);
@@ -25,6 +28,7 @@ const log = (message) => {
 
 module.exports = (on, config) => {
     on('task', {
+        clientRequest,
         dbGetActiveUserSessions,
         dbGetUser,
         dbGetUserSession,
@@ -32,12 +36,14 @@ module.exports = (on, config) => {
         externalRequest,
         fileExist,
         getRecentEmail,
+        keycloakRequest,
         log,
         oktaRequest,
         postBotMessage,
         postIncomingWebhook,
         postMessageAs,
         urlHealthCheck,
+        reactToMessageAs,
     });
 
     on('before:browser:launch', (browser = {}, launchOptions) => {

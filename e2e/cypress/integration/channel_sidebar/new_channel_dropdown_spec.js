@@ -11,16 +11,9 @@
 // Group: @channel_sidebar
 
 import * as TIMEOUTS from '../../fixtures/timeouts';
-import {testWithConfig} from '../../support/hooks';
 import {getRandomId} from '../../utils';
 
 describe('Channel sidebar', () => {
-    testWithConfig({
-        ServiceSettings: {
-            ExperimentalChannelSidebarOrganization: 'default_on',
-        },
-    });
-
     before(() => {
         // # Login as test user and visit town-square
         cy.apiInitSetup({loginAfter: true}).then(({team}) => {

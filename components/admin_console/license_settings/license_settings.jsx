@@ -7,14 +7,17 @@ import React from 'react';
 import {FormattedDate, FormattedTime, FormattedMessage} from 'react-intl';
 
 import * as Utils from 'utils/utils.jsx';
+import {isLicenseExpired, isLicenseExpiring} from 'utils/license_utils.jsx';
 import {format} from 'utils/markdown';
 
 import * as AdminActions from 'actions/admin_actions.jsx';
-import {trackEvent} from 'actions/diagnostics_actions';
+import {trackEvent} from 'actions/telemetry_actions';
 
 import FormattedMarkdownMessage from 'components/formatted_markdown_message.jsx';
 import FormattedAdminHeader from 'components/widgets/admin_console/formatted_admin_header';
 import LoadingWrapper from 'components/widgets/loading/loading_wrapper';
+
+import RenewLinkCard from './renew_license_card/renew_license_card';
 
 export default class LicenseSettings extends React.PureComponent {
     static propTypes = {
@@ -53,6 +56,8 @@ export default class LicenseSettings extends React.PureComponent {
             restarting: false,
             restartError: null,
         };
+
+        this.fileInputRef = React.createRef();
     }
 
     componentDidMount() {
@@ -88,7 +93,7 @@ export default class LicenseSettings extends React.PureComponent {
     }
 
     handleChange = () => {
-        const element = this.refs.fileInput;
+        const element = this.fileInputRef.current;
         if (element && element.files.length > 0) {
             this.setState({fileSelected: true, fileName: element.files[0].name});
         }
@@ -97,7 +102,7 @@ export default class LicenseSettings extends React.PureComponent {
     handleSubmit = async (e) => {
         e.preventDefault();
 
-        const element = this.refs.fileInput;
+        const element = this.fileInputRef.current;
         if (!element || element.files.length === 0) {
             return;
         }
@@ -220,6 +225,7 @@ export default class LicenseSettings extends React.PureComponent {
                         <div>
                             <p>
                                 <button
+                                    type='button'
                                     onClick={this.handleUpgrade}
                                     className='btn btn-primary'
                                 >
@@ -240,6 +246,12 @@ export default class LicenseSettings extends React.PureComponent {
                                     </LoadingWrapper>
                                 </button>
                             </p>
+                            <p className='upgrade-legal-terms'>
+                                <FormattedMarkdownMessage
+                                    id='admin.license.enterprise.upgrade.accept-terms'
+                                    defaultMessage='By clicking **Upgrade to Enterprise Edition**, I agree to the terms of the Mattermost Enterprise Edition License.'
+                                />
+                            </p>
                             {this.state.upgradeError &&
                                 <div className='col-sm-12'>
                                     <div className='form-group has-error'>
@@ -259,6 +271,7 @@ export default class LicenseSettings extends React.PureComponent {
                             </p>
                             <p>
                                 <button
+                                    type='button'
                                     onClick={this.handleRestart}
                                     className='btn btn-primary'
                                 >
@@ -326,6 +339,7 @@ export default class LicenseSettings extends React.PureComponent {
                         href='https://about.mattermost.com/enterprise-edition-terms/'
                     >{'Enterprise Edition Terms of Service'}</a>{' and '}
                     <a
+                        data-testid='privacyPolicyLink'
                         rel='noopener noreferrer'
                         target='_blank'
                         href='https://about.mattermost.com/default-privacy-policy/'
@@ -340,6 +354,7 @@ export default class LicenseSettings extends React.PureComponent {
                     {'Mattermost Enterprise Edition. A license is required to unlock enterprise features.'}
                     <p className='trial'>
                         <button
+                            type='button'
                             className='btn btn-primary'
                             onClick={this.requestLicense}
                             disabled={isDisabled}
@@ -393,6 +408,7 @@ export default class LicenseSettings extends React.PureComponent {
                             className='form-horizontal'
                             role='form'
                         >
+                            {this.renewLicenseCard()}
                             <div className='form-group'>
                                 <label
                                     className='control-label col-sm-4'
@@ -462,10 +478,12 @@ export default class LicenseSettings extends React.PureComponent {
                 </label>
                 <div className='col-sm-8'>
                     <button
+                        type='button'
                         className='btn btn-danger'
                         onClick={this.handleRemove}
                         disabled={this.props.isDisabled}
                         id='remove-button'
+                        data-testid='remove-button'
                     >
                         {removeButtonText}
                     </button>
@@ -528,14 +546,17 @@ export default class LicenseSettings extends React.PureComponent {
                 </label>
                 <div className='col-sm-8'>
                     <div className='file__upload'>
-                        <button className='btn btn-primary'>
+                        <button
+                            type='button'
+                            className='btn btn-primary'
+                        >
                             <FormattedMessage
                                 id='admin.license.choose'
                                 defaultMessage='Choose File'
                             />
                         </button>
                         <input
-                            ref='fileInput'
+                            ref={this.fileInputRef}
                             type='file'
                             accept='.mattermost-license'
                             onChange={this.handleChange}
@@ -587,6 +608,19 @@ export default class LicenseSettings extends React.PureComponent {
                 </div>
             </>
         );
+    }
+
+    renewLicenseCard = () => {
+        if (isLicenseExpired(this.props.license) || isLicenseExpiring(this.props.license)) {
+            return (
+                <RenewLinkCard
+                    license={this.props.license}
+                    isLicenseExpired={isLicenseExpired(this.props.license)}
+                    totalUsers={this.props.stats.TOTAL_USERS}
+                />
+            );
+        }
+        return null;
     }
 }
 /* eslint-enable react/no-string-refs */

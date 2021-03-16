@@ -6,14 +6,13 @@ import React from 'react';
 import {injectIntl} from 'react-intl';
 import {Permissions} from 'mattermost-redux/constants';
 
-import * as GlobalActions from 'actions/global_actions.jsx';
+import * as GlobalActions from 'actions/global_actions';
 import {Constants, ModalIdentifiers} from 'utils/constants';
 import {intlShape} from 'utils/react_intl';
 import {cmdOrCtrlPressed, isKeyPressed} from 'utils/utils';
 import {useSafeUrl} from 'utils/url';
 import * as UserAgent from 'utils/user_agent';
 import InvitationModal from 'components/invitation_modal';
-import UserLimitModal from 'components/user_limit_modal';
 
 import TeamPermissionGate from 'components/permissions_gates/team_permission_gate';
 import SystemPermissionGate from 'components/permissions_gates/system_permission_gate';
@@ -31,12 +30,13 @@ import MarketplaceModal from 'components/plugin_marketplace';
 import Menu from 'components/widgets/menu/menu';
 import TeamGroupsManageModal from 'components/team_groups_manage_modal';
 
+import withGetCloudSubscription from '../common/hocs/cloud/with_get_cloud_subcription';
+
 class MainMenu extends React.PureComponent {
     static propTypes = {
         mobile: PropTypes.bool.isRequired,
         id: PropTypes.string,
         teamId: PropTypes.string,
-        teamType: PropTypes.string,
         teamName: PropTypes.string,
         siteName: PropTypes.string,
         currentUser: PropTypes.object,
@@ -49,8 +49,6 @@ class MainMenu extends React.PureComponent {
         canManageSystemBots: PropTypes.bool.isRequired,
         canCreateOrDeleteCustomEmoji: PropTypes.bool.isRequired,
         canManageIntegrations: PropTypes.bool.isRequired,
-        enableUserCreation: PropTypes.bool.isRequired,
-        enableEmailInvitations: PropTypes.bool.isRequired,
         enablePluginMarketplace: PropTypes.bool.isRequired,
         experimentalPrimaryTeam: PropTypes.string,
         helpLink: PropTypes.string,
@@ -60,11 +58,11 @@ class MainMenu extends React.PureComponent {
         isMentionSearch: PropTypes.bool,
         teamIsGroupConstrained: PropTypes.bool.isRequired,
         isLicensedForLDAPGroups: PropTypes.bool,
-        currentUsers: PropTypes.number,
-        userLimit: PropTypes.string,
-        userIsAdmin: PropTypes.bool,
         showGettingStarted: PropTypes.bool.isRequired,
         intl: intlShape.isRequired,
+        showNextStepsTips: PropTypes.bool,
+        isCloud: PropTypes.bool,
+        subscriptionStats: PropTypes.object,
         actions: PropTypes.shape({
             openModal: PropTypes.func.isRequred,
             showMentions: PropTypes.func,
@@ -72,6 +70,7 @@ class MainMenu extends React.PureComponent {
             closeRightHandSide: PropTypes.func.isRequired,
             closeRhsMenu: PropTypes.func.isRequired,
             unhideNextSteps: PropTypes.func.isRequired,
+            getSubscriptionStats: PropTypes.func.isRequired,
         }).isRequired,
     };
 
@@ -86,7 +85,7 @@ class MainMenu extends React.PureComponent {
         GlobalActions.toggleShortcutsModal();
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         document.addEventListener('keydown', this.handleKeyDown);
     }
 
@@ -122,7 +121,12 @@ class MainMenu extends React.PureComponent {
     }
 
     shouldShowUpgradeModal = () => {
-        return (this.props.currentUsers >= this.props.userLimit) && (this.props.userLimit !== '0') && this.props.userIsAdmin;
+        const {subscriptionStats, isCloud} = this.props;
+
+        if (subscriptionStats?.is_paid_tier === 'true') { // eslint-disable-line camelcase
+            return false;
+        }
+        return isCloud && subscriptionStats?.remaining_seats <= 0;
     }
 
     render() {
@@ -158,23 +162,6 @@ class MainMenu extends React.PureComponent {
                 id='invitePeople'
                 modalId={ModalIdentifiers.INVITATION}
                 dialogType={InvitationModal}
-                text={formatMessage({
-                    id: 'navbar_dropdown.invitePeople',
-                    defaultMessage: 'Invite People',
-                })}
-                extraText={formatMessage({
-                    id: 'navbar_dropdown.invitePeopleExtraText',
-                    defaultMessage: 'Add or invite people to the team',
-                })}
-                icon={this.props.mobile && <i className='fa fa-user-plus'/>}
-            />
-        );
-
-        const upgradeCloudModal = (
-            <Menu.ItemToggleModalRedux
-                id='invitePeople'
-                modalId={ModalIdentifiers.UPGRADE_CLOUD_ACCOUNT}
-                dialogType={UserLimitModal}
                 text={formatMessage({
                     id: 'navbar_dropdown.invitePeople',
                     defaultMessage: 'Invite People',
@@ -236,7 +223,7 @@ class MainMenu extends React.PureComponent {
                         teamId={this.props.teamId}
                         permissions={[Permissions.ADD_USER_TO_TEAM, Permissions.INVITE_GUEST]}
                     >
-                        {this.shouldShowUpgradeModal() ? upgradeCloudModal : invitePeopleModal}
+                        {invitePeopleModal}
                     </TeamPermissionGate>
                 </Menu.Group>
                 <Menu.Group>
@@ -371,7 +358,7 @@ class MainMenu extends React.PureComponent {
                         id='gettingStarted'
                         show={this.props.showGettingStarted}
                         onClick={() => this.props.actions.unhideNextSteps()}
-                        text={formatMessage({id: 'navbar_dropdown.gettingStarted', defaultMessage: 'Getting Started'})}
+                        text={formatMessage({id: this.props.showNextStepsTips ? 'sidebar_next_steps.tipsAndNextSteps' : 'navbar_dropdown.gettingStarted', defaultMessage: this.props.showNextStepsTips ? 'Tips & Next Steps' : 'Getting Started'})}
                     />
                     <Menu.ItemAction
                         id='keyboardShortcuts'
@@ -414,4 +401,4 @@ class MainMenu extends React.PureComponent {
     }
 }
 
-export default injectIntl(MainMenu);
+export default injectIntl(withGetCloudSubscription((MainMenu)));

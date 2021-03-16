@@ -88,7 +88,6 @@ exports[`components/admin_console/SchemaAdminSettings should match snapshot with
               <FormattedMessage
                 defaultMessage="false"
                 id="admin.false"
-                values={Object {}}
               />
             }
             helpText={
@@ -107,7 +106,6 @@ exports[`components/admin_console/SchemaAdminSettings should match snapshot with
               <FormattedMessage
                 defaultMessage="true"
                 id="admin.true"
-                values={Object {}}
               />
             }
             value={false}
@@ -196,7 +194,6 @@ exports[`components/admin_console/SchemaAdminSettings should match snapshot with
               <FormattedMessage
                 defaultMessage="Regenerate"
                 id="admin.regenerate"
-                values={Object {}}
               />
             }
             setByEnv={false}
@@ -265,7 +262,6 @@ exports[`components/admin_console/SchemaAdminSettings should match snapshot with
                 <FormattedMessage
                   defaultMessage="Setting Eight"
                   id="label-h"
-                  values={Object {}}
                 />
               </span>
             </div>
@@ -335,36 +331,46 @@ exports[`components/admin_console/SchemaAdminSettings should match snapshot with
                 },
                 Object {
                   "order": 9,
+                  "text": "Svenska (Beta)",
+                  "value": "sv",
+                },
+                Object {
+                  "order": 10,
                   "text": "Türkçe",
                   "value": "tr",
                 },
                 Object {
-                  "order": 10,
+                  "order": 11,
+                  "text": "Български (Beta)",
+                  "value": "bg",
+                },
+                Object {
+                  "order": 12,
                   "text": "Pусский",
                   "value": "ru",
                 },
                 Object {
-                  "order": 11,
+                  "order": 13,
                   "text": "Yкраїнська (Alpha)",
                   "value": "uk",
                 },
                 Object {
-                  "order": 12,
+                  "order": 14,
                   "text": "한국어 (Alpha)",
                   "value": "ko",
                 },
                 Object {
-                  "order": 13,
+                  "order": 15,
                   "text": "中文 (简体)",
                   "value": "zh-CN",
                 },
                 Object {
-                  "order": 14,
+                  "order": 16,
                   "text": "中文 (繁體)",
                   "value": "zh-TW",
                 },
                 Object {
-                  "order": 15,
+                  "order": 17,
                   "text": "日本語",
                   "value": "ja",
                 },
@@ -392,14 +398,6 @@ exports[`components/admin_console/SchemaAdminSettings should match snapshot with
               <FormattedMessage
                 defaultMessage="No result"
                 id="no-result-j"
-                values={Object {}}
-              />
-            }
-            notPresent={
-              <FormattedMessage
-                defaultMessage="No present"
-                id="no-present-j"
-                values={Object {}}
               />
             }
             onChange={[Function]}
@@ -454,36 +452,46 @@ exports[`components/admin_console/SchemaAdminSettings should match snapshot with
                 },
                 Object {
                   "order": 9,
+                  "text": "Svenska (Beta)",
+                  "value": "sv",
+                },
+                Object {
+                  "order": 10,
                   "text": "Türkçe",
                   "value": "tr",
                 },
                 Object {
-                  "order": 10,
+                  "order": 11,
+                  "text": "Български (Beta)",
+                  "value": "bg",
+                },
+                Object {
+                  "order": 12,
                   "text": "Pусский",
                   "value": "ru",
                 },
                 Object {
-                  "order": 11,
+                  "order": 13,
                   "text": "Yкраїнська (Alpha)",
                   "value": "uk",
                 },
                 Object {
-                  "order": 12,
+                  "order": 14,
                   "text": "한국어 (Alpha)",
                   "value": "ko",
                 },
                 Object {
-                  "order": 13,
+                  "order": 15,
                   "text": "中文 (简体)",
                   "value": "zh-CN",
                 },
                 Object {
-                  "order": 14,
+                  "order": 16,
                   "text": "中文 (繁體)",
                   "value": "zh-TW",
                 },
                 Object {
-                  "order": 15,
+                  "order": 17,
                   "text": "日本語",
                   "value": "ja",
                 },
@@ -534,7 +542,6 @@ exports[`components/admin_console/SchemaAdminSettings should match snapshot with
               <FormattedMessage
                 defaultMessage="false"
                 id="admin.false"
-                values={Object {}}
               />
             }
             helpText={
@@ -553,7 +560,6 @@ exports[`components/admin_console/SchemaAdminSettings should match snapshot with
               <FormattedMessage
                 defaultMessage="true"
                 id="admin.true"
-                values={Object {}}
               />
             }
             value={true}
@@ -613,7 +619,6 @@ exports[`components/admin_console/SchemaAdminSettings should match snapshot with
               <FormattedMessage
                 defaultMessage="Setting Twelve"
                 id="label-l"
-                values={Object {}}
               />
             }
             createJobHelpText={
@@ -633,7 +638,6 @@ exports[`components/admin_console/SchemaAdminSettings should match snapshot with
               <FormattedMessage
                 defaultMessage="false"
                 id="admin.false"
-                values={Object {}}
               />
             }
             helpText={
@@ -652,7 +656,6 @@ exports[`components/admin_console/SchemaAdminSettings should match snapshot with
               <FormattedMessage
                 defaultMessage="true"
                 id="admin.true"
-                values={Object {}}
               />
             }
             value={false}
@@ -663,7 +666,6 @@ exports[`components/admin_console/SchemaAdminSettings should match snapshot with
               <FormattedMessage
                 defaultMessage="false"
                 id="admin.false"
-                values={Object {}}
               />
             }
             helpText={
@@ -682,7 +684,6 @@ exports[`components/admin_console/SchemaAdminSettings should match snapshot with
               <FormattedMessage
                 defaultMessage="true"
                 id="admin.true"
-                values={Object {}}
               />
             }
             value={true}
@@ -700,7 +701,6 @@ exports[`components/admin_console/SchemaAdminSettings should match snapshot with
         <FormattedMessage
           defaultMessage="Save"
           id="save_button.save"
-          values={Object {}}
         />
       }
       disabled={true}
@@ -732,6 +732,7 @@ exports[`components/admin_console/SchemaAdminSettings should match snapshot with
       placement="top"
       rootClose={false}
       show={false}
+      target={null}
     >
       <Tooltip
         bsClass="tooltip"

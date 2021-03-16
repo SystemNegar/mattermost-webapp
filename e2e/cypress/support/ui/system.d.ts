@@ -15,7 +15,7 @@
 // ***************************************************************
 
 declare namespace Cypress {
-    interface Chainable<Subject = any> {
+    interface Chainable {
 
         /**
          * Verify license exists via admin console.
@@ -24,5 +24,21 @@ declare namespace Cypress {
          *   cy.uiCheckLicenseExists();
          */
         uiCheckLicenseExists(): Chainable;
+
+        /**
+         * Reset system scheme permissions via System Console
+         *
+         * @example
+         *   cy.uiResetPermissionsToDefault();
+         */
+        uiResetPermissionsToDefault(): Chainable;
+
+        /**
+         * Save settings located in System Console
+         *
+         * @example
+         *   cy.uiSaveConfig();
+         */
+        uiSaveConfig(): Chainable;
     }
 }

@@ -75,7 +75,7 @@ export default class FeatureDiscovery extends React.PureComponent<Props, State> 
             copyID,
             copyDefault,
             learnMoreURL,
-            imgPath
+            imgPath,
         } = this.props;
 
         let gettingTrialError: React.ReactNode = '';
@@ -109,6 +109,7 @@ export default class FeatureDiscovery extends React.PureComponent<Props, State> 
                         />
                     </div>
                     <button
+                        type='button'
                         className='btn btn-primary'
                         data-testid='featureDiscovery_primaryCallToAction'
                         onClick={this.requestLicense}

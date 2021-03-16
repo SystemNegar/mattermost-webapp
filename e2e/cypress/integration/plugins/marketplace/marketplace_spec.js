@@ -7,23 +7,28 @@
 // - Use element ID when selecting an element. Create one if none.
 // ***************************************************************
 
-// Group: @plugin_marketplace @plugin
+// Group: @not_cloud @plugin_marketplace @plugin
 
 import * as TIMEOUTS from '../../../fixtures/timeouts';
 
 describe('Plugin Marketplace', () => {
     let townsquareLink;
+    let pluginManagementPage;
     let regularUser;
 
     before(() => {
+        cy.shouldNotRunOnCloudEdition();
+        cy.shouldHavePluginUploadEnabled();
+
         cy.apiInitSetup().then(({team, user}) => {
             regularUser = user;
             townsquareLink = `/${team.name}/channels/town-square`;
+            pluginManagementPage = '/admin_console/plugins/plugin_management';
         });
     });
 
     describe('should not render in main menu', () => {
-        it('for non-admin', () => {
+        it('MM-T1952 Plugin Marketplace is not available to normal users', () => {
             // # Login as sysadmin
             cy.apiAdminLogin();
 
@@ -41,13 +46,14 @@ describe('Plugin Marketplace', () => {
             cy.visit(townsquareLink);
 
             // * Verify Plugin Marketplace does not exist
-            verifyPluginMarketplaceDoesNotExist();
+            verifyPluginMarketplaceVisibility(false);
         });
 
-        it('when marketplace disabled', () => {
+        it('MM-T1957 Marketplace is not available when "Enable Marketplace" is set to false', () => {
             // # Login as sysadmin
             cy.apiAdminLogin();
 
+            // # Enable Plugins
             // # Disable Plugin Marketplace
             cy.apiUpdateConfig({
                 PluginSettings: {
@@ -61,14 +67,14 @@ describe('Plugin Marketplace', () => {
             cy.visit(townsquareLink);
 
             // * Verify Plugin Marketplace does not exist
-            verifyPluginMarketplaceDoesNotExist();
+            verifyPluginMarketplaceVisibility(false);
         });
 
-        it('when plugins disabled', () => {
+        it('MM-T1959 Marketplace is not available when "Enable Plugins" is false', () => {
             // # Login as sysadmin
             cy.apiAdminLogin();
 
-            // # Disable Plugin
+            // # Disable Plugins
             // # Enable Plugin Marketplace
             cy.apiUpdateConfig({
                 PluginSettings: {
@@ -82,7 +88,57 @@ describe('Plugin Marketplace', () => {
             cy.visit(townsquareLink);
 
             // * Verify Plugin Marketplace does not exist
-            verifyPluginMarketplaceDoesNotExist();
+            verifyPluginMarketplaceVisibility(false);
+        });
+    });
+
+    describe('should render in main menu', () => {
+        it('MM-T1960 Marketplace is available when "Enable Plugins" is true', () => {
+            // # Login as sysadmin
+            cy.apiAdminLogin();
+
+            // # Disable Plugins
+            // # Enable Plugin Marketplace
+            cy.apiUpdateConfig({
+                PluginSettings: {
+                    Enable: false,
+                    EnableMarketplace: true,
+                    MarketplaceUrl: 'https://api.integrations.mattermost.com',
+                },
+            });
+            cy.visit(pluginManagementPage);
+
+            cy.wait(TIMEOUTS.HALF_SEC).get('input[data-testid="enablefalse"]').should('be.checked');
+            cy.get('input[data-testid="enabletrue"]').check();
+            cy.get('#saveSetting').click();
+
+            // Verify that the Plugin Marketplace is available
+            cy.visit(townsquareLink);
+            verifyPluginMarketplaceVisibility(true);
+        });
+
+        it('MM-T1958 Marketplace is available when "Enable Marketplace" is set to true', () => {
+            // # Login as sysadmin
+            cy.apiAdminLogin();
+
+            // # Enable Plugins
+            // # Disable Plugin Marketplace
+            cy.apiUpdateConfig({
+                PluginSettings: {
+                    Enable: true,
+                    EnableMarketplace: false,
+                    MarketplaceUrl: 'https://api.integrations.mattermost.com',
+                },
+            });
+            cy.visit(pluginManagementPage);
+
+            cy.wait(TIMEOUTS.HALF_SEC).get('input[data-testid="enableMarketplacefalse"]').should('be.checked');
+            cy.get('input[data-testid="enableMarketplacetrue"]').check();
+            cy.get('#saveSetting').click();
+
+            // Verify that the Plugin Marketplace is available
+            cy.visit(townsquareLink);
+            verifyPluginMarketplaceVisibility(true);
         });
     });
 
@@ -119,7 +175,7 @@ describe('Plugin Marketplace', () => {
             });
         });
 
-        it('render an error bar', () => {
+        it('MM-T1966 render an error bar', () => {
             // * Verify should be an error connecting to the marketplace server
             cy.get('#error_bar').contains('Error connecting to the marketplace server');
         });
@@ -208,13 +264,30 @@ describe('Plugin Marketplace', () => {
             cy.get('#marketplaceTabs-tab-allPlugins').scrollIntoView().should('be.visible');
 
             // * Verify installed plugins tabs button should be visible
-            cy.get('#marketplaceTabs-tab-installed').scrollIntoView().should('be.visible');
+            cy.uiCloseAnnouncementBar().then(() => {
+                cy.get('#marketplaceTabs-tab-installed').scrollIntoView().should('be.visible');
+            });
 
             // * Verify modal list is visible
             cy.get('.more-modal__list').scrollIntoView().should('be.visible');
         });
 
-        it('autofocus on search plugin input box', () => {
+        it('MM-T2001 autofocus on search plugin input box', () => {
+            cy.uiCloseAnnouncementBar().then(() => {
+                cy.findByLabelText('Close').click();
+            });
+
+            cy.get('#lhsHeader').should('be.visible').within(() => {
+                // # Click hamburger main menu
+                cy.findByLabelText('main menu').click();
+
+                // * Verify dropdown menu should be visible
+                cy.get('.dropdown-menu').should('be.visible').within(() => {
+                    // * Plugin Marketplace button should be visible then click
+                    cy.findByText('Plugin Marketplace').should('be.visible').click();
+                });
+            });
+
             // * Verify search plugins should be focused
             cy.findByPlaceholderText('Search Plugins').scrollIntoView().should('be.focused');
         });
@@ -230,7 +303,9 @@ describe('Plugin Marketplace', () => {
         // this test uses exist, not visible, due to issues with Cypress
         it('render the list of installed plugins on demand', () => {
             // # Click on installed plugins tab
-            cy.get('#marketplaceTabs-tab-installed').scrollIntoView().should('be.visible').click();
+            cy.uiCloseAnnouncementBar().then(() => {
+                cy.get('#marketplaceTabs-tab-installed').scrollIntoView().should('be.visible').click();
+            });
 
             // * Verify all plugins tab should not be active
             cy.get('#marketplaceTabs-pane-allPlugins').should('not.exist');
@@ -349,7 +424,7 @@ describe('Plugin Marketplace', () => {
         });
 
         // This tests fails, if any plugins are previously installed. See https://mattermost.atlassian.net/browse/MM-21610
-        it('change tab to "All Plugins" when "Install Plugins" link is clicked', () => {
+        it('MM-T1986 change tab to "All Plugins" when "Install Plugins" link is clicked', () => {
             cy.get('#marketplaceTabs').scrollIntoView().should('be.visible').within(() => {
                 // # Switch tab to installed plugin
                 cy.findByText(/Installed/).should('be.visible').click();
@@ -417,7 +492,7 @@ describe('Plugin Marketplace', () => {
             cy.get('#error_bar').should('not.exist');
         });
 
-        it('display installed plugins', () => {
+        it('MM-T1979 display installed plugins', () => {
             // # Install one plugin
             cy.apiInstallPluginFromUrl('https://github.com/mattermost/mattermost-plugin-github/releases/download/v0.7.0/github-0.7.0.tar.gz', true);
 
@@ -425,8 +500,10 @@ describe('Plugin Marketplace', () => {
             cy.get('#marketplace-plugin-github').scrollIntoView().should('be.visible');
 
             // * Verify one local plugin should be installed
-            cy.get('#marketplaceTabs-tab-installed').scrollIntoView().should('be.visible').click();
-            cy.get('#marketplaceTabs-pane-installed').find('.more-modal__row').should('have.length', 1);
+            cy.uiCloseAnnouncementBar().then(() => {
+                cy.get('#marketplaceTabs-tab-installed').scrollIntoView().should('be.visible').click();
+                cy.get('#marketplaceTabs-pane-installed').find('.more-modal__row').should('have.length', 1);
+            });
 
             // * Verify no error bar should be visible
             cy.get('#error_bar').should('not.exist');
@@ -435,22 +512,27 @@ describe('Plugin Marketplace', () => {
 });
 
 function uninstallAllPlugins() {
-    cy.apiGetAllPlugins().then((response) => {
-        const {active, inactive} = response.body;
+    cy.apiGetAllPlugins().then(({plugins}) => {
+        const {active, inactive} = plugins;
         inactive.forEach((plugin) => cy.apiRemovePluginById(plugin.id));
         active.forEach((plugin) => cy.apiRemovePluginById(plugin.id));
     });
 }
 
-function verifyPluginMarketplaceDoesNotExist() {
+function verifyPluginMarketplaceVisibility(shouldBeVisible) {
     cy.wait(TIMEOUTS.HALF_SEC).get('#lhsHeader').should('be.visible').within(() => {
         // # Click hamburger main menu
         cy.get('#sidebarHeaderDropdownButton').click();
 
         // * Verify dropdown menu should be visible
         cy.get('.dropdown-menu').should('be.visible').within(() => {
-            // * Verify Plugin Marketplace button should not exist
-            cy.findByText('Plugin Marketplace').should('not.exist');
+            if (shouldBeVisible) {
+                // * Verify Plugin Marketplace button should exist
+                cy.findByText('Plugin Marketplace').should('exist');
+            } else {
+                // * Verify Plugin Marketplace button should not exist
+                cy.findByText('Plugin Marketplace').should('not.exist');
+            }
         });
     });
 }

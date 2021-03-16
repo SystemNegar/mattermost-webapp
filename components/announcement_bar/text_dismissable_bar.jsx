@@ -4,8 +4,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {trackEvent} from 'actions/diagnostics_actions.jsx';
+import {trackEvent} from 'actions/telemetry_actions.jsx';
 import Markdown from 'components/markdown';
+
+import alertIcon from 'images/icons/round-white-info-icon.svg';
 
 import AnnouncementBar from './default_announcement_bar';
 
@@ -61,13 +63,19 @@ export default class TextDismissableBar extends React.PureComponent {
                 showCloseButton={allowDismissal}
                 handleClose={this.handleDismiss}
                 message={
-                    <Markdown
-                        message={text}
-                        options={{
-                            singleline: true,
-                            mentionHighlight: false,
-                        }}
-                    />
+                    <>
+                        <img
+                            className='advisor-icon'
+                            src={alertIcon}
+                        />
+                        <Markdown
+                            message={text}
+                            options={{
+                                singleline: true,
+                                mentionHighlight: false,
+                            }}
+                        />
+                    </>
                 }
             />
         );

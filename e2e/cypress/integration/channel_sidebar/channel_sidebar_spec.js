@@ -11,22 +11,25 @@
 // Group: @channel_sidebar
 
 import * as TIMEOUTS from '../../fixtures/timeouts';
-import {testWithConfig} from '../../support/hooks';
 import {getAdminAccount} from '../../support/env';
 import {getRandomId} from '../../utils';
 
-describe('Channel sidebar', () => {
-    testWithConfig({
-        ServiceSettings: {
-            ExperimentalChannelSidebarOrganization: 'default_on',
-        },
-    });
+function verifyChannelSwitch(displayName, url) {
+    cy.get('#channelHeaderTitle', {timeout: TIMEOUTS.HALF_MIN}).should('be.visible').should('contain', displayName);
+    cy.url().should('include', url);
+}
 
+describe('Channel sidebar', () => {
     const sysadmin = getAdminAccount();
+    let testTeam;
+    let testUser;
 
     before(() => {
         // # Login as test user and visit town-square
-        cy.apiInitSetup({loginAfter: true}).then(({team}) => {
+        cy.apiInitSetup({loginAfter: true}).then(({team, user}) => {
+            testTeam = team;
+            testUser = user;
+
             cy.visit(`/${team.name}/channels/town-square`);
         });
     });
@@ -66,10 +69,7 @@ describe('Channel sidebar', () => {
         cy.get('.SidebarChannel:not(.unread):contains(Town Square)').should('be.visible');
 
         // # Have another user post in the Off Topic channel
-        cy.apiGetChannelByName(teamName, 'off-topic').then((response) => {
-            expect(response.status).to.equal(200);
-
-            const channel = response.body;
+        cy.apiGetChannelByName(teamName, 'off-topic').then(({channel}) => {
             cy.postMessageAs({sender: sysadmin, message: 'Test', channelId: channel.id});
         });
 
@@ -103,7 +103,7 @@ describe('Channel sidebar', () => {
         cy.get('.SidebarChannel:contains(Off-Topic)').should('not.exist');
     });
 
-    it('MM-23239 should remove channel from sidebar after deleting it', () => {
+    it('MM-T1684 should remove channel from sidebar after deleting it', () => {
         // # Start with a new team
         const teamName = `team-${getRandomId()}`;
         cy.createNewTeam(teamName, teamName);
@@ -117,7 +117,7 @@ describe('Channel sidebar', () => {
         // # Wait for the channel to change
         cy.get('#channelHeaderTitle', {timeout: TIMEOUTS.HALF_MIN}).should('be.visible').should('contain', 'Off-Topic');
 
-        // # Click on the channel menu and select Leave Channel
+        // # Click on the channel menu and select Archive Channel
         cy.get('#channelHeaderTitle').click();
         cy.get('#channelArchiveChannel').should('be.visible').click();
         cy.get('#deleteChannelModalDeleteButton').should('be.visible').click();
@@ -129,8 +129,20 @@ describe('Channel sidebar', () => {
         cy.get('.SidebarChannel:contains(Off-Topic)').should('not.exist');
     });
 
-    function verifyChannelSwitch(displayName, url) {
-        cy.get('#channelHeaderTitle', {timeout: TIMEOUTS.HALF_MIN}).should('be.visible').should('contain', displayName);
-        cy.url().should('include', url);
-    }
+    it('MM-T3351 Channels created from another instance should immediately appear in the sidebar', () => {
+        // # Go to Town Square on the test team
+        cy.visit(`/${testTeam.name}/channels/town-square`);
+
+        // * Verify that we've switched to the new team
+        cy.get('#headerTeamName').should('be.visible').should('contain', testTeam.display_name);
+
+        // # Create a new channel
+        cy.apiCreateChannel(testTeam.id, `channel-${getRandomId()}`, 'New Test Channel').then(({channel}) => {
+            // # Add the user to the channel
+            cy.apiAddUserToChannel(channel.id, testUser.id).then(() => {
+                // * Verify that new channel appears in the sidebar;
+                cy.get(`#sidebarItem_${channel.name}`).should('be.visible');
+            });
+        });
+    });
 });

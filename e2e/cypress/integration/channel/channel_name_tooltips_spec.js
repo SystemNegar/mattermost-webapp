@@ -8,16 +8,14 @@
 // ***************************************************************
 
 // Stage: @prod
-// Group: @channel
+// Group: @channel @not_cloud
 
 import * as TIMEOUTS from '../../fixtures/timeouts';
 
 const timestamp = Date.now();
 
-function verifyChannel(res, verifyExistence = true) {
-    const channel = res.body;
-
-    // # Wait for Channel to be c
+function verifyChannel(channel, verifyExistence = true) {
+    // # Wait for Channel to be created
     cy.wait(TIMEOUTS.HALF_SEC);
 
     // # Hover on the channel name
@@ -42,6 +40,15 @@ describe('channel name tooltips', () => {
     let testTeam;
 
     before(() => {
+        cy.shouldNotRunOnCloudEdition();
+
+        // # Update config
+        cy.apiUpdateConfig({
+            ServiceSettings: {
+                EnableLegacySidebar: true,
+            },
+        });
+
         // # Login as new user and visit town-square
         cy.apiInitSetup().then(({team, user}) => {
             testTeam = team;
@@ -63,8 +70,8 @@ describe('channel name tooltips', () => {
             testTeam.id,
             'channel-test',
             `Public channel with a long name-${timestamp}`,
-        ).then((res) => {
-            verifyChannel(res);
+        ).then(({channel}) => {
+            verifyChannel(channel);
         });
     });
 
@@ -75,8 +82,8 @@ describe('channel name tooltips', () => {
             'channel-test',
             `Private channel with a long name-${timestamp}`,
             'P',
-        ).then((res) => {
-            verifyChannel(res);
+        ).then(({channel}) => {
+            verifyChannel(channel);
         });
     });
 
@@ -86,8 +93,8 @@ describe('channel name tooltips', () => {
             testTeam.id,
             'channel-test',
             'Public channel',
-        ).then((res) => {
-            verifyChannel(res, false);
+        ).then(({channel}) => {
+            verifyChannel(channel, false);
         });
     });
 
@@ -98,14 +105,14 @@ describe('channel name tooltips', () => {
             'channel-test',
             'Private channel',
             'P',
-        ).then((res) => {
-            verifyChannel(res, false);
+        ).then(({channel}) => {
+            verifyChannel(channel, false);
         });
     });
 
     it('Should show tooltip on hover - user with a long username', () => {
         // # Open a DM with the user
-        cy.get('#addDirectChannel').should('be.visible').click();
+        cy.findByRole('button', {name: 'write a direct message'}).click();
         cy.focused().as('searchBox').type(longUser.username, {force: true});
 
         // * Verify that the user is selected in the results list before typing enter

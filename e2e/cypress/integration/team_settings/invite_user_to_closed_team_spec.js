@@ -7,6 +7,7 @@
 // - Use element ID when selecting an element. Create one if none.
 // ***************************************************************
 
+// Stage: @prod
 // Group: @team_settings
 
 import {getRandomId} from '../../utils';
@@ -18,8 +19,8 @@ describe('Team Settings', () => {
 
     before(() => {
         // # If the instance the test is running on is licensed, assign true to isLicensed variable
-        cy.apiGetClientLicense().then(({license}) => {
-            isLicensed = license.IsLicensed === 'true';
+        cy.apiGetClientLicense().then((data) => {
+            ({isLicensed} = data);
         });
 
         cy.apiInitSetup().then(({team}) => {
